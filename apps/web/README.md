@@ -30,41 +30,7 @@ The application allows photographers to share and discover **"Camera Recipes"**�
 - **Testing**: [Jest](https://jestjs.io/) & React Testing Library
 - **Linting**: ESLint
 - **EXIF Detection**: [Express.js](https://expressjs.com)
-## 🚀 Getting Started
-
-Follow these steps to set up the project locally.
-
-### Prerequisites
-
-- Node.js (v18 or higher)
-- npm, yarn, pnpm, or bun
-
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone [https://github.com/ExelAlfanso/Rensa.git](https://github.com/ExelAlfanso/Rensa.git)
-   cd Rensa
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   # or
-   yarn install
-3. Run the development server
-   ```bash
-   npm run dev
-   ```
-4. Open your browser Navigate to http://localhost:3000 to see the application running.
-
-## 🧪 Running Tests
-Ensure the application is working correctly by running the test suite.
-   ```bash
-
-   npm run test
-   # or to watch for changes
-   npm run test:watch
-   ```
+- 
 ### 🤝 Contributing
 Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are greatly appreciated.
 
