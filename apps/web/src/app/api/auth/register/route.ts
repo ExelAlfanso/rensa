@@ -1,5 +1,6 @@
 import { connectDB } from "@/lib/mongodb";
 import { registerLimiter } from "@/lib/rateLimiter";
+import Roll from "@/models/Roll";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
@@ -49,7 +50,13 @@ export async function POST(req: Request) {
       );
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({ username, email, password: hashedPassword });
+    const defaultRoll = new Roll({
+      userId: user._id,
+      name: "All Photos",
+      description: "This is your default roll.",
+    });
     await user.save();
+    await defaultRoll.save();
 
     return NextResponse.json(
       { message: "User registered successfully" },

@@ -36,6 +36,7 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
       },
+
       async authorize(credentials) {
         await connectDB();
         const user = await User.findOne({ email: credentials?.email });
@@ -77,9 +78,6 @@ export const authOptions: NextAuthOptions = {
     updateAge: 24 * 60 * 60, // rotate token only once every 24 hours
   },
   callbacks: {
-    async redirect() {
-      return "/explore";
-    },
     async jwt({ token, account, user }) {
       // console.log("JWT callback:", { token });
       if (account) {
@@ -109,8 +107,5 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
-  },
-  pages: {
-    signIn: "/auth/login",
   },
 };

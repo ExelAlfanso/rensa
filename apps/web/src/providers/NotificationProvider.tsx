@@ -34,8 +34,6 @@ export function NotificationProvider({
   const reconnectAttempts = useRef(0);
   const reconnectTimeout = useRef<NodeJS.Timeout | null>(null);
   const connectWebSocket = () => {
-    if (!accessToken) return;
-
     const WS_URL =
       process.env.NEXT_PUBLIC_ENVIRONMENT === "DEVELOPMENT"
         ? "ws://localhost:4000/api/ws"
@@ -64,8 +62,6 @@ export function NotificationProvider({
     ws.onclose = () => {
       console.log("❌ WebSocket disconnected");
 
-      if (!accessToken) return; // user logout, stop reconnecting
-
       const delay = Math.min(1000 * 2 ** reconnectAttempts.current, 30000); // exponential backoff
       reconnectAttempts.current += 1;
       console.log(`🔄 Reconnecting in ${delay / 1000}s...`);
@@ -81,6 +77,8 @@ export function NotificationProvider({
     if (!accessToken) {
       console.log("No token, skipping WebSocket");
       return;
+    } else {
+      console.log("Token found, connecting WebSocket" + accessToken);
     }
 
     connectWebSocket();
