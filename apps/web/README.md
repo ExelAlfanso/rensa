@@ -24,13 +24,12 @@ The application allows photographers to share and discover **"Camera Recipes"**�
 
 ## 🛠️ Tech Stack
 
-- **Framework**: [Next.js](https://nextjs.org/) (App Router)
+- **Framework**: Next.js, Elysia.js, and FastAPI
 - **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Styling**: Tailwind CSS, Phosphor Icons, Daisy UI
 - **Testing**: [Jest](https://jestjs.io/) & React Testing Library
 - **Linting**: ESLint
-- **EXIF Detection**: [Express.js](https://expressjs.com)
-- 
+
 ### 🤝 Contributing
 Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are greatly appreciated.
 
