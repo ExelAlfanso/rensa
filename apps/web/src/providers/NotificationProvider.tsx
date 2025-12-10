@@ -45,13 +45,13 @@ export function NotificationProvider({
     initialData: [],
   });
 
-  useEffect(() => {
-    if (notifications.length > 0) {
-      console.log("✅ Notifications fetched:", notifications);
-    } else {
-      console.log("ℹ️ No notifications found.");
-    }
-  }, [notifications]);
+  // useEffect(() => {
+  //   if (notifications.length > 0) {
+  //     console.log("✅ Notifications fetched:", notifications);
+  //   } else {
+  //     console.log("ℹ️ No notifications found.");
+  //   }
+  // }, [notifications]);
   const connectWebSocket = () => {
     const WS_URL =
       process.env.NEXT_PUBLIC_ENVIRONMENT === "DEVELOPMENT"
@@ -61,20 +61,22 @@ export function NotificationProvider({
     wsRef.current = ws;
 
     ws.onopen = () => {
-      console.log("Connecting to WS at", WS_URL);
-      console.log("📡 WebSocket connected!");
+      // console.log("Connecting to WS at", WS_URL);
+      // console.log("📡 WebSocket connected!");
       reconnectAttempts.current = 0; // reset reconnect attempts
     };
 
     ws.onmessage = async (event) => {
-      console.log("📩 WS Message received:", event.data);
+      // console.log("📩 WS Message received:", event.data);
       try {
         const data = JSON.parse(event.data);
         queryClient.setQueryData<NotificationData[]>(
           ["notifications", user?.id],
-          (oldNotifications = []) => [data, ...oldNotifications]
+          (oldNotifications = []) => {
+            const newList = [data, ...oldNotifications];
+            return newList.slice(0, 10);
+          }
         );
-        0;
       } catch (err) {
         console.error("Invalid WS message:", err);
       }
@@ -83,11 +85,11 @@ export function NotificationProvider({
     ws.onerror = (err) => console.error("WS Error:", err);
 
     ws.onclose = () => {
-      console.log("❌ WebSocket disconnected");
+      // console.log("❌ WebSocket disconnected");
 
       const delay = Math.min(1000 * 2 ** reconnectAttempts.current, 30000); // exponential backoff
       reconnectAttempts.current += 1;
-      console.log(`🔄 Reconnecting in ${delay / 1000}s...`);
+      // console.log(`🔄 Reconnecting in ${delay / 1000}s...`);
 
       if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current);
 
@@ -98,11 +100,12 @@ export function NotificationProvider({
   };
   useEffect(() => {
     if (!user?.id || !accessToken) {
-      console.log("No token, skipping WebSocket");
+      // console.log("No token, skipping WebSocket");
       return;
-    } else {
-      console.log("Token found, connecting WebSocket" + accessToken);
     }
+    // else {
+    //   console.log("Token found, connecting WebSocket" + accessToken);
+    // }
 
     connectWebSocket();
 

@@ -5,7 +5,7 @@ export async function fetchNotifications(
   page = 1,
   limit = 10
 ) {
-  console.log("Fetching notifications for recipientId:", recipientId);
+  // console.log("Fetching notifications for recipientId:", recipientId);
   const res = await elysiaApi.get(
     `/notifications?recipientId=${recipientId}&page=${page}&limit=${limit}`
   );
@@ -16,7 +16,7 @@ export async function sendPhotoSavedNotification(
   actorId: string,
   photoId: string // roll / photo / profile
 ) {
-  console.log("Sending photo saved notification...");
+  // console.log("Sending photo saved notification...");
   const recipientId = await fetchPhotoOwnerByPhotoId(photoId);
   console.log(
     "actorId:",
