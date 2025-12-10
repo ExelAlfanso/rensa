@@ -3,6 +3,7 @@ import { registerLimiter } from "@/lib/rateLimiter";
 import Roll from "@/models/Roll";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
+import { startSession } from "mongoose";
 import { NextResponse } from "next/server";
 
 /*
@@ -55,8 +56,18 @@ export async function POST(req: Request) {
       name: "All Photos",
       description: "This is your default roll.",
     });
-    await user.save();
-    await defaultRoll.save();
+    const session = await startSession();
+    session.startTransaction();
+    try {
+      await user.save({ session });
+      await defaultRoll.save({ session });
+      await session.commitTransaction();
+    } catch (err) {
+      await session.abortTransaction();
+      throw err;
+    } finally {
+      session.endSession();
+    }
 
     return NextResponse.json(
       { message: "User registered successfully" },

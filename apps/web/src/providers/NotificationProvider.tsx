@@ -3,7 +3,14 @@
 import { fetchNotifications } from "@/services/NotificationServices";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { createContext, useContext, useEffect, useRef } from "react";
+import { access } from "fs";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+} from "react";
 
 interface NotificationData {
   id: string;
@@ -41,35 +48,33 @@ export function NotificationProvider({
   const { data: notifications = [], refetch } = useQuery<NotificationData[]>({
     queryKey: ["notifications", user?.id],
     queryFn: () => fetchNotifications(user!.id),
-    enabled: !!accessToken,
+    enabled: !!accessToken && !!user?.id,
     initialData: [],
   });
 
-  // useEffect(() => {
-  //   if (notifications.length > 0) {
-  //     console.log("✅ Notifications fetched:", notifications);
-  //   } else {
-  //     console.log("ℹ️ No notifications found.");
-  //   }
-  // }, [notifications]);
-  const connectWebSocket = () => {
+  const connectWebSocket = useCallback(() => {
     const WS_URL =
       process.env.NEXT_PUBLIC_ENVIRONMENT === "DEVELOPMENT"
         ? "ws://localhost:4000/api/ws"
         : process.env.NEXT_PUBLIC_ELYSIA_WS_URL;
+    if (!WS_URL) {
+      console.error("WebSocket URL is not configured");
+      return;
+    }
     const ws = new WebSocket(`${WS_URL}?token=${accessToken}`);
     wsRef.current = ws;
 
     ws.onopen = () => {
-      // console.log("Connecting to WS at", WS_URL);
-      // console.log("📡 WebSocket connected!");
-      reconnectAttempts.current = 0; // reset reconnect attempts
+      reconnectAttempts.current = 0;
     };
 
     ws.onmessage = async (event) => {
-      // console.log("📩 WS Message received:", event.data);
       try {
         const data = JSON.parse(event.data);
+        if (!data.id || !data.recipientId || !data.type) {
+          console.warn("Invalid notification data received:", data);
+          return;
+        }
         queryClient.setQueryData<NotificationData[]>(
           ["notifications", user?.id],
           (oldNotifications = []) => {
@@ -80,40 +85,32 @@ export function NotificationProvider({
       } catch (err) {
         console.error("Invalid WS message:", err);
       }
+
+      ws.onerror = (err) => console.error("WS Error:", err);
+
+      ws.onclose = () => {
+        const delay = Math.min(1000 * 2 ** reconnectAttempts.current, 30000); // exponential backoff
+        reconnectAttempts.current += 1;
+
+        if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current);
+
+        reconnectTimeout.current = setTimeout(() => {
+          connectWebSocket();
+        }, delay);
+      };
     };
-
-    ws.onerror = (err) => console.error("WS Error:", err);
-
-    ws.onclose = () => {
-      // console.log("❌ WebSocket disconnected");
-
-      const delay = Math.min(1000 * 2 ** reconnectAttempts.current, 30000); // exponential backoff
-      reconnectAttempts.current += 1;
-      // console.log(`🔄 Reconnecting in ${delay / 1000}s...`);
-
-      if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current);
-
-      reconnectTimeout.current = setTimeout(() => {
-        connectWebSocket();
-      }, delay);
-    };
-  };
+  }, [accessToken, queryClient, user?.id]);
   useEffect(() => {
     if (!user?.id || !accessToken) {
-      // console.log("No token, skipping WebSocket");
       return;
     }
-    // else {
-    //   console.log("Token found, connecting WebSocket" + accessToken);
-    // }
-
     connectWebSocket();
 
     return () => {
       if (wsRef.current) wsRef.current.close();
       if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current);
     };
-  }, [user?.id, accessToken]);
+  }, [user?.id, accessToken, connectWebSocket]);
 
   return (
     <NotificationContext.Provider

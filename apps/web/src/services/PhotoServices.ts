@@ -138,13 +138,23 @@ export async function fetchPhotosFromRoll(
 }
 
 export async function fetchPhotoOwnerByPhotoId(photoId: string) {
-  const res = await api.get<{ data: { ownerId: string } }>(
-    `/photos/${photoId}/owner`
-  );
-  return res.data.data.ownerId;
+  try {
+    const res = await api.get<{ data: { ownerId: string } }>(
+      `/photos/${photoId}/owner`
+    );
+    return res.data.data.ownerId;
+  } catch (error) {
+    console.error("Error fetching photo owner:", error);
+    throw error;
+  }
 }
 
 export async function fetchPhotoById(photoId: string) {
-  const res = await api.get(`/photos/${photoId}`);
-  return res.data.data;
+  try {
+    const res = await api.get(`/photos/${photoId}`);
+    return res.data.data;
+  } catch (error) {
+    console.error("Error fetching photo by ID:", error);
+    throw error;
+  }
 }

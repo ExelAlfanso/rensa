@@ -6,10 +6,10 @@ import Image from "next/image";
 import Text from "@/components/Text";
 import IconDropdown from "../IconDropdown";
 import DropdownItem from "../DropdownItem";
-import { useNotifications } from "@/hooks/useNotifications";
+import { useNotificationContext } from "@/providers/NotificationProvider";
 
 const NotificationDropdown = () => {
-  const { notifications } = useNotifications();
+  const { notifications } = useNotificationContext();
 
   return (
     <div className="relative z-50 w-full">

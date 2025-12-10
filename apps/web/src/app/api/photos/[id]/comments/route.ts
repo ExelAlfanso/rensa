@@ -1,5 +1,4 @@
 import Comment from "@/models/Comment";
-import User from "@/models/User"; //
 import { NextResponse } from "next/server";
 
 /*
@@ -58,7 +57,6 @@ export async function GET(
       .sort({ createdAt: 1 }) // older first ; OR -1 if you want newest first
       .skip(offset)
       .limit(limit);
-
     const total = await Comment.countDocuments({ photoId: id });
 
     return NextResponse.json(

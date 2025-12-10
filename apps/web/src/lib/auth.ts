@@ -61,7 +61,6 @@ export const authOptions: NextAuthOptions = {
           process.env.NEXTAUTH_SECRET!,
           { expiresIn: "7d" }
         );
-        console.log("accessToken:", accessToken);
         return {
           id: user._id.toString(),
           name: user.username,

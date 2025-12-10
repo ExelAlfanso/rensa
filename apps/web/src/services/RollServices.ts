@@ -39,9 +39,9 @@ export async function updateRollDetails(
 export async function fetchDefaultRoll({ queryKey }: { queryKey: string[] }) {
   const [, userId] = queryKey;
 
-  const res = await fetch(`/api/rolls/default?userId=${userId}`);
+  const res = await api.get(`/api/rolls/default`, {
+    params: { userId },
+  });
 
-  if (!res.ok) throw new Error("Failed to fetch default roll");
-
-  return res.json();
+  return res.data.data.roll;
 }

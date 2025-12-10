@@ -19,7 +19,7 @@ export async function GET(
     });
   } catch (error) {
     return NextResponse.json(
-      { success: false, message: "Failed to connect to database " + error },
+      { success: false, message: "Failed to fetch photo owner " },
       { status: 500 }
     );
   }

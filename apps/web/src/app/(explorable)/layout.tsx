@@ -1,6 +1,5 @@
 "use client";
 import ExploreNavBar from "@/components/navbar/ExploreNavBar";
-import NotificationWrapper from "@/components/NotificationProviderWrapper";
 
 export default function RootLayout({
   children,

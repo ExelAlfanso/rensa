@@ -7,10 +7,21 @@ export async function GET(
   context: { params: Promise<{ id: string }> }
 ) {
   const { id } = await context.params;
+  if (!/^[0-9a-fA-F]{24}$/.test(id)) {
+    return NextResponse.json(
+      { success: false, message: "Invalid photo ID format" },
+      { status: 400 }
+    );
+  }
   try {
     await connectDB();
-    console.log("photoId", id);
     const photo = await Photo.findById(id).lean();
+    if (!photo) {
+      return NextResponse.json(
+        { success: false, message: "Photo not found" },
+        { status: 404 }
+      );
+    }
     return NextResponse.json({
       success: true,
       message: "Successfully fetched photo.",

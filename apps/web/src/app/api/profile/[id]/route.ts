@@ -38,7 +38,7 @@ export async function GET(
     return NextResponse.json(
       {
         success: true,
-        message: "Sucessfully fetched user profile!",
+        message: "Successfully fetched user profile!",
         data: {
           user,
           rolls: rollsWithPreviews,
