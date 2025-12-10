@@ -4,7 +4,8 @@ import { connectDB } from "./mongodb";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import GoogleProvider from "next-auth/providers/google";
-import NextAuth, { DefaultSession, DefaultUser } from "next-auth";
+import { DefaultSession, DefaultUser } from "next-auth";
+import jwt from "jsonwebtoken";
 
 declare module "next-auth" {
   interface Session {
@@ -17,6 +18,7 @@ declare module "next-auth" {
 
   interface User extends DefaultUser {
     id: string;
+    accessToken?: string;
   }
 }
 
@@ -34,6 +36,7 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "text" },
         password: { label: "Password", type: "password" },
       },
+
       async authorize(credentials) {
         await connectDB();
         const user = await User.findOne({ email: credentials?.email });
@@ -50,10 +53,19 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid password");
         }
         console.log("✅ User authenticated:", user.email);
+        const accessToken = jwt.sign(
+          {
+            id: user._id.toString(),
+            email: user.email,
+          },
+          process.env.NEXTAUTH_SECRET!,
+          { expiresIn: "7d" }
+        );
         return {
           id: user._id.toString(),
           name: user.username,
           email: user.email,
+          accessToken,
         };
       },
     }),
@@ -65,13 +77,14 @@ export const authOptions: NextAuthOptions = {
     updateAge: 24 * 60 * 60, // rotate token only once every 24 hours
   },
   callbacks: {
-    async redirect() {
-      return "/explore";
-    },
     async jwt({ token, account, user }) {
+      // console.log("JWT callback:", { token });
       if (account) {
         token.accessToken = account.access_token;
         token.provider = account.provider;
+      }
+      if (user?.accessToken) {
+        token.accessToken = user.accessToken;
       }
       if (user) {
         token.id = user.id;
@@ -89,12 +102,9 @@ export const authOptions: NextAuthOptions = {
           email: token.email,
           provider: token.provider,
         };
-        session.accessToken = token.accessToken as string | undefined;
+        session.accessToken = token.accessToken as string;
       }
       return session;
     },
-  },
-  pages: {
-    signIn: "/auth/login",
   },
 };

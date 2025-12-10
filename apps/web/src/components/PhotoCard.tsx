@@ -97,7 +97,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
                       }
                     }}
                     disabled={!selectedRoll || isLoading}
-                    className={`w-[32px] h-[32px] flex items-center justify-center rounded-full cursor-pointer transition-colors duration-200 text-black hover:bg-white-700
+                    className={`pointer-events-auto z-20 w-[32px] h-[32px] flex items-center justify-center rounded-full cursor-pointer transition-colors duration-200 text-black hover:bg-white-700
               ${
                 isSaved
                   ? "bg-black border-black text-white"

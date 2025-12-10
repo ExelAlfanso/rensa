@@ -1,5 +1,4 @@
 import mongoose, { model, Schema, Types } from "mongoose";
-
 export interface RollDocument extends Document {
   _id: string;
   userId: Types.ObjectId;

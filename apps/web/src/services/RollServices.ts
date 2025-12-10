@@ -1,10 +1,16 @@
 import { api } from "@/lib/axios";
+import { sendPhotoSavedNotification } from "./NotificationServices";
 
 export function fetchRollById(rollId: string) {
   return api.get(`/rolls/${rollId}`);
 }
 
-export async function addPhotoToRoll(rollId: string, photoId: string) {
+export async function addPhotoToRoll(
+  actorId: string,
+  rollId: string,
+  photoId: string
+) {
+  await sendPhotoSavedNotification(actorId, photoId);
   return api.post(`/rolls/${rollId}/photos/${photoId}`, {
     rollIds: [rollId],
     photoId,
@@ -30,12 +36,8 @@ export async function updateRollDetails(
   return api.patch(`/rolls/${rollId}`, { name, description });
 }
 
-export async function fetchDefaultRoll({ queryKey }: any) {
-  const [, userId] = queryKey;
+export async function fetchDefaultRoll() {
+  const res = await api.get(`/rolls/default`);
 
-  const res = await fetch(`/api/rolls/default?userId=${userId}`);
-
-  if (!res.ok) throw new Error("Failed to fetch default roll");
-
-  return res.json();
+  return res.data;
 }
