@@ -23,7 +23,7 @@ export function usePhotoRoll(photoId: string | null) {
   // Fetch DEFAULT ROLL
   // -----------------------
   const { data: defaultRoll } = useQuery({
-    queryKey: user?.id ? ["defaultRoll", user.id] : ["defaultRoll"],
+    queryKey: ["defaultRoll"],
     queryFn: fetchDefaultRoll,
     enabled: !!user?.id,
     select: (res) => res.data, // res.data.data → changed based on your API structure

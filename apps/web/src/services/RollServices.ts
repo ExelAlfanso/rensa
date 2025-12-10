@@ -36,12 +36,8 @@ export async function updateRollDetails(
   return api.patch(`/rolls/${rollId}`, { name, description });
 }
 
-export async function fetchDefaultRoll({ queryKey }: { queryKey: string[] }) {
-  const [, userId] = queryKey;
+export async function fetchDefaultRoll() {
+  const res = await api.get(`/rolls/default`);
 
-  const res = await api.get(`/api/rolls/default`, {
-    params: { userId },
-  });
-
-  return res.data.data.roll;
+  return res.data;
 }
