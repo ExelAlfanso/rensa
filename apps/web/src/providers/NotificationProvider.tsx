@@ -1,24 +1,29 @@
 "use client";
 
+import { fetchNotifications } from "@/services/NotificationServices";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { createContext, useContext, useEffect, useRef } from "react";
 
 interface NotificationData {
   id: string;
-  href: string;
-  user: {
-    userid: string;
-    src: string;
+  recipientId: string;
+  actorId: {
+    id: string;
     username: string;
+    avatar: string;
   };
+  photoId: string;
   type: string;
   message: string;
   createdAt?: string;
+  updatedAt?: string;
 }
 
 interface NotificationContextType {
   notifications: NotificationData[];
   clearNotifications: () => void;
+  refetch: () => void;
 }
 
 const NotificationContext = createContext<NotificationContextType | null>(null);
@@ -28,11 +33,25 @@ export function NotificationProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const [notifications, setNotifications] = useState<NotificationData[]>([]);
   const wsRef = useRef<WebSocket | null>(null);
-  const { accessToken } = useAuthStore();
+  const { user, accessToken } = useAuthStore();
+  const queryClient = useQueryClient();
   const reconnectAttempts = useRef(0);
   const reconnectTimeout = useRef<NodeJS.Timeout | null>(null);
+  const { data: notifications = [], refetch } = useQuery<NotificationData[]>({
+    queryKey: ["notifications", user?.id],
+    queryFn: () => fetchNotifications(user!.id),
+    enabled: !!accessToken,
+    initialData: [],
+  });
+
+  useEffect(() => {
+    if (notifications.length > 0) {
+      console.log("✅ Notifications fetched:", notifications);
+    } else {
+      console.log("ℹ️ No notifications found.");
+    }
+  }, [notifications]);
   const connectWebSocket = () => {
     const WS_URL =
       process.env.NEXT_PUBLIC_ENVIRONMENT === "DEVELOPMENT"
@@ -47,14 +66,18 @@ export function NotificationProvider({
       reconnectAttempts.current = 0; // reset reconnect attempts
     };
 
-    ws.onmessage = (event) => {
+    ws.onmessage = async (event) => {
       console.log("📩 WS Message received:", event.data);
-      // try {
-      //   const data = JSON.parse(event.data);
-      //   setNotifications((prev) => [...prev, data]);
-      // } catch (err) {
-      //   console.error("Invalid WS message:", err);
-      // }
+      try {
+        const data = JSON.parse(event.data);
+        queryClient.setQueryData<NotificationData[]>(
+          ["notifications", user?.id],
+          (oldNotifications = []) => [data, ...oldNotifications]
+        );
+        0;
+      } catch (err) {
+        console.error("Invalid WS message:", err);
+      }
     };
 
     ws.onerror = (err) => console.error("WS Error:", err);
@@ -74,7 +97,7 @@ export function NotificationProvider({
     };
   };
   useEffect(() => {
-    if (!accessToken) {
+    if (!user?.id || !accessToken) {
       console.log("No token, skipping WebSocket");
       return;
     } else {
@@ -87,13 +110,15 @@ export function NotificationProvider({
       if (wsRef.current) wsRef.current.close();
       if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current);
     };
-  }, [accessToken]);
+  }, [user?.id, accessToken]);
 
   return (
     <NotificationContext.Provider
       value={{
         notifications,
-        clearNotifications: () => setNotifications([]),
+        clearNotifications: () =>
+          queryClient.setQueryData(["notifications", user?.id], []),
+        refetch,
       }}
     >
       {children}

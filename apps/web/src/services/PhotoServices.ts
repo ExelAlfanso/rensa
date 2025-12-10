@@ -146,5 +146,5 @@ export async function fetchPhotoOwnerByPhotoId(photoId: string) {
 
 export async function fetchPhotoById(photoId: string) {
   const res = await api.get(`/photos/${photoId}`);
-  return res.data.data.photo;
+  return res.data.data;
 }

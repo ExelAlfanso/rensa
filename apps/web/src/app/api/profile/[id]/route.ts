@@ -30,7 +30,7 @@ export async function GET(
         };
       })
     );
-    const user = await User.findById(id).select("username email").lean();
+    const user = await User.findById(id).select("username email avatar").lean();
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }

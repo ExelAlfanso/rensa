@@ -17,6 +17,8 @@ interface IconDropdownProps {
     | "regular"
     | "thin"
     | undefined;
+
+  className?: string;
 }
 
 const IconDropdown: React.FC<IconDropdownProps> = ({
@@ -25,6 +27,7 @@ const IconDropdown: React.FC<IconDropdownProps> = ({
   Tag = undefined,
   position = "center",
   weight = "fill",
+  className = "",
 }) => {
   const positionClasses = {
     left: "-right-5",
@@ -46,7 +49,7 @@ const IconDropdown: React.FC<IconDropdownProps> = ({
       <ul
         className={`absolute ${
           positionClasses[position]
-        } top-10 md:top-13 mt-2 w-60 flex flex-col items-center rounded-2xl bg-white-200 p-0 shadow-lg transform transition-all duration-200 ease-out origin-top
+        } top-10 md:top-13 mt-2 w-60 flex flex-col items-center rounded-2xl bg-white-200 p-0 shadow-lg transform transition-all duration-200 ease-out origin-top ${className}
           ${
             open
               ? "opacity-100 scale-100 translate-y-0"

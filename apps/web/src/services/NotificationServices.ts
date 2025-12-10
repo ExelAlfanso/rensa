@@ -1,16 +1,15 @@
 import { elysiaApi } from "@/lib/axios";
 import { fetchPhotoOwnerByPhotoId } from "./PhotoServices";
-
 export async function fetchNotifications(
   recipientId: string,
   page = 1,
   limit = 10
 ) {
-  const res = await elysiaApi.post(`/notifications/${recipientId}`, {
-    page,
-    limit,
-  });
-  return res.data;
+  console.log("Fetching notifications for recipientId:", recipientId);
+  const res = await elysiaApi.get(
+    `/notifications?recipientId=${recipientId}&page=${page}&limit=${limit}`
+  );
+  return res.data.data.notifications;
 }
 
 export async function sendPhotoSavedNotification(
