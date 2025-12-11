@@ -4,7 +4,7 @@ import { FilterQuery, SortOrder } from "mongoose";
 import { NextResponse } from "next/server";
 
 /*
-  GET /api/photos?page=1&limit=10&filters=tag1,tag2
+  GET /api/photos?page=1&limit=10&filters=tag1,tag2&sort=recent||popular
   Fetch paginated photos with optional filters
 */
 

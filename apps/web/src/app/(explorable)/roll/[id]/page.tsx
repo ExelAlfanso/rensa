@@ -12,8 +12,7 @@ export default async function RollPageWrapper({
   let rollData;
   let ownerId;
   try {
-    const roll = await fetchRollById(id);
-    rollData = roll.data.data;
+    rollData = await fetchRollById(id);
     ownerId = await fetchProfileByRollId(id);
   } catch {
     rollData = null;

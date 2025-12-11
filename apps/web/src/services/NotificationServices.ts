@@ -10,7 +10,6 @@ export async function fetchNotifications(
   });
   return res.data.data.notifications;
 }
-
 export async function sendPhotoSavedNotification(
   actorId: string,
   photoId: string // roll / photo / profile
@@ -20,7 +19,7 @@ export async function sendPhotoSavedNotification(
     if (recipientId === actorId) {
       return null;
     }
-    const res = await elysiaApi.post(`/notifications/photo-saved`, {
+    const res = await elysiaApi.post(`/notifications`, {
       actorId,
       recipientId,
       photoId,
@@ -32,3 +31,57 @@ export async function sendPhotoSavedNotification(
     throw error;
   }
 }
+export async function sendBookmarkedNotification(
+  actorId: string,
+  photoId: string // roll / photo / profile
+) {
+  try {
+    const recipientId = await fetchPhotoOwnerByPhotoId(photoId);
+    if (recipientId === actorId) {
+      return null;
+    }
+    const res = await elysiaApi.post(`/notifications`, {
+      actorId,
+      recipientId,
+      photoId,
+      type: "photo-bookmarked",
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Error sending photo bookmarked notification:", error);
+    throw error;
+  }
+}
+export async function sendCommentedNotification(
+  actorId: string,
+  photoId: string // roll / photo / profile
+) {
+  try {
+    const recipientId = await fetchPhotoOwnerByPhotoId(photoId);
+    if (recipientId === actorId) {
+      return null;
+    }
+    const res = await elysiaApi.post(`/notifications`, {
+      actorId,
+      recipientId,
+      photoId,
+      type: "photo-commented",
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Error sending photo commented notification:", error);
+    throw error;
+  }
+}
+
+// export async function clearNotifications(recipientId: string) {
+//   try {
+//     const res = await elysiaApi.delete(`/notifications`, {
+//       params: { recipientId },
+//     });
+//     return res.data;
+//   } catch (error) {
+//     console.error("Error clearing notifications:", error);
+//     throw error;
+//   }
+// }

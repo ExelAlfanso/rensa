@@ -4,6 +4,7 @@ import Heading from "@/components/Heading";
 import { EditRollProvider } from "@/providers/EditRollProvider";
 import RollPageMasonryGallerySection from "@/sections/RollPageMasonryGallerySection/RollPageMasonryGallerySection";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { useState } from "react";
 
 interface RollPageClientProps {
   id: string;
@@ -18,15 +19,20 @@ export default function RollPageClient({
 }: RollPageClientProps) {
   const { user } = useAuthStore();
   const isOwner = user?.id === ownerId;
+  const [rollName, setRollName] = useState(name);
+  const handleOnRollUpdate = (roll: { rollId: string; name: string }) => {
+    setRollName(roll.name);
+  };
+
   return (
-    <EditRollProvider>
+    <EditRollProvider onRollUpdate={handleOnRollUpdate}>
       <div className="min-h-screen w-full bg-white">
         <span className="flex flex-row items-center justify-center mt-30 space-x-2">
-          <Heading className="text-black">{name}</Heading>
+          <Heading className="text-black">{rollName}</Heading>
           <RollPageDropdown
             isOwner={isOwner}
             rollId={id}
-            name={name}
+            name={rollName}
           ></RollPageDropdown>
         </span>
         <RollPageMasonryGallerySection isOwner={isOwner} rollId={id} />

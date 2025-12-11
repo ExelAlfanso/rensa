@@ -85,7 +85,7 @@ export const EditRollProvider = ({
   };
   const saveChanges = async (rollId: string, name: string) => {
     try {
-      await api.patch(`/api/rolls/${rollId}`, { name });
+      await api.patch(`/rolls/${rollId}`, { name });
 
       if (onRollUpdate) onRollUpdate({ rollId, name, type: "default" });
 

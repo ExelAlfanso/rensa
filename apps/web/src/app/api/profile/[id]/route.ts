@@ -15,21 +15,21 @@ export async function GET(
   const { id } = await context.params;
   try {
     await connectDB();
-    const rolls = await Roll.find({ userId: id }).lean();
-    const rollsWithPreviews = await Promise.all(
-      rolls.map(async (roll) => {
-        const randomPhotos = await Photo.aggregate([
-          { $match: { _id: { $in: roll.photos } } },
-          { $sample: { size: 4 } },
-          { $project: { url: 1, _id: 1 } },
-        ]);
+    // const rolls = await Roll.find({ userId: id }).lean();
+    // const rollsWithPreviews = await Promise.all(
+    //   rolls.map(async (roll) => {
+    //     const randomPhotos = await Photo.aggregate([
+    //       { $match: { _id: { $in: roll.photos } } },
+    //       { $sample: { size: 4 } },
+    //       { $project: { url: 1, _id: 1 } },
+    //     ]);
 
-        return {
-          ...roll,
-          previewPhotos: randomPhotos.map((p) => p.url),
-        };
-      })
-    );
+    //     return {
+    //       ...roll,
+    //       previewPhotos: randomPhotos.map((p) => p.url),
+    //     };
+    //   })
+    // );
     const user = await User.findById(id).select("username email avatar").lean();
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
@@ -41,7 +41,6 @@ export async function GET(
         message: "Successfully fetched user profile!",
         data: {
           user,
-          rolls: rollsWithPreviews,
         },
       },
       { status: 200 }

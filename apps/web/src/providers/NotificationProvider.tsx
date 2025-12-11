@@ -3,7 +3,6 @@
 import { fetchNotifications } from "@/services/NotificationServices";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { access } from "fs";
 import {
   createContext,
   useCallback,

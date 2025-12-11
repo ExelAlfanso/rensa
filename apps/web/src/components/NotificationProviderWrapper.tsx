@@ -1,5 +1,4 @@
 "use client";
-import { useAuthStore } from "@/stores/useAuthStore";
 import { NotificationProvider } from "@/providers/NotificationProvider";
 
 export default function NotificationProviderWrapper({
@@ -7,9 +6,5 @@ export default function NotificationProviderWrapper({
 }: {
   children: React.ReactNode;
 }) {
-  const accessToken = useAuthStore((s) => s.accessToken);
-
-  return (
-    <NotificationProvider token={accessToken}>{children}</NotificationProvider>
-  );
+  return <NotificationProvider>{children}</NotificationProvider>;
 }

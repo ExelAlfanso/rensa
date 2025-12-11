@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
 import Roll from "@/models/Roll";
 import { connectDB } from "@/lib/mongodb";
+import Photo from "@/models/Photo";
+import { SortOrder } from "mongoose";
+import { create } from "domain";
 
 /*
-  GET /api/rolls?userId=<userId>
+  GET /api/rolls?userId=...&sort=recent||mostPopular||oldest||leastPopular
   Fetch rolls for a specific user
   Returns { success: boolean, message: string, data: rolls[] }
 */
@@ -11,10 +14,31 @@ export async function GET(req: Request) {
   await connectDB();
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("userId");
+  const sort = searchParams.get("sort") || "latest" || "oldest";
+
+  const sortOptions: Record<string, SortOrder> =
+    sort === "latest" ? { createdAt: -1 } : { createdAt: 1 };
   try {
-    const rolls = await Roll.find({ userId: id }).lean();
+    const rolls = await Roll.find({ userId: id }).sort(sortOptions).lean();
+    const rollsWithPreviews = await Promise.all(
+      rolls.map(async (roll) => {
+        const randomPhotos = await Photo.aggregate([
+          { $match: { _id: { $in: roll.photos } } },
+          { $sample: { size: 4 } },
+          { $project: { url: 1, _id: 1 } },
+        ]);
+        return {
+          ...roll,
+          previewPhotos: randomPhotos.map((p) => p.url),
+        };
+      })
+    );
     return NextResponse.json(
-      { success: true, message: "Fetched rolls successfully", data: rolls },
+      {
+        success: true,
+        message: "Fetched rolls successfully",
+        data: { rolls: rollsWithPreviews },
+      },
       { status: 200 }
     );
   } catch (error) {
