@@ -1,4 +1,4 @@
-import api from "@/lib/axios";
+import { api } from "@/lib/axios";
 import { PopulatedPhoto } from "@/types/PopulatedPhoto";
 // import { Filters } from "@/sections/FilterSection";
 export async function fetchImagesFromPicSum(page: number) {
@@ -56,19 +56,21 @@ export interface FetchPhotosResponse {
 }
 
 // Fetch photos from your MongoDB backend
-export async function fetchImagesFromDB(
+export async function fetchPhotosFromDB(
   page: number,
-  filters: string[] | undefined
+  filters: string[] | undefined,
+  sort: "recent" | "popular" = "recent"
 ): Promise<FetchPhotosResponse> {
   try {
     const params: Record<string, string | number | undefined> = {
       page,
       limit: 10,
+      sort,
       filters: filters ? filters.join(",") : undefined,
     };
     // console.log("📤 Sending request to /photos/getPhotos with params:", params);
 
-    const res = await api.get<BackendPhotosResponse>("/photos/getPhotos", {
+    const res = await api.get<BackendPhotosResponse>("/photos", {
       params,
     });
 
@@ -106,15 +108,17 @@ export async function searchPhotosByTags(
 }
 
 // 🆕 Fetch photos by Roll ID
-export async function fetchImagesFromRoll(
+export async function fetchPhotosFromRoll(
   rollId: string,
   page: number,
-  filters?: string[]
+  filters?: string[],
+  sort: "recent" | "popular" = "recent"
 ): Promise<FetchPhotosResponse> {
   try {
     const params: Record<string, string | number | undefined> = {
       page,
       limit: 10,
+      sort,
       filters: filters ? filters.join(",") : undefined,
     };
 
@@ -129,6 +133,28 @@ export async function fetchImagesFromRoll(
     };
   } catch (error) {
     console.error("Error fetching photos from roll:", error);
+    throw error;
+  }
+}
+
+export async function fetchPhotoOwnerByPhotoId(photoId: string) {
+  try {
+    const res = await api.get<{ data: { ownerId: string } }>(
+      `/photos/${photoId}/owner`
+    );
+    return res.data.data.ownerId;
+  } catch (error) {
+    console.error("Error fetching photo owner:", error);
+    throw error;
+  }
+}
+
+export async function fetchPhotoById(photoId: string) {
+  try {
+    const res = await api.get(`/photos/${photoId}`);
+    return res.data.data;
+  } catch (error) {
+    console.error("Error fetching photo by ID:", error);
     throw error;
   }
 }

@@ -3,18 +3,18 @@
 import React, { useEffect, useState } from "react";
 import Heading from "../Heading";
 import Text from "../Text";
-import Comment from "../Comment";
 
-import { BookmarkSimpleIcon, CaretDownIcon } from "@phosphor-icons/react";
-import IconButton from "../buttons/IconButton";
+import { BookmarkSimpleIcon } from "@phosphor-icons/react";
 import { formatDate } from "@/utils/DateFormatter";
 import { PhotoMetadata } from "@/models/Photo";
 import RecipeList from "../lists/RecipeList";
 import ProfileBadge from "../badges/ProfileBadge";
-import CommentInputField from "../inputfields/CommentInputField";
-import api from "@/lib/axios";
-import { useSession } from "next-auth/react";
+import { api } from "@/lib/axios";
 import PrimaryButton from "../buttons/PrimaryButton";
+import CommentSection from "@/sections/CommentSection";
+import RollDropdownIconButton from "../dropdowns/rolls/RollDropdownIconButton";
+import usePhotoRoll from "@/hooks/usePhotoRoll";
+import { useAuthStore } from "@/stores/useAuthStore";
 interface PhotoInfoCardProps {
   id?: string;
   className?: string;
@@ -27,13 +27,13 @@ interface PhotoInfoCardProps {
   metadata?: PhotoMetadata;
   bookmarkedBy?: string[];
 }
+
 //TODO: Comment feature
 //TODO: Save feature
 
 const PhotoInfoCard: React.FC<PhotoInfoCardProps> = ({
   id,
   className,
-  children,
   title,
   initialBookmarks,
   description,
@@ -41,22 +41,28 @@ const PhotoInfoCard: React.FC<PhotoInfoCardProps> = ({
   userId,
   bookmarkedBy,
 }) => {
-  const { data: session } = useSession();
-  const currentUserId = session?.user?.id as string | undefined;
+  const { user } = useAuthStore();
   const [username, setUsername] = useState("Loading...");
   const [avatarUrl, setAvatarUrl] = useState("/profile.jpg");
   const [isBookmarked, setIsBookmarked] = useState(
-    currentUserId ? bookmarkedBy?.includes(currentUserId) : false
+    user ? bookmarkedBy?.includes(user.id) : false
   );
-
   const [bookmarks, setBookmarks] = useState(initialBookmarks);
 
+  const {
+    selectedRoll,
+    isLoading,
+    isSaved,
+    setSelectedRoll,
+    savedToRolls,
+    saveToRoll,
+    removeFromRoll,
+  } = usePhotoRoll(id || null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   useEffect(() => {
-    setIsBookmarked(
-      currentUserId ? bookmarkedBy?.includes(currentUserId) : false
-    );
+    setIsBookmarked(user ? bookmarkedBy?.includes(user.id) : false);
     fetchProfileData(userId);
-  }, [userId, currentUserId, bookmarkedBy]);
+  }, [userId, user, bookmarkedBy, id]);
 
   const handleBookmarkToggle = async () => {
     setIsBookmarked((prev) => !prev);
@@ -66,7 +72,7 @@ const PhotoInfoCard: React.FC<PhotoInfoCardProps> = ({
 
       const res = await api.post(`/photos/bookmark/${id}`, {
         action,
-        userId: currentUserId,
+        userId: user?.id,
       });
       setBookmarks(res.data.bookmarks);
     } catch (err) {
@@ -87,7 +93,7 @@ const PhotoInfoCard: React.FC<PhotoInfoCardProps> = ({
   return (
     <div
       id={id}
-      className={`flex flex-col gap-1.5 bg-white-200 ${className} shadow-lg p-10 rounded-3xl text-primary w-full lg:max-w-3xl xl:w-[30%]`}
+      className={`flex flex-col gap-1.5 bg-white-200 ${className} shadow-lg p-10 rounded-3xl text-primary w-full lg:max-w-3xl xl:w-[40%]`}
     >
       <div className="inline-flex items-center justify-between w-full">
         <span className="text-black inline-flex items-center justify-center">
@@ -96,29 +102,31 @@ const PhotoInfoCard: React.FC<PhotoInfoCardProps> = ({
             {isBookmarked ? (
               <BookmarkSimpleIcon
                 weight="fill"
-                size={28}
+                size={24}
                 className="hover:scale-110 transition-transform cursor-pointer focus:border-0"
               />
             ) : (
               <BookmarkSimpleIcon
                 weight="regular"
-                size={28}
+                size={24}
                 className="hover:scale-110 transition-transform cursor-pointer focus:border-0"
               />
             )}
           </button>
         </span>
         <div className="inline-flex gap-5">
-          <IconButton
-            Icon={CaretDownIcon}
-            color="tertiary"
-            iconPosition={"right"}
-            paddingX={1}
-          >
-            All Photos
-          </IconButton>
+          <RollDropdownIconButton
+            isOpen={isDropdownOpen}
+            setIsOpen={setIsDropdownOpen}
+            selectedRoll={selectedRoll}
+            setSelectedRoll={setSelectedRoll}
+            savedToRolls={savedToRolls}
+            disabled={isLoading || isSaved}
+          />
 
-          <PrimaryButton>Save</PrimaryButton>
+          <PrimaryButton onClick={isSaved ? removeFromRoll : saveToRoll}>
+            {isLoading ? "Loading..." : isSaved ? "Saved" : "Save"}
+          </PrimaryButton>
         </div>
       </div>
       <div className="mb-9">
@@ -132,6 +140,7 @@ const PhotoInfoCard: React.FC<PhotoInfoCardProps> = ({
           avatarUrl={avatarUrl}
           username={username}
           alt={username}
+          href={`/profile/${userId}`}
           className="mb-5"
         />
         <p className="text-[16px] text-black-200 max-w-[350px]">
@@ -141,29 +150,7 @@ const PhotoInfoCard: React.FC<PhotoInfoCardProps> = ({
       <div>
         <RecipeList metadata={metadata}></RecipeList>
       </div>
-      <div>
-        <Heading size="m" className="mb-5">
-          Comments
-        </Heading>
-        <div className="overflow-y-scroll no-scrollbar h-35">
-          {/*TODO: Map through comments and render them*/}
-          <Comment username="user1">Nice looking picture mate!</Comment>
-          <Comment>Nice looking picture mate!</Comment>
-          <Comment>Nice looking picture mate!</Comment>
-          <Comment>Nice looking picture mate!</Comment>
-          <Comment>Nice looking picture mate!</Comment>
-          <Comment>Nice looking picture mate!</Comment>
-          <Comment>Nice looking picture mate!</Comment>
-          <Comment>Nice looking picture mate!</Comment>
-          <Comment>Nice looking picture mate!</Comment>
-          <Comment>Nice looking picture mate!</Comment>
-          <Comment>Nice looking picture mate!</Comment>
-          <Comment>Nice looking picture mate!</Comment>
-        </div>
-        <CommentInputField></CommentInputField>
-      </div>
-
-      {children}
+      <CommentSection id={id}></CommentSection>
     </div>
   );
 };

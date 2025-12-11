@@ -12,6 +12,7 @@ interface AuthState {
   setAccessToken: (token?: string) => void;
   setLoading: (loading: boolean) => void;
   clearAuth: () => void;
+  logout: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(

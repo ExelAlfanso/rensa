@@ -1,10 +1,16 @@
-import api from "@/lib/axios";
+import { api } from "@/lib/axios";
+import { sendPhotoSavedNotification } from "./NotificationServices";
 
 export function fetchRollById(rollId: string) {
   return api.get(`/rolls/${rollId}`);
 }
 
-export async function addPhotoToRoll(rollId: string, photoId: string) {
+export async function addPhotoToRoll(
+  actorId: string,
+  rollId: string,
+  photoId: string
+) {
+  await sendPhotoSavedNotification(actorId, photoId);
   return api.post(`/rolls/${rollId}/photos/${photoId}`, {
     rollIds: [rollId],
     photoId,
@@ -28,4 +34,10 @@ export async function updateRollDetails(
   description: string
 ) {
   return api.patch(`/rolls/${rollId}`, { name, description });
+}
+
+export async function fetchDefaultRoll() {
+  const res = await api.get(`/rolls/default`);
+
+  return res.data;
 }

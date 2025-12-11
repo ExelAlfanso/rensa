@@ -14,6 +14,7 @@ interface RollPagePhotoCardProps {
   photo: string | PopulatedPhoto;
   rollId: string;
   onPhotoRemoved?: (photoId: string) => void;
+  isOwner: boolean;
 }
 
 const RollPagePhotoCard: React.FC<RollPagePhotoCardProps> = ({
@@ -21,6 +22,7 @@ const RollPagePhotoCard: React.FC<RollPagePhotoCardProps> = ({
   photo,
   rollId,
   onPhotoRemoved,
+  isOwner,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { showToast } = useToast();
@@ -52,7 +54,6 @@ const RollPagePhotoCard: React.FC<RollPagePhotoCardProps> = ({
     >
       <Link href={id ? `/photo/${id}` : "#"} prefetch={false}>
         <div className="relative overflow-hidden rounded-3xl group cursor-pointer transition-transform duration-300 hover:scale-[1.02]">
-          {/* Image */}
           <ImageWithSkeleton
             image={{
               src: getPhotoUrl(photo),
@@ -62,27 +63,27 @@ const RollPagePhotoCard: React.FC<RollPagePhotoCardProps> = ({
             }}
           />
 
-          {/* Hover overlay */}
           <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-40 transition-opacity duration-300 pointer-events-none rounded-3xl" />
 
-          {/* Gradient overlay + button */}
-          <div className="absolute inset-0 transition-opacity duration-300 opacity-0 group-hover:opacity-100 pointer-events-none rounded-3xl">
-            <div className="absolute top-3 right-3 pointer-events-auto">
-              <SmallIconButton
-                onClick={handleUnsaveClick}
-                disabled={isLoading}
-                className={`w-[32px] h-[32px] flex items-center justify-center rounded-full transition-colors duration-200 bg-white text-black hover:bg-gray-200 ${
-                  isLoading ? "opacity-70 cursor-wait" : ""
-                }`}
-              >
-                {isLoading ? (
-                  <div className="text-current loading loading-spinner" />
-                ) : (
-                  <TrashIcon size={16} weight="bold" />
-                )}
-              </SmallIconButton>
+          {isOwner && (
+            <div className="absolute inset-0 transition-opacity duration-300 opacity-0 group-hover:opacity-100 pointer-events-none rounded-3xl">
+              <div className="absolute top-3 right-3 pointer-events-auto">
+                <SmallIconButton
+                  onClick={handleUnsaveClick}
+                  disabled={isLoading}
+                  className={`w-[32px] h-[32px] flex items-center justify-center rounded-full transition-colors duration-200 bg-white text-black hover:bg-gray-200 ${
+                    isLoading ? "opacity-70 cursor-wait" : ""
+                  }`}
+                >
+                  {isLoading ? (
+                    <div className="text-current loading loading-spinner" />
+                  ) : (
+                    <TrashIcon size={16} weight="bold" />
+                  )}
+                </SmallIconButton>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </Link>
     </motion.div>

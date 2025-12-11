@@ -30,7 +30,7 @@ export async function GET(
         };
       })
     );
-    const user = await User.findById(id).select("username email").lean();
+    const user = await User.findById(id).select("username email avatar").lean();
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
@@ -38,7 +38,7 @@ export async function GET(
     return NextResponse.json(
       {
         success: true,
-        message: "Sucessfully fetched user profile!",
+        message: "Successfully fetched user profile!",
         data: {
           user,
           rolls: rollsWithPreviews,

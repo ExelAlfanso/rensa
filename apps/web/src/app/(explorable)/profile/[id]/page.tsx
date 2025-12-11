@@ -1,19 +1,20 @@
+import { use } from "react";
 import ProfilePageClient from "./ProfilePageClient";
-import api from "@/lib/axios";
 import { notFound } from "next/navigation";
+import { fetchProfile } from "@/services/ProfileServices";
 
-export default async function ProfilePageWrapper(context: {
+export default function ProfilePageWrapper({
+  params,
+}: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await context.params;
-  try {
-    const res = await api.get(`/profile/${id}`);
-    const profileData = res.data.data;
+  const { id } = use(params);
 
-    if (!profileData) throw notFound();
+  const profileData = use(fetchProfile(id));
 
-    return <ProfilePageClient profileData={profileData} />;
-  } catch (err) {
-    throw notFound();
+  if (!profileData) {
+    notFound();
   }
+
+  return <ProfilePageClient profileData={profileData} />;
 }

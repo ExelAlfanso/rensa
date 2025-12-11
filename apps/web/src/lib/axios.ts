@@ -7,4 +7,18 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
 });
-export default api;
+const elysiaApi = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_ELYSIA_URL || "http://localhost:4000/api",
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+const fastApi = axios.create({
+  baseURL: process.env.FAST_API_URL || "http://localhost:8000",
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+export { api, fastApi, elysiaApi };

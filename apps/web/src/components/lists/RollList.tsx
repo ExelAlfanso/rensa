@@ -1,5 +1,6 @@
 import React from "react";
 import RollCard from "@/components/cards/RollCard";
+import CreateNewRollCard from "../cards/CreateNewRollCard";
 
 export interface Roll {
   _id: string;
@@ -11,12 +12,14 @@ export interface Roll {
 
 interface RollListProps {
   rolls: Roll[];
+  isOwner: boolean;
 }
 
-export default function RollList({ rolls }: RollListProps) {
+export default function RollList({ rolls, isOwner }: RollListProps) {
   return (
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-5">
-      {rolls.length > 0 ? (
+      {isOwner && <CreateNewRollCard key="create-new-roll" />}
+      {rolls.length > 0 &&
         rolls.map((roll) => (
           <RollCard
             key={roll._id}
@@ -26,10 +29,7 @@ export default function RollList({ rolls }: RollListProps) {
             imageUrls={roll.previewPhotos}
             createdAt={roll.createdAt}
           />
-        ))
-      ) : (
-        <p className="text-gray-500">No rolls found.</p>
-      )}
+        ))}
     </div>
   );
 }

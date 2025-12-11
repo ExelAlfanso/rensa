@@ -8,12 +8,14 @@ interface RollPageMasonryGalleryGridProps {
   photos: (PopulatedPhoto | string)[];
   rollId: string;
   onPhotoRemoved?: (photoId: string) => void;
+  isOwner: boolean;
 }
 
 const RollPageMasonryGalleryGrid: React.FC<RollPageMasonryGalleryGridProps> = ({
   photos,
   rollId,
   onPhotoRemoved,
+  isOwner,
 }) => {
   const getDynamicColumns = (photoCount: number) => {
     if (photoCount <= 1) return 1;
@@ -44,6 +46,7 @@ const RollPageMasonryGalleryGrid: React.FC<RollPageMasonryGalleryGridProps> = ({
           const photoId = (photo as PopulatedPhoto)._id || idx.toString();
           return (
             <RollPagePhotoCard
+              isOwner={isOwner}
               key={getPhotoKey(photo, photoId)}
               id={photoId}
               photo={photo}

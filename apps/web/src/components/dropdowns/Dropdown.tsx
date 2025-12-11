@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import NotificationButton from "../buttons/NotificationButton";
 
 interface DropdownProps {
   id?: string;

@@ -4,12 +4,12 @@ import React, { useEffect } from "react";
 import "@/components/MasonryGallery.css";
 import { useInView } from "react-intersection-observer";
 import {
-  fetchImagesFromDB,
+  fetchPhotosFromDB,
   fetchImagesFromPicSum,
-  fetchImagesFromRoll, // 🆕 New service
+  fetchPhotosFromRoll, // 🆕 New service
   Photo,
   FetchPhotosResponse,
-} from "@/services/ImageServices";
+} from "@/services/PhotoServices";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import MasonryGalleryGrid from "./MasonryGalleryGrid";
 import { PopulatedPhoto } from "@/types/PopulatedPhoto";
@@ -22,6 +22,8 @@ interface MasonryGallerySectionProps {
   onPhotoClick?: (photo: Photo | string, index: number) => void;
 }
 
+const TAB_RECENT = "tab1";
+const TAB_POPULAR = "tab2";
 const MasonryGallerySection: React.FC<MasonryGallerySectionProps> = ({
   activeTab,
   filters,
@@ -29,7 +31,7 @@ const MasonryGallerySection: React.FC<MasonryGallerySectionProps> = ({
   rollId, // 🆕 destructure it
 }) => {
   const { ref, inView } = useInView({ threshold: 0.5 });
-
+  const sort = activeTab === TAB_POPULAR ? "popular" : "recent";
   const {
     data,
     fetchNextPage,
@@ -38,7 +40,13 @@ const MasonryGallerySection: React.FC<MasonryGallerySectionProps> = ({
     status,
     error,
   } = useInfiniteQuery<FetchPhotosResponse>({
-    queryKey: ["photos", filters, useDatabase ? "db" : "picsum", rollId],
+    queryKey: [
+      "photos",
+      filters,
+      activeTab,
+      useDatabase ? "db" : "picsum",
+      rollId,
+    ],
     queryFn: async ({ pageParam }) => {
       const page = pageParam as number;
 
@@ -47,9 +55,9 @@ const MasonryGallerySection: React.FC<MasonryGallerySectionProps> = ({
       // 2️⃣ DB (default)
       // 3️⃣ Picsum (fallback)
       if (rollId) {
-        return await fetchImagesFromRoll(rollId, page, filters);
+        return await fetchPhotosFromRoll(rollId, page, filters, sort);
       } else if (useDatabase) {
-        return await fetchImagesFromDB(page, filters);
+        return await fetchPhotosFromDB(page, filters, sort);
       } else {
         return await fetchImagesFromPicSum(page);
       }

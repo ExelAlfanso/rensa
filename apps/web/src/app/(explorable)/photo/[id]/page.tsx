@@ -2,8 +2,10 @@ import MasonryGalleryPage from "@/sections/MasonryGallerySection/MasonryGalleryS
 import Heading from "@/components/Heading";
 import PhotoInfoCard from "@/components/cards/PhotoInfoCard";
 import ImagePreview from "@/components/ImagePreview";
-import api from "@/lib/axios";
+
 import { redirect } from "next/navigation";
+import { api } from "@/lib/axios";
+import { fetchPhotoById } from "@/services/PhotoServices";
 
 export default async function PhotoPage({
   params,
@@ -11,11 +13,10 @@ export default async function PhotoPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+
   let photo = null;
   try {
-    const res = await api.get(`/photos/photo/${id}`);
-
-    photo = res.data;
+    photo = await fetchPhotoById(id);
   } catch (error) {
     console.error("Error fetching photo:", error);
   }
@@ -43,7 +44,7 @@ export default async function PhotoPage({
           title={photo?.title}
           description={photo?.description}
           metadata={photo?.metadata}
-          userId={photo?.userId?._id.toString() || ""}
+          userId={photo?.userId.toString() || ""}
         />
       </div>
       <div className="flex flex-col items-start justify-start min-h-screen bg-white-500">

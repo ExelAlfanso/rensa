@@ -4,10 +4,10 @@ import React, { useEffect } from "react";
 import "@/components/MasonryGallery.css";
 import { useInView } from "react-intersection-observer";
 import {
-  fetchImagesFromRoll, // 🆕 New service
+  fetchPhotosFromRoll, // 🆕 New service
   Photo,
   FetchPhotosResponse,
-} from "@/services/ImageServices";
+} from "@/services/PhotoServices";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { PopulatedPhoto } from "@/types/PopulatedPhoto";
 import RollPageMasonryGalleryGrid from "./RollPageMasonryGalleryGrid";
@@ -17,11 +17,12 @@ interface RollPageMasonryGallerySectionProps {
   activeTab?: string;
   rollId: string;
   onPhotoClick?: (photo: Photo | string, index: number) => void;
+  isOwner: boolean;
 }
 
 const RollPageMasonryGallerySection: React.FC<
   RollPageMasonryGallerySectionProps
-> = ({ rollId }) => {
+> = ({ rollId, isOwner }) => {
   const { ref, inView } = useInView({ threshold: 0.5 });
   const queryClient = useQueryClient();
 
@@ -36,7 +37,7 @@ const RollPageMasonryGallerySection: React.FC<
     queryKey: ["photos", rollId],
     queryFn: async ({ pageParam }) => {
       const page = pageParam as number;
-      return await fetchImagesFromRoll(rollId, page);
+      return await fetchPhotosFromRoll(rollId, page);
     },
     getNextPageParam: (lastPage) => lastPage.nextPage,
     initialPageParam: 1,
@@ -84,6 +85,7 @@ const RollPageMasonryGallerySection: React.FC<
         photos={photos}
         rollId={rollId}
         onPhotoRemoved={handlePhotoRemoved}
+        isOwner={isOwner}
       />
 
       <div

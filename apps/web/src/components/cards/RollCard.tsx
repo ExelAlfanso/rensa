@@ -79,7 +79,6 @@ const RollCard: React.FC<RollCardProps> = ({
           <p className="text-sm text-gray-500">{formatDate(createdAt)}</p>
         )}
 
-        {/* Hover overlay */}
         <div className="absolute inset-0 rounded-2xl bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-300 pointer-events-none" />
 
         {/* Edit button (only for owner) */}
@@ -89,7 +88,7 @@ const RollCard: React.FC<RollCardProps> = ({
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                openEditor({ rollId: id, name });
+                openEditor({ rollId: id, name, type: "default" });
               }}
               className="p-2 bg-white rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"
             >
