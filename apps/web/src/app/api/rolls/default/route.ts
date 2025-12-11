@@ -8,6 +8,7 @@ import { NextResponse } from "next/server";
     GET /api/rolls/default
     Returns the default roll ("All Photos") for the authenticated user (current session for security)
 */
+
 export async function GET(req: Request) {
   await connectDB();
   const session = await getServerSession(authOptions);

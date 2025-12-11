@@ -10,6 +10,7 @@ import Button from "@/components/buttons/Button";
 interface EditRollState {
   rollId: string;
   name: string;
+  type: "deleting" | "renaming" | "default";
 }
 
 interface EditRollContextType {
@@ -42,6 +43,9 @@ export const EditRollProvider = ({
   onRollUpdate,
   onRollDelete,
 }: EditRollProviderProps) => {
+  const [type, setType] = useState<"deleting" | "renaming" | "default">(
+    "default"
+  );
   const [isOpen, setIsOpen] = useState(false);
   const [roll, setRoll] = useState<EditRollState | null>(null);
   const [name, setName] = useState("");
@@ -49,6 +53,12 @@ export const EditRollProvider = ({
   const { showToast } = useToast();
 
   const openEditor = (roll: EditRollState) => {
+    setType(roll.type);
+    if (roll.type === "deleting") {
+      setIsDeleting(true);
+    } else if (roll.type === "renaming") {
+      setIsDeleting(false);
+    }
     setRoll(roll);
     setName(roll.name);
     setIsOpen(true);
@@ -77,7 +87,7 @@ export const EditRollProvider = ({
     try {
       await api.patch(`/api/rolls/${rollId}`, { name });
 
-      if (onRollUpdate) onRollUpdate({ rollId, name });
+      if (onRollUpdate) onRollUpdate({ rollId, name, type: "default" });
 
       closeEditor();
       showToast("Roll updated successfully", "success");
@@ -105,14 +115,20 @@ export const EditRollProvider = ({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                 />
-                <div className="flex justify-between gap-2 mt-5">
-                  <Button
-                    className="bg-red-600 text-white hover:bg-red-700"
-                    onClick={() => setIsDeleting(true)}
-                  >
-                    Delete
-                  </Button>
-                  <div className="flex flex-row gap-2">
+                <div
+                  className={`${
+                    type === "default" ? "justify-between" : "justify-end"
+                  } gap-2 mt-5 flex`}
+                >
+                  {type === "default" && (
+                    <Button
+                      className="bg-red-600 text-white hover:bg-red-700"
+                      onClick={() => setIsDeleting(true)}
+                    >
+                      Delete
+                    </Button>
+                  )}
+                  <div className={`flex flex-row gap-2`}>
                     <TertiaryButton onClick={closeEditor}>
                       Cancel
                     </TertiaryButton>
@@ -142,7 +158,12 @@ export const EditRollProvider = ({
                   >
                     Yes
                   </Button>
-                  <TertiaryButton onClick={() => setIsDeleting(false)}>
+                  <TertiaryButton
+                    onClick={() => {
+                      if (type === "deleting") closeEditor();
+                      else setIsDeleting(false);
+                    }}
+                  >
                     No
                   </TertiaryButton>
                 </div>

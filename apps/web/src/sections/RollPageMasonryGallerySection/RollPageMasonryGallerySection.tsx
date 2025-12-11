@@ -17,11 +17,12 @@ interface RollPageMasonryGallerySectionProps {
   activeTab?: string;
   rollId: string;
   onPhotoClick?: (photo: Photo | string, index: number) => void;
+  isOwner: boolean;
 }
 
 const RollPageMasonryGallerySection: React.FC<
   RollPageMasonryGallerySectionProps
-> = ({ rollId }) => {
+> = ({ rollId, isOwner }) => {
   const { ref, inView } = useInView({ threshold: 0.5 });
   const queryClient = useQueryClient();
 
@@ -84,6 +85,7 @@ const RollPageMasonryGallerySection: React.FC<
         photos={photos}
         rollId={rollId}
         onPhotoRemoved={handlePhotoRemoved}
+        isOwner={isOwner}
       />
 
       <div

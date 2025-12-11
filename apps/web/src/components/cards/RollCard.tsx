@@ -88,7 +88,7 @@ const RollCard: React.FC<RollCardProps> = ({
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                openEditor({ rollId: id, name });
+                openEditor({ rollId: id, name, type: "default" });
               }}
               className="p-2 bg-white rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"
             >

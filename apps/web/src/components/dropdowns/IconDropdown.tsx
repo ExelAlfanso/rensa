@@ -37,12 +37,12 @@ const IconDropdown: React.FC<IconDropdownProps> = ({
   const [open, setOpen] = useState(false);
   const dropdownRef = useOutsideClick<HTMLDivElement>(() => setOpen(false));
   return (
-    <div className={`relative`} ref={dropdownRef}>
+    <div className={`relative text-black`} ref={dropdownRef}>
       {Tag && (
         <Tag
           weight={weight}
           size={iconSize}
-          className="hover:text-black-200 transition-colors duration-200 cursor-pointer"
+          className="hover:text-black-200 text-black transition-colors duration-200 cursor-pointer"
           onClick={() => setOpen((prev) => !prev)}
         />
       )}

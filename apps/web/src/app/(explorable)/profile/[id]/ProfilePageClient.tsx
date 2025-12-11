@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Heading from "@/components/Heading";
 import AccentButton from "@/components/buttons/AccentButton";
@@ -65,6 +65,7 @@ export default function ProfilePageClient({
           </Heading>
           <div className="flex flex-row items-center justify-center gap-4 mt-4">
             <ShareButton userId={user?.id || ""}></ShareButton>
+
             {isOwner && <AccentButton>Edit Profile</AccentButton>}
           </div>
           <div className="flex flex-col items-start justify-center gap-6 mt-10 xl:mt-0 w-full px-6">

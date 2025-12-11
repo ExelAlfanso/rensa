@@ -216,7 +216,7 @@ const RollDropdown: React.FC<RollDropdownProps> = ({
         onClick={handleClick}
         className="flex flex-row items-center gap-2 px-4 py-2 font-semibold cursor-pointer rounded-3xl ring-0 outline-0"
       >
-        <Text size="xs">{selectedRoll ? selectedRoll.name : "All Photos"}</Text>
+        <Text size="xs">{selectedRoll ? selectedRoll.name : "None"}</Text>
 
         {!disabled && <CaretDownIcon weight="bold" />}
       </button>

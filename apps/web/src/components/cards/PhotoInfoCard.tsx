@@ -10,7 +10,6 @@ import { PhotoMetadata } from "@/models/Photo";
 import RecipeList from "../lists/RecipeList";
 import ProfileBadge from "../badges/ProfileBadge";
 import { api } from "@/lib/axios";
-import { useSession } from "next-auth/react";
 import PrimaryButton from "../buttons/PrimaryButton";
 import CommentSection from "@/sections/CommentSection";
 import RollDropdownIconButton from "../dropdowns/rolls/RollDropdownIconButton";
@@ -141,6 +140,7 @@ const PhotoInfoCard: React.FC<PhotoInfoCardProps> = ({
           avatarUrl={avatarUrl}
           username={username}
           alt={username}
+          href={`/profile/${userId}`}
           className="mb-5"
         />
         <p className="text-[16px] text-black-200 max-w-[350px]">

@@ -1,31 +1,30 @@
-import Heading from "@/components/Heading";
-import RollPageMasonryGallerySection from "@/sections/RollPageMasonryGallerySection/RollPageMasonryGallerySection";
+import RollPageClient from "./RollPageClient";
+import { fetchProfileByRollId } from "@/services/ProfileServices";
 import { fetchRollById } from "@/services/RollServices";
-import { DotsThreeCircleIcon } from "@phosphor-icons/react/dist/ssr";
+import { redirect } from "next/navigation";
 
-export default async function RollPage({
+export default async function RollPageWrapper({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  let rollData = null;
+  let rollData;
+  let ownerId;
   try {
-    const res = await fetchRollById(id);
-    rollData = res.data.data;
-  } catch (err) {
-    console.error("Error fetching roll data:", err);
+    const roll = await fetchRollById(id);
+    rollData = roll.data.data;
+    ownerId = await fetchProfileByRollId(id);
+  } catch {
+    rollData = null;
+    ownerId = null;
+    redirect("/404");
   }
   return (
-    <div className="min-h-screen w-full bg-white">
-      <span className="flex flex-row items-center justify-center mt-30">
-        <Heading className="text-black">{rollData?.name}</Heading>
-        <DotsThreeCircleIcon
-          className="text-black cursor-pointer hover:text-gray-800"
-          size={32}
-        />
-      </span>
-      <RollPageMasonryGallerySection rollId={id} />
-    </div>
+    <RollPageClient
+      ownerId={ownerId}
+      name={rollData.name || "Unknown Roll"}
+      id={id}
+    ></RollPageClient>
   );
 }
