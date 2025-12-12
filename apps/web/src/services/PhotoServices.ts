@@ -1,6 +1,6 @@
 import { api } from "@/lib/axios";
 import { PopulatedPhoto } from "@/types/PopulatedPhoto";
-// import { Filters } from "@/sections/FilterSection";
+import { sendBookmarkedNotification } from "./NotificationServices";
 export async function fetchImagesFromPicSum(page: number) {
   const newImages = Array.from({ length: 10 }, () => {
     const h = 300 + Math.floor(Math.random() * 200);

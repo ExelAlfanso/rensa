@@ -15,6 +15,7 @@ import CommentSection from "@/sections/CommentSection";
 import RollDropdownIconButton from "../dropdowns/rolls/RollDropdownIconButton";
 import usePhotoRoll from "@/hooks/usePhotoRoll";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { bookmarkPhoto } from "@/services/PhotoPostServices";
 interface PhotoInfoCardProps {
   id?: string;
   className?: string;
@@ -69,12 +70,8 @@ const PhotoInfoCard: React.FC<PhotoInfoCardProps> = ({
     setBookmarks((prev) => (isBookmarked ? (prev || 0) - 1 : (prev || 0) + 1));
     try {
       const action = isBookmarked ? "decrement" : "increment";
-
-      const res = await api.post(`/photos/bookmark/${id}`, {
-        action,
-        userId: user?.id,
-      });
-      setBookmarks(res.data.bookmarks);
+      const res = await bookmarkPhoto(user?.id, id || "", action);
+      setBookmarks(res);
     } catch (err) {
       console.log(err);
     }
