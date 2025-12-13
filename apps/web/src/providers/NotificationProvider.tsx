@@ -52,11 +52,10 @@ export function NotificationProvider({
   });
 
   const connectWebSocket = useCallback(() => {
-    // const WS_URL =
-    //   process.env.NEXT_PUBLIC_ENVIRONMENT === "DEVELOPMENT"
-    //     ? "ws://localhost:4000/api/ws"
-    //     : process.env.NEXT_PUBLIC_ELYSIA_WS_URL;
-    const WS_URL = "ws://localhost:4000/api/ws"; // Update with your WS URL
+    const WS_URL =
+      process.env.NEXT_PUBLIC_ENVIRONMENT === "DEVELOPMENT"
+        ? "ws://localhost:4000/api/ws"
+        : process.env.NEXT_PUBLIC_ELYSIA_WS_URL;
     if (!WS_URL) {
       console.error("WebSocket URL is not configured");
       return;

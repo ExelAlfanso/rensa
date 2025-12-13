@@ -15,7 +15,7 @@ const NotificationDropdown = () => {
     <div className="relative z-50 w-full">
       <IconDropdown
         Tag={BellIcon}
-        className="h-100 overflow-y-auto no-scrollbar"
+        className="h-100 overflow-y-auto no-scrollbar  "
       >
         <Heading alignment="center" size="m" className="py-6">
           Notifications
@@ -25,11 +25,11 @@ const NotificationDropdown = () => {
             <DropdownItem
               key={idx}
               href={"/photo/" + notification.photoId}
-              className={
+              className={`w-full ${
                 idx === notifications.length - 1 ? "rounded-b-2xl" : ""
-              }
+              }`}
             >
-              <div className={`avatar w-12 h-12 inline mr-3 `}>
+              <div className={`w-12 h-12 inline mr-3 relative`}>
                 <Image
                   src={notification.actorId.avatar || "/profile.jpg"}
                   alt="profile"
