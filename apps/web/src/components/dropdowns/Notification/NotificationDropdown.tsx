@@ -41,7 +41,11 @@ const NotificationDropdown = () => {
                 <span className="inline font-bold">
                   {notification.actorId.username}
                 </span>{" "}
-                saved your image
+                {notification.type === "photo-saved"
+                  ? "saved your photo."
+                  : notification.type === "photo-commented"
+                  ? "commented on your photo."
+                  : "bookmarked your photo."}
               </Text>
             </DropdownItem>
           ))
