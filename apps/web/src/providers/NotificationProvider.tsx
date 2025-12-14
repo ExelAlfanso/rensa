@@ -1,6 +1,11 @@
 "use client";
 
-import { fetchNotifications } from "@/services/NotificationServices";
+import { NotificationData } from "@/models/Notification";
+import {
+  clearUserNotifications,
+  fetchNotifications,
+  markUserNotificationAsRead,
+} from "@/services/NotificationServices";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -11,24 +16,10 @@ import {
   useRef,
 } from "react";
 
-interface NotificationData {
-  id: string;
-  recipientId: string;
-  actorId: {
-    id: string;
-    username: string;
-    avatar: string;
-  };
-  photoId: string;
-  type: string;
-  message: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
 interface NotificationContextType {
   notifications: NotificationData[];
   clearNotifications: () => void;
+  markNotificationAsRead: (id: string) => void;
   refetch: () => void;
 }
 
@@ -46,11 +37,13 @@ export function NotificationProvider({
   const reconnectTimeout = useRef<NodeJS.Timeout | null>(null);
   const { data: notifications = [], refetch } = useQuery<NotificationData[]>({
     queryKey: ["notifications", user?.id],
-    queryFn: () => fetchNotifications(user!.id),
+    queryFn: async () => await fetchNotifications(user!.id),
     enabled: !!accessToken && !!user?.id,
     initialData: [],
   });
-
+  // useEffect(() => {
+  //   console.log(notifications);
+  // }, [notifications]);
   const connectWebSocket = useCallback(() => {
     const WS_URL =
       process.env.NEXT_PUBLIC_ENVIRONMENT === "DEVELOPMENT"
@@ -88,7 +81,7 @@ export function NotificationProvider({
       ws.onerror = (err) => console.error("WS Error:", err);
 
       ws.onclose = () => {
-        const delay = Math.min(1000 * 2 ** reconnectAttempts.current, 30000); // exponential backoff
+        const delay = Math.min(500 * 2 ** reconnectAttempts.current, 10000); // exponential backoff
         reconnectAttempts.current += 1;
 
         if (reconnectTimeout.current) clearTimeout(reconnectTimeout.current);
@@ -99,6 +92,7 @@ export function NotificationProvider({
       };
     };
   }, [accessToken, queryClient, user?.id]);
+
   useEffect(() => {
     if (!user?.id || !accessToken) {
       return;
@@ -111,12 +105,51 @@ export function NotificationProvider({
     };
   }, [user?.id, accessToken, connectWebSocket]);
 
+  const clearNotifications = useCallback(() => {
+    if (!user?.id) return;
+    clearUserNotifications(user.id);
+    queryClient.setQueryData<NotificationData[]>(
+      ["notifications", user.id],
+      []
+    );
+  }, [queryClient, user?.id]);
+
+  const markNotificationAsRead = useCallback(
+    async (id: string) => {
+      if (!user?.id) return;
+
+      const key = ["notifications", user.id];
+
+      const current = queryClient.getQueryData<NotificationData[]>(key) || [];
+
+      const target = current.find((n) => n.id === id);
+
+      // already read → skip
+      if (!target || target.read) return;
+
+      // 🔥 optimistic update
+      queryClient.setQueryData<NotificationData[]>(key, (old = []) =>
+        old.map((n) => (n.id === id ? { ...n, read: true } : n))
+      );
+
+      try {
+        markUserNotificationAsRead(id);
+      } catch (err) {
+        console.error("Failed to mark notification as read", err);
+
+        // rollback kalau gagal
+        queryClient.setQueryData<NotificationData[]>(key, current);
+      }
+    },
+    [queryClient, user?.id]
+  );
+
   return (
     <NotificationContext.Provider
       value={{
         notifications,
-        clearNotifications: () =>
-          queryClient.setQueryData(["notifications", user?.id], []),
+        clearNotifications,
+        markNotificationAsRead,
         refetch,
       }}
     >

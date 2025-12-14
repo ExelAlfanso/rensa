@@ -1,7 +1,9 @@
 "use client";
 
+import { notificationDropdownOpenAtom } from "@/atoms/iconDropdownAtom";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
-import React, { useState } from "react";
+import { useSetAtom } from "jotai";
+import React, { SetStateAction, useEffect, useState } from "react";
 
 interface IconDropdownProps {
   id?: string;
@@ -19,6 +21,7 @@ interface IconDropdownProps {
     | undefined;
 
   className?: string;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
 const IconDropdown: React.FC<IconDropdownProps> = ({
@@ -36,6 +39,7 @@ const IconDropdown: React.FC<IconDropdownProps> = ({
   };
   const [open, setOpen] = useState(false);
   const dropdownRef = useOutsideClick<HTMLDivElement>(() => setOpen(false));
+
   return (
     <div className={`relative text-black`} ref={dropdownRef}>
       {Tag && (
@@ -46,19 +50,21 @@ const IconDropdown: React.FC<IconDropdownProps> = ({
           onClick={() => setOpen((prev) => !prev)}
         />
       )}
-      <ul
-        className={`absolute ${
-          positionClasses[position]
-        } top-10 md:top-13 mt-2 w-90 flex flex-col items-center rounded-2xl bg-white-200 p-0 shadow-lg transform transition-all duration-200 ease-out origin-top ${className}
+      {open && (
+        <ul
+          className={`absolute ${
+            positionClasses[position]
+          } top-10 md:top-13 mt-2 w-90 flex flex-col items-center rounded-2xl bg-white-200 p-0 shadow-lg transform transition-all duration-200 ease-out origin-top ${className}
           ${
             open
               ? "opacity-100 scale-100 translate-y-0"
               : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
           }
         `}
-      >
-        {children}
-      </ul>
+        >
+          {children}
+        </ul>
+      )}
     </div>
   );
 };

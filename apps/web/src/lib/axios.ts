@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getSession } from "next-auth/react";
 
 const api = axios.create({
   baseURL: process.env.PUBLIC_API_URL || "http://localhost:3000/api",
@@ -14,6 +15,7 @@ const elysiaApi = axios.create({
     "Content-Type": "application/json",
   },
 });
+
 const fastApi = axios.create({
   baseURL: process.env.FAST_API_URL || "http://localhost:8000",
   withCredentials: true,
@@ -21,4 +23,16 @@ const fastApi = axios.create({
     "Content-Type": "application/json",
   },
 });
+elysiaApi.interceptors.request.use(
+  async (config) => {
+    const session = await getSession();
+    if (session?.accessToken) {
+      config.headers.Authorization = `Bearer ${session.accessToken}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 export { api, fastApi, elysiaApi };
