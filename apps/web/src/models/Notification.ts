@@ -8,6 +8,7 @@ export interface NotificationData {
   };
   photoId: string;
   type: string;
+  read: boolean;
   message: string;
   createdAt?: string;
   updatedAt?: string;
