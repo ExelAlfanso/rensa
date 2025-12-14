@@ -25,9 +25,13 @@ const fastApi = axios.create({
 });
 elysiaApi.interceptors.request.use(
   async (config) => {
-    const session = await getSession();
-    if (session?.accessToken) {
-      config.headers.Authorization = `Bearer ${session.accessToken}`;
+    try {
+      const session = await getSession();
+      if (session?.accessToken) {
+        config.headers.Authorization = `Bearer ${session.accessToken}`;
+      }
+    } catch (error) {
+      return Promise.reject(error);
     }
     return config;
   },

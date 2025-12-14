@@ -79,7 +79,7 @@ export async function sendCommentedNotification(
 export async function clearUserNotifications(userId: string) {
   try {
     const res = await elysiaApi.delete(`/notifications/${userId}`);
-    return res.data.success;
+    return res.data?.success ?? false;
   } catch (error) {
     console.error("Error clearing notifications:", error);
     throw error;
@@ -89,9 +89,9 @@ export async function clearUserNotifications(userId: string) {
 export async function markUserNotificationAsRead(notificationId: string) {
   try {
     const res = await elysiaApi.put(`/notifications/${notificationId}/read`);
-    return res.data.success;
+    return res.data?.success ?? false;
   } catch (error) {
-    console.error("Error marking notification to read:", error);
+    console.error("Error marking notification as read:", error);
     throw error;
   }
 }

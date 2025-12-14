@@ -1,17 +1,17 @@
-import { useNotificationContext } from "@/providers/NotificationProvider";
 import { useRef, useEffect } from "react";
 
 export default function useReadOnVisible(
-  id: string,
+  id: string | undefined,
   read: boolean,
   onVisible: () => void
 ) {
   const ref = useRef<HTMLLIElement>(null);
-  useEffect(() => {
-    if (id === undefined) {
-      return;
-    }
+  const onVisibleRef = useRef(onVisible);
 
+  useEffect(() => {
+    onVisibleRef.current = onVisible;
+  }, [onVisible]);
+  useEffect(() => {
     if (read) {
       return;
     }
@@ -26,6 +26,7 @@ export default function useReadOnVisible(
       ([entry]) => {
         if (entry.isIntersecting) {
           onVisible();
+          onVisibleRef.current();
           observer.disconnect();
         }
       },
@@ -37,7 +38,7 @@ export default function useReadOnVisible(
     return () => {
       observer.disconnect();
     };
-  }, [read, onVisible, id]);
+  }, [read, onVisible]);
 
   return ref;
 }

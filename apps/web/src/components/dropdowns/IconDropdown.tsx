@@ -1,9 +1,7 @@
 "use client";
 
-import { notificationDropdownOpenAtom } from "@/atoms/iconDropdownAtom";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
-import { useSetAtom } from "jotai";
-import React, { SetStateAction, useEffect, useState } from "react";
+import React, { useState } from "react";
 
 interface IconDropdownProps {
   id?: string;
@@ -21,7 +19,6 @@ interface IconDropdownProps {
     | undefined;
 
   className?: string;
-  onClick?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
 const IconDropdown: React.FC<IconDropdownProps> = ({

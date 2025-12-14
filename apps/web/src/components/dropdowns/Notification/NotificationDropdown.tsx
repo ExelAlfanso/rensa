@@ -60,14 +60,15 @@ const NotificationItem = ({ notification, isLast }: NotificationItemProps) => {
 
 const NotificationDropdown = () => {
   const { notifications, clearNotifications } = useNotificationContext();
+  const unreadCount = notifications.filter((n) => !n.read).length;
   const handleClearAllNotifications = () => {
     clearNotifications();
   };
   return (
     <div className="relative z-50 w-full">
-      {notifications.filter((n) => !n.read).length > 0 && (
+      {unreadCount > 0 && (
         <div className="absolute z-20 right-0 top-0 rounded-full bg-red-500 w-4 h-4 text-white-500 text-[10px] flex items-center justify-center">
-          {notifications.filter((n) => !n.read).length}
+          {unreadCount}
         </div>
       )}
       <IconDropdown Tag={BellIcon} className="h-100">

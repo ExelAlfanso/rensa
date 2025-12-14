@@ -41,9 +41,7 @@ export function NotificationProvider({
     enabled: !!accessToken && !!user?.id,
     initialData: [],
   });
-  // useEffect(() => {
-  //   console.log(notifications);
-  // }, [notifications]);
+
   const connectWebSocket = useCallback(() => {
     const WS_URL =
       process.env.NEXT_PUBLIC_ENVIRONMENT === "DEVELOPMENT"
@@ -105,13 +103,22 @@ export function NotificationProvider({
     };
   }, [user?.id, accessToken, connectWebSocket]);
 
-  const clearNotifications = useCallback(() => {
+  const clearNotifications = useCallback(async () => {
     if (!user?.id) return;
-    clearUserNotifications(user.id);
-    queryClient.setQueryData<NotificationData[]>(
-      ["notifications", user.id],
-      []
-    );
+
+    const key = ["notifications", user.id];
+    const current = queryClient.getQueryData<NotificationData[]>(key) || [];
+
+    // Optimistic update
+    queryClient.setQueryData<NotificationData[]>(key, []);
+
+    try {
+      await clearUserNotifications(user.id);
+    } catch (err) {
+      console.error("Failed to clear notifications", err);
+      // Rollback on failure
+      queryClient.setQueryData<NotificationData[]>(key, current);
+    }
   }, [queryClient, user?.id]);
 
   const markNotificationAsRead = useCallback(
@@ -133,11 +140,11 @@ export function NotificationProvider({
       );
 
       try {
-        markUserNotificationAsRead(id);
+        await markUserNotificationAsRead(id);
       } catch (err) {
         console.error("Failed to mark notification as read", err);
 
-        // rollback kalau gagal
+        // rollback on failure
         queryClient.setQueryData<NotificationData[]>(key, current);
       }
     },
