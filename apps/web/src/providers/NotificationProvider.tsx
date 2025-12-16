@@ -35,6 +35,22 @@ export function NotificationProvider({
   const queryClient = useQueryClient();
   const reconnectAttempts = useRef(0);
   const reconnectTimeout = useRef<NodeJS.Timeout | null>(null);
+  const notifAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      notifAudioRef.current = new Audio("/audios/notification2.mp3");
+      notifAudioRef.current.volume = 0.8;
+    }
+  }, []);
+
+  const playNotification = async () => {
+    try {
+      await notifAudioRef.current?.play();
+    } catch (err) {
+      console.warn("Audio blocked by browser", err);
+    }
+  };
   const { data: notifications = [], refetch } = useQuery<NotificationData[]>({
     queryKey: ["notifications", user?.id],
     queryFn: async () => await fetchNotifications(user!.id),
@@ -72,6 +88,7 @@ export function NotificationProvider({
             return newList.slice(0, 10);
           }
         );
+        playNotification();
       } catch (err) {
         console.error("Invalid WS message:", err);
       }

@@ -1,5 +1,11 @@
 import { elysiaApi } from "@/lib/axios";
 import { fetchPhotoOwnerByPhotoId } from "./PhotoServices";
+
+export type PhotoNotificationType =
+  | "photo-saved"
+  | "photo-bookmarked"
+  | "photo-commented";
+
 export async function fetchNotifications(
   recipientId: string,
   page = 1,
@@ -11,70 +17,40 @@ export async function fetchNotifications(
   return res.data.data.notifications;
 }
 
-//TODO: RATE LIMITING
-export async function sendPhotoSavedNotification(
+async function sendPhotoNotification(
   actorId: string,
-  photoId: string // roll / photo / profile
+  photoId: string,
+  type: PhotoNotificationType
 ) {
   try {
     const recipientId = await fetchPhotoOwnerByPhotoId(photoId);
-    if (recipientId === actorId) {
+
+    if (!recipientId || recipientId === actorId) {
       return null;
     }
+
     const res = await elysiaApi.post(`/notifications`, {
       actorId,
       recipientId,
       photoId,
-      type: "photo-saved",
+      type,
     });
+
     return res.data;
   } catch (error) {
-    console.error("Error sending photo saved notification:", error);
+    console.error(`Error sending ${type} notification:`, error);
     throw error;
   }
 }
-export async function sendBookmarkedNotification(
-  actorId: string,
-  photoId: string // roll / photo / profile
-) {
-  try {
-    const recipientId = await fetchPhotoOwnerByPhotoId(photoId);
-    if (recipientId === actorId) {
-      return null;
-    }
-    const res = await elysiaApi.post(`/notifications`, {
-      actorId,
-      recipientId,
-      photoId,
-      type: "photo-bookmarked",
-    });
-    return res.data;
-  } catch (error) {
-    console.error("Error sending photo bookmarked notification:", error);
-    throw error;
-  }
-}
-export async function sendCommentedNotification(
-  actorId: string,
-  photoId: string // roll / photo / profile
-) {
-  try {
-    const recipientId = await fetchPhotoOwnerByPhotoId(photoId);
-    if (recipientId === actorId) {
-      return null;
-    }
-    const res = await elysiaApi.post(`/notifications`, {
-      actorId,
-      recipientId,
-      photoId,
-      type: "photo-commented",
-    });
-    return res.data;
-  } catch (error) {
-    console.error("Error sending photo commented notification:", error);
-    throw error;
-  }
-}
+
+export const sendPhotoSavedNotification = (actorId: string, photoId: string) =>
+  sendPhotoNotification(actorId, photoId, "photo-saved");
+
+export const sendBookmarkedNotification = (actorId: string, photoId: string) =>
+  sendPhotoNotification(actorId, photoId, "photo-bookmarked");
+
+export const sendCommentedNotification = (actorId: string, photoId: string) =>
+  sendPhotoNotification(actorId, photoId, "photo-commented");
 
 export async function clearUserNotifications(userId: string) {
   try {
