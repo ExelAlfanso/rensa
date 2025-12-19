@@ -19,7 +19,7 @@ export default function ProfilePageWrapper({
   return (
     <ProfilePageClient
       profileData={{
-        user: { id, ...profileData.user },
+        user: { id, ...profileData },
         rolls: rollData.data,
       }}
     />
