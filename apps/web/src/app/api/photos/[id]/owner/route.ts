@@ -2,6 +2,11 @@ import { connectDB } from "@/lib/mongodb";
 import Photo from "@/models/Photo";
 import { NextResponse } from "next/server";
 
+/*
+  GET /api/photos/[id]/owner
+  Fetch the owner of a specific photo by ID
+*/
+
 export async function GET(
   request: Request,
   context: { params: Promise<{ id: string }> }

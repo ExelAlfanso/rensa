@@ -1,6 +1,6 @@
 import { api } from "@/lib/axios";
 import { PopulatedPhoto } from "@/types/PopulatedPhoto";
-// import { Filters } from "@/sections/FilterSection";
+import { sendBookmarkedNotification } from "./NotificationServices";
 export async function fetchImagesFromPicSum(page: number) {
   const newImages = Array.from({ length: 10 }, () => {
     const h = 300 + Math.floor(Math.random() * 200);
@@ -30,7 +30,6 @@ export interface Photo {
   userId: string;
   url: string;
   bookmarks: number;
-  bookmarkedBy: string[];
   title: string;
   description: string;
   tags: string[];
@@ -86,7 +85,35 @@ export async function fetchPhotosFromDB(
     throw error;
   }
 }
+export async function fetchBookmarkedPhotosFromDB(
+  page: number,
+  filters: string[] | undefined,
+  sort: "recent" | "popular" = "recent"
+): Promise<FetchPhotosResponse> {
+  try {
+    const params: Record<string, string | number | undefined> = {
+      page,
+      limit: 10,
+      sort,
+      filters: filters ? filters.join(",") : undefined,
+    };
 
+    const res = await api.get<BackendPhotosResponse>("/photos/bookmark", {
+      params,
+    });
+
+    // console.log("Fetched photos from DB:", res.data);
+
+    return {
+      data: res.data.photos,
+      urls: res.data.photos.map((photo) => photo.url),
+      nextPage: res.data.hasMore ? page + 1 : undefined,
+    };
+  } catch (error) {
+    console.error("Error fetching photos:", error);
+    throw error;
+  }
+}
 // Search photos by tags
 export async function searchPhotosByTags(
   tags: string[],
@@ -155,6 +182,16 @@ export async function fetchPhotoById(photoId: string) {
     return res.data.data;
   } catch (error) {
     console.error("Error fetching photo by ID:", error);
+    throw error;
+  }
+}
+
+export async function fetchUserBookmarkedPhotos(userId: string) {
+  try {
+    const res = await api.get(`/users/${userId}`);
+    return res.data.data.user.bookmarks;
+  } catch (error) {
+    console.error("Error fetching user's bookmarked photos:", error);
     throw error;
   }
 }

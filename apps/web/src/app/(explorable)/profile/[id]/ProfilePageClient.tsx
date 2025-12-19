@@ -10,10 +10,12 @@ import { EditRollProvider } from "@/providers/EditRollProvider";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { CreateRollProvider } from "@/providers/CreateRollProvider";
 import ShareButton from "@/components/buttons/ShareButton";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { fetchRollsByUserId } from "@/services/RollServices";
 
 interface ProfilePageClientProps {
   profileData: {
-    user: { username: string; avatar?: string };
+    user: { id: string; username: string; avatar?: string };
     rolls: Roll[];
   };
 }
@@ -22,28 +24,57 @@ export default function ProfilePageClient({
   profileData,
 }: ProfilePageClientProps) {
   const { user } = useAuthStore();
+  const queryClient = useQueryClient();
+  const [filter, setFilter] = useState("latest");
   const isOwner = user?.name === profileData.user?.username;
-  const [rolls, setRolls] = useState(profileData.rolls);
+
+  const { data: rolls } = useQuery({
+    queryKey: ["profileRolls", profileData.user.id, filter],
+    queryFn: async () => {
+      const res = await fetchRollsByUserId(profileData.user.id, filter);
+      return res;
+    },
+    enabled: !!profileData.user?.username,
+  });
+
   const handleRollUpdate = (roll: { rollId: string; name: string }) => {
-    setRolls((prev) =>
-      prev.map((r) => (r._id === roll.rollId ? { ...r, name: roll.name } : r))
+    queryClient.setQueryData<Roll[]>(
+      ["profileRolls", profileData.user.id, filter],
+      (oldRolls) => {
+        if (!oldRolls) return [];
+        return oldRolls.map((r) =>
+          r._id === roll.rollId ? { ...r, name: roll.name } : r
+        );
+      }
     );
   };
   const handleRollDelete = (rollId: string) => {
-    setRolls((prev) => prev.filter((r) => r._id !== rollId));
+    queryClient.setQueryData<Roll[]>(
+      ["profileRolls", profileData.user.id, filter],
+      (oldRolls) => {
+        if (!oldRolls) return [];
+        return oldRolls.filter((r) => r._id !== rollId);
+      }
+    );
   };
 
   const handleRollCreate = (roll: { _id: string; name: string }) => {
-    setRolls((prev) => [
-      {
-        _id: roll._id,
-        userId: user?.id || "",
-        name: roll.name,
-        previewPhotos: [],
-        createdAt: new Date().toISOString(),
-      },
-      ...prev,
-    ]);
+    queryClient.setQueryData<Roll[]>(
+      ["profileRolls", profileData.user.id, filter],
+      (oldRolls) => {
+        if (!oldRolls) return [];
+        return [
+          {
+            _id: roll._id,
+            userId: user?.id || "",
+            name: roll.name,
+            previewPhotos: [],
+            createdAt: new Date().toISOString(),
+          },
+          ...oldRolls,
+        ];
+      }
+    );
   };
   return (
     <CreateRollProvider onRollCreate={handleRollCreate}>
@@ -69,7 +100,7 @@ export default function ProfilePageClient({
             {isOwner && <AccentButton>Edit Profile</AccentButton>}
           </div>
           <div className="flex flex-col items-start justify-center gap-6 mt-10 xl:mt-0 w-full px-6">
-            <ProfileRollFilterDropdown />
+            <ProfileRollFilterDropdown setFilter={setFilter} />
             <RollList rolls={rolls} isOwner={isOwner} />
           </div>
         </div>

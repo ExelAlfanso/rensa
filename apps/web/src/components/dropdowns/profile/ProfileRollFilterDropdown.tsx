@@ -10,13 +10,13 @@ interface ProfileRollFilterDropdownProps {
 const ProfileRollFilterDropdown: React.FC<ProfileRollFilterDropdownProps> = ({
   setFilter,
 }) => {
-  const filters = ["Latest", "Oldest", "Most Popular", "Least Popular"];
+  const filters = ["Latest", "Oldest"];
   return (
     <TertiaryDropdown
       className="w-35"
       initialValue={"Latest"}
       values={filters}
-      onChange={(value) => setFilter?.(value)}
+      onChange={(value) => setFilter?.(value.toLowerCase().replace(" ", "-"))}
     />
   );
 };

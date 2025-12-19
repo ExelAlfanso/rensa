@@ -1,10 +1,12 @@
+import { authOptions } from "@/lib/auth";
 import { connectDB } from "@/lib/mongodb";
 import Photo, { PhotoDocument } from "@/models/Photo";
 import { FilterQuery, SortOrder } from "mongoose";
+import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
 /*
-  GET /api/photos?page=1&limit=10&filters=tag1,tag2
+  GET /api/photos?page=1&limit=10&filters=tag1,tag2&sort=recent||popular
   Fetch paginated photos with optional filters
 */
 

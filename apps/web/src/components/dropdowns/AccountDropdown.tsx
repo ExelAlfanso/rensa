@@ -4,7 +4,6 @@ import React from "react";
 import { CaretDownIcon } from "@phosphor-icons/react";
 import { accountDropdownDatas } from "@/app/datas/accountDropdownDatas";
 import IconDropdown from "./IconDropdown";
-import Heading from "../Heading";
 import Image from "next/image";
 import Text from "../Text";
 import DropdownItem from "./DropdownItem";

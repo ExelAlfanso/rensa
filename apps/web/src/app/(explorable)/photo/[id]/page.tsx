@@ -4,7 +4,6 @@ import PhotoInfoCard from "@/components/cards/PhotoInfoCard";
 import ImagePreview from "@/components/ImagePreview";
 
 import { redirect } from "next/navigation";
-import { api } from "@/lib/axios";
 import { fetchPhotoById } from "@/services/PhotoServices";
 
 export default async function PhotoPage({
@@ -13,14 +12,12 @@ export default async function PhotoPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-
   let photo = null;
   try {
     photo = await fetchPhotoById(id);
   } catch (error) {
     console.error("Error fetching photo:", error);
   }
-
   if (!photo) {
     redirect("/not-found");
   }
@@ -38,13 +35,10 @@ export default async function PhotoPage({
         <PhotoInfoCard
           id={id}
           initialBookmarks={photo?.bookmarks}
-          bookmarkedBy={
-            photo?.bookmarkedBy?.map((id: string) => id.toString()) || []
-          }
           title={photo?.title}
           description={photo?.description}
           metadata={photo?.metadata}
-          userId={photo?.userId.toString() || ""}
+          ownerId={photo?.userId.toString() || ""}
         />
       </div>
       <div className="flex flex-col items-start justify-start min-h-screen bg-white-500">

@@ -31,10 +31,6 @@ const TertiaryDropdown: React.FC<TertiaryDropdownProps> = ({
     onChange?.(target.innerText);
     setIsOpen(false);
   };
-  useEffect(() => {
-    console.log("isOpen changed:", isOpen);
-  }, [isOpen]);
-
   return (
     <div ref={dropdownRef} className={`relative ${className} text-primary`}>
       {label && (

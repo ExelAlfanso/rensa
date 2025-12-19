@@ -103,11 +103,9 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
                   ? "bg-black border-black text-white"
                   : "bg-white border-white text-black"
               }
-              ${isLoading ? "opacity-70 cursor-wait" : ""}`}
+             `}
                   >
-                    {isLoading ? (
-                      <div className="text-current loading loading-spinner" />
-                    ) : isSaved ? (
+                    {isSaved ? (
                       <CheckIcon size={16} weight="bold" />
                     ) : (
                       <PlusIcon size={16} />

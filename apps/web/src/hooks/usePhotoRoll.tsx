@@ -13,6 +13,7 @@ export function usePhotoRoll(photoId: string | null) {
   const { showToast } = useToast();
   const queryClient = useQueryClient();
   const { user } = useAuthStore();
+
   const actorId = user?.id || "";
   const [selectedRoll, setSelectedRoll] = useState<{
     id: string;
@@ -62,6 +63,21 @@ export function usePhotoRoll(photoId: string | null) {
       queryClient.invalidateQueries({ queryKey: ["savedRolls", photoId] });
     },
     onError: () => showToast("Failed to add photo", "error"),
+    onMutate: async (rollId: string) => {
+      await queryClient.cancelQueries({ queryKey: ["savedRolls", photoId] });
+      const previousSavedRolls = queryClient.getQueryData<string[]>([
+        "savedRolls",
+        photoId,
+      ]);
+      queryClient.setQueryData<string[]>(
+        ["savedRolls", photoId],
+        (old = []) => {
+          if (!old.includes(rollId)) return [...old, rollId];
+          return old;
+        }
+      );
+      return { previousSavedRolls };
+    },
   });
 
   // -----------------------

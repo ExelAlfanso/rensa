@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import Heading from "../Heading";
 import Text from "../Text";
 
@@ -15,21 +15,21 @@ import CommentSection from "@/sections/CommentSection";
 import RollDropdownIconButton from "../dropdowns/rolls/RollDropdownIconButton";
 import usePhotoRoll from "@/hooks/usePhotoRoll";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { bookmarkPhoto } from "@/services/PhotoPostServices";
+import { fetchUserBookmarkedPhotos } from "@/services/PhotoServices";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { fetchProfile } from "@/services/ProfileServices";
 interface PhotoInfoCardProps {
-  id?: string;
+  id: string;
   className?: string;
   bookmarks?: number;
   initialBookmarks?: number;
   children?: React.ReactNode;
   title?: string;
   description?: string;
-  userId: string;
+  ownerId: string;
   metadata?: PhotoMetadata;
-  bookmarkedBy?: string[];
 }
-
-//TODO: Comment feature
-//TODO: Save feature
 
 const PhotoInfoCard: React.FC<PhotoInfoCardProps> = ({
   id,
@@ -38,17 +38,29 @@ const PhotoInfoCard: React.FC<PhotoInfoCardProps> = ({
   initialBookmarks,
   description,
   metadata,
-  userId,
-  bookmarkedBy,
+  ownerId,
 }) => {
   const { user } = useAuthStore();
-  const [username, setUsername] = useState("Loading...");
-  const [avatarUrl, setAvatarUrl] = useState("/profile.jpg");
-  const [isBookmarked, setIsBookmarked] = useState(
-    user ? bookmarkedBy?.includes(user.id) : false
-  );
   const [bookmarks, setBookmarks] = useState(initialBookmarks);
+  const [isBookmarkedState, setIsBookmarked] = useState(false);
 
+  const { data: isBookmarked = false } = useQuery({
+    queryKey: ["isPhotoBookmarked", user?.id, id],
+    queryFn: async () => {
+      if (!user?.id) return false;
+      const bookmarkedPhotos = await fetchUserBookmarkedPhotos(user.id);
+      return bookmarkedPhotos.includes(id || "");
+    },
+  });
+  useEffect(() => {
+    setIsBookmarked(isBookmarked);
+  }, [isBookmarked]);
+  const { data: profile } = useQuery({
+    queryKey: ["ownerId", ownerId],
+    queryFn: async () => await fetchProfile(ownerId),
+    staleTime: 5 * 60 * 1000,
+    enabled: !!ownerId,
+  });
   const {
     selectedRoll,
     isLoading,
@@ -59,37 +71,20 @@ const PhotoInfoCard: React.FC<PhotoInfoCardProps> = ({
     removeFromRoll,
   } = usePhotoRoll(id || null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  useEffect(() => {
-    setIsBookmarked(user ? bookmarkedBy?.includes(user.id) : false);
-    fetchProfileData(userId);
-  }, [userId, user, bookmarkedBy, id]);
 
   const handleBookmarkToggle = async () => {
-    setIsBookmarked((prev) => !prev);
-    setBookmarks((prev) => (isBookmarked ? (prev || 0) - 1 : (prev || 0) + 1));
+    setIsBookmarked((prev: boolean) => !prev);
+    setBookmarks((prev) =>
+      isBookmarkedState ? (prev || 0) - 1 : (prev || 0) + 1
+    );
     try {
-      const action = isBookmarked ? "decrement" : "increment";
-
-      const res = await api.post(`/photos/bookmark/${id}`, {
-        action,
-        userId: user?.id,
-      });
-      setBookmarks(res.data.bookmarks);
+      const action = isBookmarkedState ? "decrement" : "increment";
+      const res = await bookmarkPhoto(user?.id, id || "", action);
     } catch (err) {
       console.log(err);
     }
   };
 
-  const fetchProfileData = async (userId: string) => {
-    try {
-      const response = await api.get(`/profile/${userId}`);
-      const user = response.data.data.user;
-      setUsername(user.username);
-      setAvatarUrl(user.avatarUrl);
-    } catch (err) {
-      console.error("Error fetching profile data:", err);
-    }
-  };
   return (
     <div
       id={id}
@@ -99,7 +94,7 @@ const PhotoInfoCard: React.FC<PhotoInfoCardProps> = ({
         <span className="text-black inline-flex items-center justify-center">
           <Text size="s">{bookmarks}</Text>
           <button onClick={handleBookmarkToggle}>
-            {isBookmarked ? (
+            {isBookmarkedState ? (
               <BookmarkSimpleIcon
                 weight="fill"
                 size={24}
@@ -137,10 +132,10 @@ const PhotoInfoCard: React.FC<PhotoInfoCardProps> = ({
           <Heading size="m">{title}</Heading>
         </div>
         <ProfileBadge
-          avatarUrl={avatarUrl}
-          username={username}
-          alt={username}
-          href={`/profile/${userId}`}
+          avatarUrl={profile?.avatarUrl}
+          username={profile?.username || "loading..."}
+          alt={profile?.username}
+          href={`/profile/${ownerId}`}
           className="mb-5"
         />
         <p className="text-[16px] text-black-200 max-w-[350px]">

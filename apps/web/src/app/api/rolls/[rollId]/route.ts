@@ -1,5 +1,7 @@
+import { authOptions } from "@/lib/auth";
 import { connectDB } from "@/lib/mongodb";
 import Roll from "@/models/Roll";
+import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
 /*
@@ -46,17 +48,21 @@ export async function PATCH(
 ) {
   const { rollId } = await context.params;
   const { name } = await req.json();
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
   try {
     await connectDB();
     const updatedRoll = await Roll.findByIdAndUpdate(
       rollId,
-      { name },
+      { name, userId: session.user.id },
       { new: true }
     ).lean();
     if (!updatedRoll) {
       return NextResponse.json(
-        { success: false, message: "Roll not found" },
-        { status: 404 }
+        { success: false, message: "Forbidden or roll not found" },
+        { status: 403 }
       );
     }
     return NextResponse.json(

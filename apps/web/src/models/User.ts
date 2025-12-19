@@ -1,4 +1,4 @@
-import mongoose, { model, Schema } from "mongoose";
+import mongoose, { model, ObjectId, Schema } from "mongoose";
 
 export interface UserDocument {
   _id: string;
@@ -6,6 +6,7 @@ export interface UserDocument {
   email: string;
   password: string;
   avatar: string;
+  bookmarks: ObjectId[];
 }
 
 const UserSchema = new Schema<UserDocument>(
@@ -26,7 +27,8 @@ const UserSchema = new Schema<UserDocument>(
     },
     avatar: {
       type: String,
-    },
+    },  
+    bookmarks:{type: [{ type: Schema.Types.ObjectId, ref: "Photo" }], default: []}
   },
   {
     timestamps: true,

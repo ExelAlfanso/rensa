@@ -1,0 +1,40 @@
+import { api } from "@/lib/axios";
+import {
+  sendBookmarkedNotification,
+  sendCommentedNotification,
+} from "./NotificationServices";
+import { CommentType } from "@/sections/CommentSection";
+
+export async function bookmarkPhoto(
+  userId: string | undefined,
+  photoId: string,
+  action: "increment" | "decrement"
+) {
+  try {
+    const res = await api.post(`/photos/bookmark/${photoId}`, {
+      action,
+      userId: userId,
+    });
+    await sendBookmarkedNotification(userId || "", photoId);
+    return res.data.bookmarks;
+  } catch (error) {
+    console.error("Error bookmarking photo:", error);
+    throw error;
+  }
+}
+
+export async function commentPhoto(
+  newComment: CommentType,
+  id: string,
+  userId: string | undefined
+) {
+  try {
+    await api.post(`/photos/${id}/comments`, {
+      text: newComment.text,
+      userId: userId,
+    });
+    await sendCommentedNotification(userId || "", id);
+  } catch (err) {
+    console.error("Error posting comment:", err);
+  }
+}

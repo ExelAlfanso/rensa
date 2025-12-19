@@ -24,10 +24,10 @@ declare module "next-auth" {
 
 export const authOptions: NextAuthOptions = {
   providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }),
+    // GoogleProvider({
+    //   clientId: process.env.GOOGLE_CLIENT_ID!,
+    //   clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    // }),
 
     CredentialsProvider({
       name: "Credentials",
@@ -41,7 +41,7 @@ export const authOptions: NextAuthOptions = {
         await connectDB();
         const user = await User.findOne({ email: credentials?.email });
         if (!user) {
-          console.log("❌ No user found for", credentials?.email);
+          console.log("  No user found for", credentials?.email);
           throw new Error("No User found");
         }
         const isValid = await bcrypt.compare(
@@ -49,7 +49,7 @@ export const authOptions: NextAuthOptions = {
           user.password
         );
         if (!isValid) {
-          console.log("❌ Invalid password for", credentials?.email);
+          console.log("  Invalid password for", credentials?.email);
           throw new Error("Invalid password");
         }
         console.log("✅ User authenticated:", user.email);
@@ -106,5 +106,10 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
+  },
+  pages: {
+    signIn: "/login",
+    signOut: "/logout",
+    error: "/not-found", // Error code passed in query string as ?error=
   },
 };

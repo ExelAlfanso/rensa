@@ -5,6 +5,7 @@ import IconDropdown from "../IconDropdown";
 import DropdownItem from "../DropdownItem";
 import { useEditRoll } from "@/providers/EditRollProvider";
 import { useAuthStore } from "@/stores/useAuthStore";
+import { useToast } from "@/providers/ToastProvider";
 
 interface RollPageDropdownProps {
   rollId: string;
@@ -18,6 +19,7 @@ const RollPageDropdown: React.FC<RollPageDropdownProps> = ({
   isOwner,
 }) => {
   const { openEditor } = useEditRoll();
+  const { showToast } = useToast();
   return (
     <div className={`z-20`}>
       <IconDropdown
@@ -34,7 +36,14 @@ const RollPageDropdown: React.FC<RollPageDropdownProps> = ({
             Rename
           </DropdownItem>
         )}
-        <DropdownItem className="px-10" href={""}>
+        <DropdownItem
+          className="px-10"
+          onClick={() => {
+            const shareUrl = `${window.location.origin}/roll/${rollId}`;
+            navigator.clipboard.writeText(shareUrl);
+            showToast("Roll link copied to clipboard!", "success");
+          }}
+        >
           Share
         </DropdownItem>
         {isOwner && (
