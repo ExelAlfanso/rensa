@@ -17,16 +17,16 @@ export async function GET(
   const { id } = await context.params;
 
   try {
-    // 1️⃣ Check session
-    const session = await getServerSession({ req: request, ...authOptions });
-    if (!session) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
+    // // 1️⃣ Check session
+    // const session = await getServerSession({ req: request, ...authOptions });
+    // if (!session) {
+    //   return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    // }
 
-    // Optional: only allow the user to access their own data
-    if (session.user.id !== id) {
-      return NextResponse.json({ message: "Forbidden" }, { status: 403 });
-    }
+    // // Optional: only allow the user to access their own data
+    // if (session.user.id !== id) {
+    //   return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+    // }
 
     await connectDB();
 

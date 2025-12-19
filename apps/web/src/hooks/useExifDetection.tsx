@@ -29,7 +29,7 @@ export function useExifDetection(
       const formData = new FormData();
       formData.append("file", file);
       const res = await api.post(
-        "https://exifreader.onrender.com/api/exifread",
+        process.env.NEXT_PUBLIC_EXIF_URL || "/api/exifread",
 
         formData,
         {

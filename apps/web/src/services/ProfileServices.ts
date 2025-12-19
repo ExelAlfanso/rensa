@@ -1,7 +1,7 @@
 import { api } from "@/lib/axios";
 
 export function fetchProfile(id: string) {
-  return api.get(`/profile/${id}`).then((res) => res.data.data);
+  return api.get(`/profile/${id}`).then((res) => res.data.data.user);
 }
 
 export function fetchProfileByRollId(rollId: string) {

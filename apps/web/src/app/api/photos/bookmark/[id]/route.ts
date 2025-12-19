@@ -1,39 +1,61 @@
 import Photo from "@/models/Photo";
-import { Types } from "mongoose";
+import User from "@/models/User";
+import { ObjectId } from "mongoose";
 import { NextResponse } from "next/server";
 
-/*
-  POST /api/photos/bookmark/[id]
-  Increment or decrement bookmark count for a photo
-*/
 export async function POST(
   request: Request,
-  context: { params: Promise<{ id: string }> }
+  context: { params: { id: string } }
 ) {
   const { id } = await context.params;
+
   try {
     const { action, userId } = await request.json();
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return NextResponse.json(
+        { success: false, message: "User not found" },
+        { status: 404 }
+      );
+    }
+
     const photo = await Photo.findById(id);
     if (!photo) {
-      return NextResponse.json({ error: "Photo not found" }, { status: 404 });
+      return NextResponse.json(
+        { success: false, message: "Photo not found" },
+        { status: 404 }
+      );
     }
-    if (action === "increment") {
-      if (!photo.bookmarkedBy.includes(userId)) {
-        photo.bookmarkedBy.push(userId);
-        photo.bookmarks += 1;
-      }
-    } else if (action === "decrement") {
-      if (photo.bookmarkedBy.includes(userId)) {
-        photo.bookmarkedBy = photo.bookmarkedBy.filter(
-          (uid: string) => uid === userId
-        );
-        photo.bookmarks -= 1;
-      }
+
+    const isBookmarked = user.bookmarks.some(
+      (pid: ObjectId) => pid.toString() === id
+    );
+
+    if (action === "increment" && !isBookmarked) {
+      user.bookmarks.push(photo._id);
+      photo.bookmarks += 1;
     }
-    await photo.save();
+
+    if (action === "decrement" && isBookmarked) {
+      user.bookmarks = user.bookmarks.filter(
+        (pid: ObjectId) => pid.toString() !== id
+      );
+      photo.bookmarks = Math.max(0, photo.bookmarks - 1);
+    }
+
+    await Promise.all([user.save(), photo.save()]);
+
     return NextResponse.json({
-      bookmarks: photo.bookmarks,
-      isBookmarked: photo.bookmarkedBy.includes(userId),
+      success: true,
+      bookmarks: user.bookmarks.map((id: ObjectId) => id.toString()),
+      isBookmarked:
+        action === "increment"
+          ? true
+          : action === "decrement"
+          ? false
+          : isBookmarked,
+      message: "Bookmark updated",
     });
   } catch (err) {
     console.error("Error updating bookmark:", err);
