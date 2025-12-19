@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import Roll from "@/models/Roll";
 import { getToken } from "next-auth/jwt";
+import { authOptions } from "@/lib/auth";
+import { getServerSession } from "next-auth";
 
 /*
   POST /api/rolls/[rollId]/photos/[photoId]
@@ -15,7 +17,11 @@ export async function POST(
     await connectDB();
 
     const { rollId, photoId } = await context.params;
+    const session = await getServerSession(authOptions);
 
+    if (!session || !session.user) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
     if (!rollId?.length || !photoId) {
       return NextResponse.json(
         { success: false, message: "Missing rollId or photoId" },
@@ -23,18 +29,28 @@ export async function POST(
       );
     }
 
-    const result = await Roll.updateMany(
-      { _id: { $in: rollId } },
-      { $addToSet: { photos: photoId } }
+    const result = await Roll.updateOne(
+      {
+        _id: rollId,
+        userId: session.user.id,
+      },
+      {
+        $addToSet: { photos: photoId },
+      }
     );
-
+    if (result.matchedCount === 0) {
+      return NextResponse.json(
+        { success: false, message: "Forbidden or roll not found" },
+        { status: 403 }
+      );
+    }
     return NextResponse.json({
       success: true,
       message: "Photo added to selected roll",
       modifiedCount: result.modifiedCount,
     });
   } catch (error) {
-    console.error("❌ Failed to add photo to roll:", error);
+    console.error("Failed to add photo to roll:", error);
     return NextResponse.json(
       { success: false, message: "Failed to add photo to roll" },
       { status: 500 }
@@ -54,17 +70,15 @@ export async function DELETE(
   context: { params: Promise<{ rollId: string; photoId: string }> }
 ) {
   const { rollId, photoId } = await context.params;
+  const session = await getServerSession(authOptions);
+
+  if (!session || !session.user) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
 
   try {
     await connectDB();
     const user = await getToken({ req, secret });
-
-    if (!user) {
-      return NextResponse.json(
-        { success: false, message: "Unauthorized" },
-        { status: 401 }
-      );
-    }
 
     const roll = await Roll.findById(rollId);
     if (!roll) {
@@ -74,7 +88,7 @@ export async function DELETE(
       );
     }
 
-    if (roll.userId.toString() !== user.id) {
+    if (roll.userId.toString() !== user?.id) {
       return NextResponse.json(
         { success: false, message: "Forbidden" },
         { status: 403 }

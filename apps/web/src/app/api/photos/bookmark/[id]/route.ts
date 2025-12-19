@@ -1,7 +1,14 @@
+import { authOptions } from "@/lib/auth";
 import Photo from "@/models/Photo";
 import User from "@/models/User";
 import { ObjectId } from "mongoose";
+import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
+
+/*
+  POST /api/photos/[id]/bookmark
+  Add or remove bookmark for a photo
+*/
 
 export async function POST(
   request: Request,
@@ -11,6 +18,13 @@ export async function POST(
 
   try {
     const { action, userId } = await request.json();
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized" },
+        { status: 401 }
+      );
+    }
 
     const user = await User.findById(userId);
     if (!user) {

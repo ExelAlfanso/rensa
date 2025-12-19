@@ -41,7 +41,7 @@ export const authOptions: NextAuthOptions = {
         await connectDB();
         const user = await User.findOne({ email: credentials?.email });
         if (!user) {
-          console.log("❌ No user found for", credentials?.email);
+          console.log("  No user found for", credentials?.email);
           throw new Error("No User found");
         }
         const isValid = await bcrypt.compare(
@@ -49,7 +49,7 @@ export const authOptions: NextAuthOptions = {
           user.password
         );
         if (!isValid) {
-          console.log("❌ Invalid password for", credentials?.email);
+          console.log("  Invalid password for", credentials?.email);
           throw new Error("Invalid password");
         }
         console.log("✅ User authenticated:", user.email);
@@ -108,8 +108,8 @@ export const authOptions: NextAuthOptions = {
     },
   },
   pages: {
-    signIn: "/auth/login",
-    signOut: "/auth/logout",
-    error: "/auth/login", // Error code passed in query string as ?error=
+    signIn: "/login",
+    signOut: "/logout",
+    error: "/not-found", // Error code passed in query string as ?error=
   },
 };

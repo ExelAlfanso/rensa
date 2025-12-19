@@ -1,4 +1,6 @@
+import { authOptions } from "@/lib/auth";
 import Comment from "@/models/Comment";
+import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
 /*
@@ -12,6 +14,13 @@ export async function POST(
   const { id } = await context.params;
   const { text, userId } = await request.json();
   try {
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized" },
+        { status: 401 }
+      );
+    }
     const newComment = await Comment.create({
       photoId: id,
       userId,
@@ -37,7 +46,7 @@ export async function POST(
 
 /*
     GET /api/photos/:id/comments?offset=0
-    Supports offset-based pagination
+    Get comments for a photo with pagination
 */
 
 export async function GET(

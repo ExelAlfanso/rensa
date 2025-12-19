@@ -4,6 +4,8 @@ import { connectDB } from "@/lib/mongodb";
 import Photo from "@/models/Photo";
 import { SortOrder } from "mongoose";
 import { create } from "domain";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 /*
   GET /api/rolls?userId=...&sort=recent||mostPopular||oldest||leastPopular
@@ -58,6 +60,13 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   await connectDB();
   const { name, imageUrl, userId } = await req.json();
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user) {
+    return NextResponse.json(
+      { success: false, message: "Unauthorized" },
+      { status: 401 }
+    );
+  }
   try {
     const newRoll = new Roll({
       name: name,
