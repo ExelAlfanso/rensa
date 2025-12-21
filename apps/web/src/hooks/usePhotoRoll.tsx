@@ -100,11 +100,12 @@ export function usePhotoRoll(photoId: string | null) {
   return {
     selectedRoll,
     isLoading: saveMutation.isPending || removeMutation.isPending,
-    isSaved,
+    isSaved: selectedRoll ? savedToRolls.includes(selectedRoll.id) : false,
     savedToRolls,
     setSelectedRoll,
-    saveToRoll: () => defaultRoll && saveMutation.mutate(defaultRoll._id),
-    removeFromRoll: () => defaultRoll && removeMutation.mutate(defaultRoll._id),
+    saveToRoll: () => selectedRoll && saveMutation.mutate(selectedRoll.id),
+    removeFromRoll: () =>
+      selectedRoll && removeMutation.mutate(selectedRoll.id),
   };
 }
 
