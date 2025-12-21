@@ -53,6 +53,7 @@ const RollDropdownIconButton: React.FC<RollDropdownIconButtonProps> = ({
     setNewRollName("");
     if (buttonRef.current?.contains(event?.target as Node)) return;
     closeAll?.();
+     
   });
   const listRef = useRef<HTMLUListElement>(null);
 
@@ -66,7 +67,10 @@ const RollDropdownIconButton: React.FC<RollDropdownIconButtonProps> = ({
     }
   }, [isCreating]);
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (!user?.id) router.push("/login");
+    if (!user?.id) {
+      router.push("/login");
+      return;
+    }
     e.stopPropagation();
     e.preventDefault();
     setIsOpen((prev) => !prev);
@@ -75,9 +79,25 @@ const RollDropdownIconButton: React.FC<RollDropdownIconButtonProps> = ({
   useEffect(() => {
     if (isOpen) {
       fetchRolls();
-      updateDropdownPosition();
+      const button = buttonRef.current;
+      const dropdown = dropdownRef.current;
+
+      if (button && dropdown) {
+        const buttonRect = button.getBoundingClientRect();
+        const dropdownRect = dropdown.getBoundingClientRect();
+
+        setDropdownPosition({
+          top: buttonRect.bottom + window.scrollY + 4,
+          left:
+            buttonRect.left +
+            window.scrollX +
+            buttonRect.width / 2 -
+            dropdownRect.width / 2,
+        });
+      }
     }
-  }, [isOpen]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, fetchRolls]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -89,7 +109,7 @@ const RollDropdownIconButton: React.FC<RollDropdownIconButtonProps> = ({
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, []);
+  }, [setIsOpen]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -104,26 +124,27 @@ const RollDropdownIconButton: React.FC<RollDropdownIconButtonProps> = ({
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const updateDropdownPosition = () => {
-    const button = buttonRef.current;
-    const dropdown = dropdownRef.current;
+  // const updateDropdownPosition = () => {
+  //   const button = buttonRef.current;
+  //   const dropdown = dropdownRef.current;
 
-    if (button && dropdown) {
-      const buttonRect = button.getBoundingClientRect();
-      const dropdownRect = dropdown.getBoundingClientRect();
+  //   if (button && dropdown) {
+  //     const buttonRect = button.getBoundingClientRect();
+  //     const dropdownRect = dropdown.getBoundingClientRect();
 
-      setDropdownPosition({
-        top: buttonRect.bottom + window.scrollY + 4,
-        left:
-          buttonRect.left +
-          window.scrollX +
-          buttonRect.width / 2 -
-          dropdownRect.width / 2,
-      });
-    }
-  };
+  //     setDropdownPosition({
+  //       top: buttonRect.bottom + window.scrollY + 4,
+  //       left:
+  //         buttonRect.left +
+  //         window.scrollX +
+  //         buttonRect.width / 2 -
+  //         dropdownRect.width / 2,
+  //     });
+  //   }
+  // };
 
   const handleCreate = () => {
     setIsCreating(true);

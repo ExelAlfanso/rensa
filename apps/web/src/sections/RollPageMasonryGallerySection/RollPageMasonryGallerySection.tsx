@@ -8,7 +8,7 @@ import {
   Photo,
   FetchPhotosResponse,
 } from "@/services/PhotoServices";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, InfiniteData } from "@tanstack/react-query";
 import { PopulatedPhoto } from "@/types/PopulatedPhoto";
 import RollPageMasonryGalleryGrid from "./RollPageMasonryGalleryGrid";
 import { useQueryClient } from "@tanstack/react-query";
@@ -64,20 +64,23 @@ const RollPageMasonryGallerySection: React.FC<
     );
   }
   const handlePhotoRemoved = (photoId: string) => {
-    queryClient.setQueryData(["photos", rollId], (oldData: any) => {
-      if (!oldData) return oldData;
+    queryClient.setQueryData(
+      ["photos", rollId],
+      (oldData: InfiniteData<FetchPhotosResponse> | undefined) => {
+        if (!oldData) return oldData;
 
-      return {
-        ...oldData,
-        pages: oldData.pages.map((page: any) => ({
-          ...page,
-          data: page.data.filter((p: any) => {
-            const id = typeof p === "string" ? p : p._id;
-            return id !== photoId;
-          }),
-        })),
-      };
-    });
+        return {
+          ...oldData,
+          pages: oldData.pages.map((page: FetchPhotosResponse) => ({
+            ...page,
+            data: page.data.filter((p: PopulatedPhoto | string) => {
+              const id = typeof p === "string" ? p : p._id;
+              return id !== photoId;
+            }),
+          })),
+        };
+      }
+    );
   };
   return (
     <div className="flex flex-col items-center justify-center">

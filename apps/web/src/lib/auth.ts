@@ -1,4 +1,4 @@
-import type { NextAuthOptions } from "next-auth";
+import type { NextAuthOptions, Session } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { connectDB } from "./mongodb";
 import User from "@/models/User";
@@ -95,11 +95,11 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (token) {
         session.user = {
-          ...(session.user as any),
+          ...(session.user as Session["user"]),
           id: token.id as string,
           name: token.name,
           email: token.email,
-          provider: token.provider,
+          provider: token.provider as string | undefined,
         };
         session.accessToken = token.accessToken as string;
       }

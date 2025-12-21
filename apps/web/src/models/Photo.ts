@@ -13,7 +13,6 @@ export interface PhotoMetadata {
 }
 
 export interface PhotoDocument extends Document {
-  _id: string;
   userId: Types.ObjectId;
   url: string;
   bookmarks: number;
