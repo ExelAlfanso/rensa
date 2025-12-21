@@ -46,10 +46,10 @@ const RollDropdown: React.FC<RollDropdownProps> = ({
   const { showToast } = useToast();
   const buttonRef = useRef<HTMLButtonElement>(null);
 
-  const dropdownRef = useOutsideClick<HTMLDivElement>(() => {
+  const dropdownRef = useOutsideClick<HTMLDivElement>((event: MouseEvent) => {
     setIsCreating(false);
     setNewRollName("");
-    if (buttonRef.current?.contains(event?.target as Node)) return;
+    if (buttonRef.current?.contains(event.target as Node)) return;
     closeAll();
   });
   const listRef = useRef<HTMLUListElement>(null);
@@ -126,25 +126,6 @@ const RollDropdown: React.FC<RollDropdownProps> = ({
     return () => window.removeEventListener("scroll", handleScroll);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // const updateDropdownPosition = () => {
-  //   const button = buttonRef.current;
-  //   const dropdown = dropdownRef.current;
-
-  //   if (button && dropdown) {
-  //     const buttonRect = button.getBoundingClientRect();
-  //     const dropdownRect = dropdown.getBoundingClientRect();
-
-  //     setDropdownPosition({
-  //       top: buttonRect.bottom + window.scrollY + 4,
-  //       left:
-  //         buttonRect.left +
-  //         window.scrollX +
-  //         buttonRect.width / 2 -
-  //         dropdownRect.width / 2,
-  //     });
-  //   }
-  // };
 
   const handleCreate = () => {
     setIsCreating(true);
