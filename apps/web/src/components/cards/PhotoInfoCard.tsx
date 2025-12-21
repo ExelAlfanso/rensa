@@ -19,6 +19,7 @@ import { bookmarkPhoto } from "@/services/PhotoPostServices";
 import { fetchUserBookmarkedPhotos } from "@/services/PhotoServices";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchProfile } from "@/services/ProfileServices";
+import { redirect } from "next/navigation";
 interface PhotoInfoCardProps {
   id: string;
   className?: string;
@@ -71,8 +72,8 @@ const PhotoInfoCard: React.FC<PhotoInfoCardProps> = ({
     removeFromRoll,
   } = usePhotoRoll(id || null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
   const handleBookmarkToggle = async () => {
+    if (!user?.id) redirect("/login");
     setIsBookmarked((prev: boolean) => !prev);
     setBookmarks((prev) =>
       isBookmarkedState ? (prev || 0) - 1 : (prev || 0) + 1
@@ -90,40 +91,42 @@ const PhotoInfoCard: React.FC<PhotoInfoCardProps> = ({
       id={id}
       className={`flex flex-col gap-1.5 bg-white-200 ${className} shadow-lg p-10 rounded-3xl text-primary w-full lg:max-w-3xl xl:w-[40%]`}
     >
-      <div className="inline-flex items-center justify-between w-full">
-        <span className="text-black inline-flex items-center justify-center">
-          <Text size="s">{bookmarks}</Text>
-          <button onClick={handleBookmarkToggle}>
-            {isBookmarkedState ? (
-              <BookmarkSimpleIcon
-                weight="fill"
-                size={24}
-                className="hover:scale-110 transition-transform cursor-pointer focus:border-0"
-              />
-            ) : (
-              <BookmarkSimpleIcon
-                weight="regular"
-                size={24}
-                className="hover:scale-110 transition-transform cursor-pointer focus:border-0"
-              />
-            )}
-          </button>
-        </span>
-        <div className="inline-flex gap-5">
-          <RollDropdownIconButton
-            isOpen={isDropdownOpen}
-            setIsOpen={setIsDropdownOpen}
-            selectedRoll={selectedRoll}
-            setSelectedRoll={setSelectedRoll}
-            savedToRolls={savedToRolls}
-            disabled={isLoading || isSaved}
-          />
+      {user?.id && (
+        <div className="inline-flex items-center justify-between w-full">
+          <span className="text-black inline-flex items-center justify-center">
+            <Text size="s">{bookmarks}</Text>
+            <button onClick={handleBookmarkToggle}>
+              {isBookmarkedState ? (
+                <BookmarkSimpleIcon
+                  weight="fill"
+                  size={24}
+                  className="hover:scale-110 transition-transform cursor-pointer focus:border-0"
+                />
+              ) : (
+                <BookmarkSimpleIcon
+                  weight="regular"
+                  size={24}
+                  className="hover:scale-110 transition-transform cursor-pointer focus:border-0"
+                />
+              )}
+            </button>
+          </span>
+          <div className="inline-flex gap-5">
+            <RollDropdownIconButton
+              isOpen={isDropdownOpen}
+              setIsOpen={setIsDropdownOpen}
+              selectedRoll={selectedRoll}
+              setSelectedRoll={setSelectedRoll}
+              savedToRolls={savedToRolls}
+              disabled={isLoading || isSaved}
+            />
 
-          <PrimaryButton onClick={isSaved ? removeFromRoll : saveToRoll}>
-            {isLoading ? "Loading..." : isSaved ? "Saved" : "Save"}
-          </PrimaryButton>
+            <PrimaryButton onClick={isSaved ? removeFromRoll : saveToRoll}>
+              {isLoading ? "Loading..." : isSaved ? "Saved" : "Save"}
+            </PrimaryButton>
+          </div>
         </div>
-      </div>
+      )}
       <div className="mb-9">
         <div className="mb-7">
           <Text size="s" className="text-white-700">

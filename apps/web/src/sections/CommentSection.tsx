@@ -3,6 +3,7 @@ import Comment from "@/components/Comment";
 import CommentInputField from "@/components/inputfields/CommentInputField";
 import { useEffect, useRef, useState } from "react";
 import { api } from "@/lib/axios";
+import { useAuthStore } from "@/stores/useAuthStore";
 
 export interface CommentType {
   _id: string;
@@ -98,7 +99,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ id }) => {
               {hasMore && idx === comments.length - 1 && (
                 <div
                   onClick={() => !loading && fetchMoreComments(id!)}
-                  className="*absolute bottom-0 left-0 flex items-center justify-center w-full h-10 cursor-pointer bg-gradient-to-t from-white/95 via-white/60 to-transparent backdrop-blur-[1px]"
+                  className="*absolute bottom-0 left-0 flex items-center justify-center w-full h-5 cursor-pointer bg-gradient-to-t from-white/95 via-white/60 to-transparent backdrop-blur-[px]"
                 >
                   {loading ? (
                     <div className="scale-75 loading loading-spinner text-primary"></div>

@@ -17,7 +17,7 @@ const PrimaryButton: React.FC<ButtonProps> = ({
       onClick={onClick}
       href={href}
       disabled={disabled}
-      className={`btn-primary hover:bg-black-300 focus:bg-black-400 disabled:bg-black-200 ${className}`}
+      className={`bg-black-500 hover:bg-black-300 focus:bg-black-400 disabled:bg-black-200 text-white ${className}`}
     >
       {children}
     </Button>

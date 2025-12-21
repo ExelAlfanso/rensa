@@ -10,6 +10,8 @@ import RollDropdownItem from "./RollDropdownItem";
 import SearchInputField from "@/components/inputfields/SearchInputField";
 import RollDropdownInputItem from "./RollDropdownInputItem";
 import { useToast } from "@/providers/ToastProvider";
+import { useAuthStore } from "@/stores/useAuthStore";
+import { redirect } from "next/navigation";
 
 interface RollDropdownProps {
   isOpen: boolean;
@@ -32,6 +34,7 @@ const RollDropdown: React.FC<RollDropdownProps> = ({
   setSelectedRoll,
   disabled,
 }) => {
+  const { user } = useAuthStore();
   const [dropdownPosition, setDropdownPosition] = useState({
     top: 0,
     left: 0,
@@ -60,8 +63,10 @@ const RollDropdown: React.FC<RollDropdownProps> = ({
     }
   }, [isCreating]);
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (!user?.id) redirect("/login");
     e.stopPropagation();
     e.preventDefault();
+
     setIsOpen((prev) => !prev);
   };
 

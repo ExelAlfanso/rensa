@@ -1,6 +1,5 @@
 "use client";
 import Footer from "@/components/footer/Footer";
-import Heading from "@/components/Heading";
 import Text from "@/components/Text";
 import IconButton from "@/components/buttons/IconButton";
 import { ArrowRightIcon } from "@phosphor-icons/react";
@@ -50,6 +49,7 @@ export default function NotFound() {
             <Link href={"/"}>
               <IconButton
                 weight={"bold"}
+                color="primary"
                 Icon={ArrowRightIcon}
                 iconPosition={"right"}
                 className="h-12"
