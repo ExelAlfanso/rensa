@@ -1,8 +1,6 @@
-import { authOptions } from "@/lib/auth";
 import { connectDB } from "@/lib/mongodb";
 import Photo, { PhotoDocument } from "@/models/Photo";
 import { FilterQuery, SortOrder } from "mongoose";
-import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
 /*

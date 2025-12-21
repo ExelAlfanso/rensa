@@ -22,7 +22,7 @@ export async function GET(
         ownerId: photo.userId,
       },
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { success: false, message: "Failed to fetch photo owner " },
       { status: 500 }

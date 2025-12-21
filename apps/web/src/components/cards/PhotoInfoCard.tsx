@@ -1,6 +1,6 @@
 "use client";
 
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Heading from "../Heading";
 import Text from "../Text";
 
@@ -9,7 +9,6 @@ import { formatDate } from "@/utils/DateFormatter";
 import { PhotoMetadata } from "@/models/Photo";
 import RecipeList from "../lists/RecipeList";
 import ProfileBadge from "../badges/ProfileBadge";
-import { api } from "@/lib/axios";
 import PrimaryButton from "../buttons/PrimaryButton";
 import CommentSection from "@/sections/CommentSection";
 import RollDropdownIconButton from "../dropdowns/rolls/RollDropdownIconButton";
@@ -17,9 +16,9 @@ import usePhotoRoll from "@/hooks/usePhotoRoll";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { bookmarkPhoto } from "@/services/PhotoPostServices";
 import { fetchUserBookmarkedPhotos } from "@/services/PhotoServices";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { fetchProfile } from "@/services/ProfileServices";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 interface PhotoInfoCardProps {
   id: string;
   className?: string;
@@ -41,6 +40,7 @@ const PhotoInfoCard: React.FC<PhotoInfoCardProps> = ({
   metadata,
   ownerId,
 }) => {
+  const router = useRouter();
   const { user } = useAuthStore();
   const [bookmarks, setBookmarks] = useState(initialBookmarks);
   const [isBookmarkedState, setIsBookmarked] = useState(false);
@@ -73,14 +73,14 @@ const PhotoInfoCard: React.FC<PhotoInfoCardProps> = ({
   } = usePhotoRoll(id || null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const handleBookmarkToggle = async () => {
-    if (!user?.id) redirect("/login");
+    if (!user?.id) router.push("/login");
     setIsBookmarked((prev: boolean) => !prev);
     setBookmarks((prev) =>
       isBookmarkedState ? (prev || 0) - 1 : (prev || 0) + 1
     );
     try {
       const action = isBookmarkedState ? "decrement" : "increment";
-      const res = await bookmarkPhoto(user?.id, id || "", action);
+      await bookmarkPhoto(user?.id, id || "", action);
     } catch (err) {
       console.log(err);
     }

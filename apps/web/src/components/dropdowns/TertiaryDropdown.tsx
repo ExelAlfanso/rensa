@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { CaretDownIcon } from "@phosphor-icons/react";
 import Text from "../Text";
 import { useOutsideClick } from "@/hooks/useOutsideClick";

@@ -7,10 +7,6 @@ import PrimaryButton from "@/components/buttons/PrimaryButton";
 import TertiaryButton from "@/components/buttons/TertiaryButton";
 import { useAuthStore } from "@/stores/useAuthStore";
 
-interface CreateRollState {
-  name: string;
-}
-
 interface CreateRollContextType {
   isOpen: boolean;
   openCreator: () => void;

@@ -2,7 +2,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import AuthFormLayout from "./AuthFormLayout";
-import InputField from "@/components/inputfields/InputField";
 import { useLoading } from "@/hooks/useLoading";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";

@@ -3,7 +3,6 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { connectDB } from "./mongodb";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
-import GoogleProvider from "next-auth/providers/google";
 import { DefaultSession, DefaultUser } from "next-auth";
 import jwt from "jsonwebtoken";
 

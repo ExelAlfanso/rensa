@@ -1,3 +1,5 @@
+"use client";
+
 import { CaretDownIcon } from "@phosphor-icons/react";
 import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -12,7 +14,7 @@ import RollDropdownInputItem from "./RollDropdownInputItem";
 import { useToast } from "@/providers/ToastProvider";
 import IconButton from "@/components/buttons/IconButton";
 import { useAuthStore } from "@/stores/useAuthStore";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 interface RollDropdownIconButtonProps {
   isOpen: boolean;
@@ -40,6 +42,7 @@ const RollDropdownIconButton: React.FC<RollDropdownIconButtonProps> = ({
     left: 0,
   });
   const [isCreating, setIsCreating] = useState(false);
+  const router = useRouter();
   const [newRollName, setNewRollName] = useState("");
   const { rolls, fetchRolls, isLoading, createRoll } = useRollsStore();
   const { showToast } = useToast();
@@ -63,7 +66,7 @@ const RollDropdownIconButton: React.FC<RollDropdownIconButtonProps> = ({
     }
   }, [isCreating]);
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (!user?.id) redirect("/login");
+    if (!user?.id) router.push("/login");
     e.stopPropagation();
     e.preventDefault();
     setIsOpen((prev) => !prev);

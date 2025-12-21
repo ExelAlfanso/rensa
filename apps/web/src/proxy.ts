@@ -10,8 +10,6 @@ export async function proxy(req: NextRequest) {
   const isProtectedPage =
     pathname.startsWith("/chat") || pathname.startsWith("/explore");
 
-  const isProtectedAPI = pathname.startsWith("/api");
-
   // 🔒 Belum login → protected page
   if (!token && isProtectedPage) {
     return NextResponse.redirect(new URL("/login", req.url));

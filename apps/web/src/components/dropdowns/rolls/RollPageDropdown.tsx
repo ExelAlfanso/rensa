@@ -4,7 +4,6 @@ import React from "react";
 import IconDropdown from "../IconDropdown";
 import DropdownItem from "../DropdownItem";
 import { useEditRoll } from "@/providers/EditRollProvider";
-import { useAuthStore } from "@/stores/useAuthStore";
 import { useToast } from "@/providers/ToastProvider";
 
 interface RollPageDropdownProps {

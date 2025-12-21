@@ -22,7 +22,6 @@ interface MasonryGallerySectionProps {
   onPhotoClick?: (photo: Photo | string, index: number) => void;
 }
 
-const TAB_RECENT = "tab1";
 const TAB_POPULAR = "tab2";
 const MasonryGallerySection: React.FC<MasonryGallerySectionProps> = ({
   activeTab,
