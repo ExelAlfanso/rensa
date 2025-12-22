@@ -25,15 +25,13 @@ export async function GET(req: Request) {
     }
     const user = await User.findById(userId);
 
-    const filter = { _id: { $in: user.bookmarks } };
-
     const [photos, total] = await Promise.all([
-      Photo.find(filter)
-        .skip(skip)
-        .limit(limit)
+      Photo.find({ _id: { $in: user!.bookmarks } })
+        .select("url")
         .populate("userId", "username avatar")
-        .lean(),
-      Photo.countDocuments(filter),
+        .skip(skip)
+        .limit(limit),
+      Photo.countDocuments({ _id: { $in: user!.bookmarks } }),
     ]);
 
     const totalPages = Math.ceil(total / limit);
