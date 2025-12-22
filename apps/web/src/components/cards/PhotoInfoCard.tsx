@@ -122,7 +122,7 @@ const PhotoInfoCard: React.FC<PhotoInfoCardProps> = ({
             />
 
             <PrimaryButton onClick={isSaved ? removeFromRoll : saveToRoll}>
-              {isLoading ? "Loading..." : isSaved ? "Saved" : "Save"}
+              {isSaved ? "Saved" : "Save"}
             </PrimaryButton>
           </div>
         </div>
