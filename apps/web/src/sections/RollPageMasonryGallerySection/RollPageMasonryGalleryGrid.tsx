@@ -1,11 +1,10 @@
 import { PopulatedPhoto } from "@/types/PopulatedPhoto";
-import { getPhotoKey } from "@/utils/MasonryGalleryUtils";
 import { AnimatePresence } from "motion/react";
 import Masonry from "react-masonry-css";
 import RollPagePhotoCard from "@/components/RollPagePhotoCard";
 
 interface RollPageMasonryGalleryGridProps {
-  photos: (PopulatedPhoto | string)[];
+  photos: PopulatedPhoto[];
   rollId: string;
   onPhotoRemoved?: (photoId: string) => void;
   isOwner: boolean;
@@ -42,12 +41,12 @@ const RollPageMasonryGalleryGrid: React.FC<RollPageMasonryGalleryGridProps> = ({
         className={`${masonryWidthClass} my-masonry-grid`}
         columnClassName="my-masonry-grid_column"
       >
-        {photos.map((photo, idx) => {
-          const photoId = (photo as PopulatedPhoto)._id || idx.toString();
+        {photos.map((photo) => {
+          const photoId = photo._id.toString();
           return (
             <RollPagePhotoCard
               isOwner={isOwner}
-              key={getPhotoKey(photo, photoId)}
+              key={photoId}
               id={photoId}
               photo={photo}
               rollId={rollId}
