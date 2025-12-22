@@ -24,6 +24,12 @@ export async function GET(req: Request) {
       );
     }
     const user = await User.findById(userId);
+    if (!user) {
+      return NextResponse.json(
+        { success: false, message: "User not found" },
+        { status: 404 }
+      );
+    }
 
     const [photos, total] = await Promise.all([
       Photo.find({ _id: { $in: user!.bookmarks } })
@@ -36,7 +42,12 @@ export async function GET(req: Request) {
 
     const totalPages = Math.ceil(total / limit);
     const hasMore = page < totalPages;
-
+    if (!photos) {
+      return NextResponse.json(
+        { success: false, message: "No bookmarked photos found" },
+        { status: 404 }
+      );
+    }
     return NextResponse.json({
       photos,
       currentPage: page,
