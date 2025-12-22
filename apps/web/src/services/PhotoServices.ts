@@ -85,16 +85,14 @@ export async function fetchPhotosFromDB(
   }
 }
 export async function fetchBookmarkedPhotosFromDB(
-  page: number,
-  filters: string[] | undefined,
-  sort: "recent" | "popular" = "recent"
+  userId: string,
+  page: number
 ): Promise<FetchPhotosResponse> {
   try {
     const params: Record<string, string | number | undefined> = {
+      userId,
       page,
       limit: 10,
-      sort,
-      filters: filters ? filters.join(",") : undefined,
     };
 
     const res = await api.get<BackendPhotosResponse>("/photos/bookmark", {
@@ -113,7 +111,6 @@ export async function fetchBookmarkedPhotosFromDB(
     throw error;
   }
 }
-// Search photos by tags
 export async function searchPhotosByTags(
   tags: string[],
   page: number = 1
@@ -133,7 +130,6 @@ export async function searchPhotosByTags(
   };
 }
 
-// 🆕 Fetch photos by Roll ID
 export async function fetchPhotosFromRoll(
   rollId: string,
   page: number,
@@ -148,7 +144,6 @@ export async function fetchPhotosFromRoll(
       filters: filters ? filters.join(",") : undefined,
     };
 
-    // Assuming your backend route looks like: /rolls/:rollId/photos
     const res = await api.get(`/rolls/${rollId}/photos`, {
       params,
     });

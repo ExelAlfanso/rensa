@@ -166,14 +166,13 @@ describe("PhotoServices", () => {
 
       (api.get as jest.Mock).mockResolvedValue(mockResponse);
 
-      const result = await fetchBookmarkedPhotosFromDB(1, undefined, "recent");
+      const result = await fetchBookmarkedPhotosFromDB("user1", 1);
 
       expect(api.get).toHaveBeenCalledWith("/photos/bookmark", {
         params: {
+          userId: "user1",
           page: 1,
           limit: 10,
-          sort: "recent",
-          filters: undefined,
         },
       });
 
@@ -184,9 +183,9 @@ describe("PhotoServices", () => {
     it("should handle API errors", async () => {
       (api.get as jest.Mock).mockRejectedValue(new Error("API Error"));
 
-      await expect(
-        fetchBookmarkedPhotosFromDB(1, undefined, "recent")
-      ).rejects.toThrow("API Error");
+      await expect(fetchBookmarkedPhotosFromDB("user1", 1)).rejects.toThrow(
+        "API Error"
+      );
     });
   });
 });
