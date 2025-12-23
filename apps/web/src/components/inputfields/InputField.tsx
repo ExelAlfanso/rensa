@@ -95,7 +95,7 @@ const InputField: React.FC<InputFieldProps> = ({
               iconPosition === "left" ? "left-0 pl-5" : "right-0 pr-5"
             } flex items-center text-black cursor-pointer`}
           >
-            <Icon className={`${disabled ? "text-gray-300" : ""}`} size={20} />
+            <Icon size={20} />
           </div>
         </div>
       )}

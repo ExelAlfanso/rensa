@@ -1,4 +1,3 @@
-import { getPhotoUrl, getPhotoTitle } from "@/utils/MasonryGalleryUtils";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { ImageWithSkeleton } from "./ImageWithSkeleton";
@@ -11,7 +10,7 @@ import { useToast } from "@/providers/ToastProvider";
 
 interface RollPagePhotoCardProps {
   id: string;
-  photo: string | PopulatedPhoto;
+  photo: PopulatedPhoto;
   rollId: string;
   onPhotoRemoved?: (photoId: string) => void;
   isOwner: boolean;
@@ -56,8 +55,8 @@ const RollPagePhotoCard: React.FC<RollPagePhotoCardProps> = ({
         <div className="relative overflow-hidden rounded-3xl group cursor-pointer transition-transform duration-300 hover:scale-[1.02]">
           <ImageWithSkeleton
             image={{
-              src: getPhotoUrl(photo),
-              alt: getPhotoTitle(photo, id),
+              src: photo.url,
+              alt: photo.title,
               width: 350,
               height: 450,
             }}

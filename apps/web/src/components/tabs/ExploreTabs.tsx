@@ -13,7 +13,7 @@ const ExploreTabs: React.FC<ExploreTabsProps> = ({
   setActiveTab,
 }) => {
   return (
-    <div className={`tabs tabs-border ${className}`}>
+    <div className={`tabs gap-5 tabs-border ${className}`}>
       {tabDatas.map((tab, idx) => (
         <input
           key={idx}

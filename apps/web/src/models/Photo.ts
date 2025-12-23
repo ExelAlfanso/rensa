@@ -1,4 +1,4 @@
-import mongoose, { model, Schema, Document, models, Types } from "mongoose";
+import mongoose, { model, Schema, Document, Types } from "mongoose";
 
 export interface PhotoMetadata {
   width: number;
@@ -13,7 +13,6 @@ export interface PhotoMetadata {
 }
 
 export interface PhotoDocument extends Document {
-  _id: string;
   userId: Types.ObjectId;
   url: string;
   bookmarks: number;

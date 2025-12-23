@@ -1,6 +1,4 @@
 import { connectDB } from "@/lib/mongodb";
-import Photo from "@/models/Photo";
-import Roll from "@/models/Roll";
 import User from "@/models/User";
 import { NextResponse } from "next/server";
 

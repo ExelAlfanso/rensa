@@ -6,9 +6,10 @@ import { useInView } from "react-intersection-observer";
 import {
   fetchPhotosFromDB,
   fetchImagesFromPicSum,
-  fetchPhotosFromRoll, // 🆕 New service
+  fetchPhotosFromRoll,
   Photo,
   FetchPhotosResponse,
+  fetchBookmarkedPhotosFromDB,
 } from "@/services/PhotoServices";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import MasonryGalleryGrid from "./MasonryGalleryGrid";
@@ -18,17 +19,18 @@ interface MasonryGallerySectionProps {
   activeTab?: string;
   filters?: string[];
   useDatabase?: boolean;
-  rollId?: string; // 🆕 Optional roll source
+  rollId?: string;
   onPhotoClick?: (photo: Photo | string, index: number) => void;
+  userId?: string;
 }
 
-const TAB_RECENT = "tab1";
 const TAB_POPULAR = "tab2";
 const MasonryGallerySection: React.FC<MasonryGallerySectionProps> = ({
   activeTab,
   filters,
   useDatabase = true,
-  rollId, // 🆕 destructure it
+  rollId,
+  userId,
 }) => {
   const { ref, inView } = useInView({ threshold: 0.5 });
   const sort = activeTab === TAB_POPULAR ? "popular" : "recent";
@@ -46,18 +48,16 @@ const MasonryGallerySection: React.FC<MasonryGallerySectionProps> = ({
       activeTab,
       useDatabase ? "db" : "picsum",
       rollId,
+      userId,
     ],
     queryFn: async ({ pageParam }) => {
       const page = pageParam as number;
-
-      // 🧩 Priority order:
-      // 1️⃣ Roll (if provided)
-      // 2️⃣ DB (default)
-      // 3️⃣ Picsum (fallback)
       if (rollId) {
         return await fetchPhotosFromRoll(rollId, page, filters, sort);
       } else if (useDatabase) {
         return await fetchPhotosFromDB(page, filters, sort);
+      } else if (userId) {
+        return await fetchBookmarkedPhotosFromDB(userId, page);
       } else {
         return await fetchImagesFromPicSum(page);
       }
@@ -68,9 +68,8 @@ const MasonryGallerySection: React.FC<MasonryGallerySectionProps> = ({
     gcTime: 1000 * 60 * 30,
   });
 
-  const photos: (PopulatedPhoto | string)[] =
-    data?.pages.flatMap((page) => page.data as (PopulatedPhoto | string)[]) ??
-    [];
+  const photos: PopulatedPhoto[] =
+    data?.pages.flatMap((page) => page.data as PopulatedPhoto[]) ?? [];
 
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {

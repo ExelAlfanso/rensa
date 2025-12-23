@@ -1,8 +1,3 @@
-import {
-  getPhotoUrl,
-  getPhotoTitle,
-  getPhotoUserId,
-} from "@/utils/MasonryGalleryUtils";
 import { PlusIcon, CheckIcon, ArrowUpRightIcon } from "@phosphor-icons/react";
 import { motion } from "motion/react";
 import Link from "next/link";
@@ -15,7 +10,7 @@ import { useAuthStore } from "@/stores/useAuthStore";
 
 interface PhotoCardProps {
   id: string | null;
-  photo: string | PopulatedPhoto;
+  photo: PopulatedPhoto;
   isDropdownOpen: boolean;
   onToggleDropdown: React.Dispatch<React.SetStateAction<boolean>>;
   closeAllDropdowns: () => void;
@@ -55,8 +50,8 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
         >
           <ImageWithSkeleton
             image={{
-              src: getPhotoUrl(photo),
-              alt: getPhotoTitle(photo, id),
+              src: photo.url,
+              alt: photo.title,
               width: 350,
               height: 450,
             }}
@@ -124,7 +119,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
               size={"xs"}
               className="absolute bottom-0 right-0 p-4 font-normal pointer-events-none"
             >
-              @{getPhotoUserId(photo)?.username}
+              @{photo.userId.username}
             </Text>
           </div>
         </div>

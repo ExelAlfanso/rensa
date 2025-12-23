@@ -32,7 +32,6 @@ export async function POST(
     const result = await Roll.updateOne(
       {
         _id: rollId,
-        userId: session.user.id,
       },
       {
         $addToSet: { photos: photoId },

@@ -51,7 +51,7 @@ export async function POST(req: Request) {
     });
 
     return res;
-  } catch (err) {
+  } catch {
     return NextResponse.json({ message: "Error logging out" }, { status: 300 });
   }
 }

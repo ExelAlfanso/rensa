@@ -3,7 +3,6 @@ import Roll from "@/models/Roll";
 import { connectDB } from "@/lib/mongodb";
 import Photo from "@/models/Photo";
 import { SortOrder } from "mongoose";
-import { create } from "domain";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
@@ -89,7 +88,7 @@ export async function POST(req: Request) {
       },
       { status: 201 }
     );
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { success: false, message: "Failed to create roll" },
       { status: 500 }

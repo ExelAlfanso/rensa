@@ -4,6 +4,7 @@ import { ChatTeardropIcon } from "@phosphor-icons/react";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { CommentType } from "@/sections/CommentSection";
 import { commentPhoto } from "@/services/PhotoPostServices";
+import Link from "next/link";
 
 interface CommentInputFieldProps {
   id?: string;
@@ -39,21 +40,30 @@ const CommentInputField: React.FC<CommentInputFieldProps> = ({
   };
 
   return (
-    <InputField
-      type="text"
-      size="m"
-      Icon={ChatTeardropIcon}
-      iconPosition="left"
-      placeholder="Comment"
-      value={comment}
-      onChange={(e) => setComment(e.target.value)}
-      onKeyDown={(e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          handleSubmit();
-        }
-      }}
-    />
+    <div className="relative mt-4">
+      <InputField
+        type="text"
+        size="m"
+        disabled={!user}
+        Icon={ChatTeardropIcon}
+        iconPosition="left"
+        placeholder={`  ${user ? "Comment" : "Log in to comment..."}`}
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            handleSubmit();
+          }
+        }}
+      />
+      {!user && (
+        <Link
+          href="/login"
+          className="absolute bg-transparent hover:bg-gray-50 hover:opacity-50 transition-all duration-200 h-full w-full top-0 left-0 rounded-3xl"
+        ></Link>
+      )}
+    </div>
   );
 };
 

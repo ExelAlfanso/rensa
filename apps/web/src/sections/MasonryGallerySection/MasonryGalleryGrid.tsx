@@ -1,12 +1,11 @@
 import { PopulatedPhoto } from "@/types/PopulatedPhoto";
-import { getPhotoKey } from "@/utils/MasonryGalleryUtils";
 import { AnimatePresence } from "motion/react";
 import Masonry from "react-masonry-css";
 import PhotoCard from "@/components/PhotoCard";
 import { useState } from "react";
 
 interface MasonryGalleryGridProps {
-  photos: (PopulatedPhoto | string)[];
+  photos: PopulatedPhoto[];
   photosId?: string[];
 }
 
@@ -42,11 +41,11 @@ const MasonryGalleryGrid: React.FC<MasonryGalleryGridProps> = ({ photos }) => {
         className={`${masonryWidthClass} my-masonry-grid`}
         columnClassName="my-masonry-grid_column"
       >
-        {photos.map((photo, idx) => {
-          const photoId = (photo as PopulatedPhoto)._id || idx.toString();
+        {photos.map((photo: PopulatedPhoto) => {
+          const photoId = photo._id.toString();
           return (
             <PhotoCard
-              key={getPhotoKey(photo, photoId)}
+              key={photoId}
               id={photoId}
               photo={photo}
               isDropdownOpen={activeDropdownId === photoId}

@@ -24,21 +24,30 @@ export async function GET(req: Request) {
       );
     }
     const user = await User.findById(userId);
-
-    const filter = { _id: { $in: user.bookmarks } };
+    if (!user) {
+      return NextResponse.json(
+        { success: false, message: "User not found" },
+        { status: 404 }
+      );
+    }
 
     const [photos, total] = await Promise.all([
-      Photo.find(filter)
-        .skip(skip)
-        .limit(limit)
+      Photo.find({ _id: { $in: user!.bookmarks } })
+        .select("url")
         .populate("userId", "username avatar")
-        .lean(),
-      Photo.countDocuments(filter),
+        .skip(skip)
+        .limit(limit),
+      Photo.countDocuments({ _id: { $in: user!.bookmarks } }),
     ]);
 
     const totalPages = Math.ceil(total / limit);
     const hasMore = page < totalPages;
-
+    if (!photos) {
+      return NextResponse.json(
+        { success: false, message: "No bookmarked photos found" },
+        { status: 404 }
+      );
+    }
     return NextResponse.json({
       photos,
       currentPage: page,

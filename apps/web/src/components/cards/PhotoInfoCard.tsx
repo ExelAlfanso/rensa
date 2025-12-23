@@ -1,6 +1,6 @@
 "use client";
 
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Heading from "../Heading";
 import Text from "../Text";
 
@@ -9,7 +9,6 @@ import { formatDate } from "@/utils/DateFormatter";
 import { PhotoMetadata } from "@/models/Photo";
 import RecipeList from "../lists/RecipeList";
 import ProfileBadge from "../badges/ProfileBadge";
-import { api } from "@/lib/axios";
 import PrimaryButton from "../buttons/PrimaryButton";
 import CommentSection from "@/sections/CommentSection";
 import RollDropdownIconButton from "../dropdowns/rolls/RollDropdownIconButton";
@@ -17,8 +16,9 @@ import usePhotoRoll from "@/hooks/usePhotoRoll";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { bookmarkPhoto } from "@/services/PhotoPostServices";
 import { fetchUserBookmarkedPhotos } from "@/services/PhotoServices";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { fetchProfile } from "@/services/ProfileServices";
+import { useRouter } from "next/navigation";
 interface PhotoInfoCardProps {
   id: string;
   className?: string;
@@ -40,6 +40,7 @@ const PhotoInfoCard: React.FC<PhotoInfoCardProps> = ({
   metadata,
   ownerId,
 }) => {
+  const router = useRouter();
   const { user } = useAuthStore();
   const [bookmarks, setBookmarks] = useState(initialBookmarks);
   const [isBookmarkedState, setIsBookmarked] = useState(false);
@@ -71,15 +72,15 @@ const PhotoInfoCard: React.FC<PhotoInfoCardProps> = ({
     removeFromRoll,
   } = usePhotoRoll(id || null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
   const handleBookmarkToggle = async () => {
+    if (!user?.id) router.push("/login");
     setIsBookmarked((prev: boolean) => !prev);
     setBookmarks((prev) =>
       isBookmarkedState ? (prev || 0) - 1 : (prev || 0) + 1
     );
     try {
       const action = isBookmarkedState ? "decrement" : "increment";
-      const res = await bookmarkPhoto(user?.id, id || "", action);
+      await bookmarkPhoto(user?.id, id || "", action);
     } catch (err) {
       console.log(err);
     }
@@ -90,40 +91,42 @@ const PhotoInfoCard: React.FC<PhotoInfoCardProps> = ({
       id={id}
       className={`flex flex-col gap-1.5 bg-white-200 ${className} shadow-lg p-10 rounded-3xl text-primary w-full lg:max-w-3xl xl:w-[40%]`}
     >
-      <div className="inline-flex items-center justify-between w-full">
-        <span className="text-black inline-flex items-center justify-center">
-          <Text size="s">{bookmarks}</Text>
-          <button onClick={handleBookmarkToggle}>
-            {isBookmarkedState ? (
-              <BookmarkSimpleIcon
-                weight="fill"
-                size={24}
-                className="hover:scale-110 transition-transform cursor-pointer focus:border-0"
-              />
-            ) : (
-              <BookmarkSimpleIcon
-                weight="regular"
-                size={24}
-                className="hover:scale-110 transition-transform cursor-pointer focus:border-0"
-              />
-            )}
-          </button>
-        </span>
-        <div className="inline-flex gap-5">
-          <RollDropdownIconButton
-            isOpen={isDropdownOpen}
-            setIsOpen={setIsDropdownOpen}
-            selectedRoll={selectedRoll}
-            setSelectedRoll={setSelectedRoll}
-            savedToRolls={savedToRolls}
-            disabled={isLoading || isSaved}
-          />
+      {user?.id && (
+        <div className="inline-flex items-center justify-between w-full">
+          <span className="text-black inline-flex items-center justify-center">
+            <Text size="s">{bookmarks}</Text>
+            <button onClick={handleBookmarkToggle}>
+              {isBookmarkedState ? (
+                <BookmarkSimpleIcon
+                  weight="fill"
+                  size={24}
+                  className="hover:scale-110 transition-transform cursor-pointer focus:border-0"
+                />
+              ) : (
+                <BookmarkSimpleIcon
+                  weight="regular"
+                  size={24}
+                  className="hover:scale-110 transition-transform cursor-pointer focus:border-0"
+                />
+              )}
+            </button>
+          </span>
+          <div className="inline-flex gap-5">
+            <RollDropdownIconButton
+              isOpen={isDropdownOpen}
+              setIsOpen={setIsDropdownOpen}
+              selectedRoll={selectedRoll}
+              setSelectedRoll={setSelectedRoll}
+              savedToRolls={savedToRolls}
+              disabled={isLoading || isSaved}
+            />
 
-          <PrimaryButton onClick={isSaved ? removeFromRoll : saveToRoll}>
-            {isLoading ? "Loading..." : isSaved ? "Saved" : "Save"}
-          </PrimaryButton>
+            <PrimaryButton onClick={isSaved ? removeFromRoll : saveToRoll}>
+              {isSaved ? "Saved" : "Save"}
+            </PrimaryButton>
+          </div>
         </div>
-      </div>
+      )}
       <div className="mb-9">
         <div className="mb-7">
           <Text size="s" className="text-white-700">

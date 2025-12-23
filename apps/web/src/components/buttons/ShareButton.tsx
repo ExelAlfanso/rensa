@@ -21,7 +21,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({ userId }) => {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
       showToast("Link copied to clipboard!", "success");
-    } catch (err) {
+    } catch {
       showToast("Failed to copy link.", "error");
     }
   };

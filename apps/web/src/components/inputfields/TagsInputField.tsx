@@ -1,6 +1,4 @@
 import React, { KeyboardEvent } from "react";
-import InputField from "./InputField";
-import { XIcon } from "@phosphor-icons/react";
 import TagChip from "../chips/TagChip";
 import BaseInputField from "./BaseInputField";
 

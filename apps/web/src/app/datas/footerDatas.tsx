@@ -1,5 +1,3 @@
-import { col } from "motion/react-client";
-
 export const footerData = [
   {
     column: 1,

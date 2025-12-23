@@ -1,17 +1,7 @@
 import { signIn } from "next-auth/react";
 import React from "react";
 
-interface GoogleLoginButtonProps {
-  id?: string;
-  className?: string;
-  children?: React.ReactNode;
-}
-
-const GoogleLoginButton: React.FC<GoogleLoginButtonProps> = ({
-  id,
-  className,
-  children,
-}) => {
+const GoogleLoginButton: React.FC = () => {
   return (
     <button
       onClick={() => signIn("google")}

@@ -1,3 +1,5 @@
+"use client";
+
 import { CaretDownIcon } from "@phosphor-icons/react";
 import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -11,6 +13,8 @@ import SearchInputField from "@/components/inputfields/SearchInputField";
 import RollDropdownInputItem from "./RollDropdownInputItem";
 import { useToast } from "@/providers/ToastProvider";
 import IconButton from "@/components/buttons/IconButton";
+import { useAuthStore } from "@/stores/useAuthStore";
+import { useRouter } from "next/navigation";
 
 interface RollDropdownIconButtonProps {
   isOpen: boolean;
@@ -38,15 +42,16 @@ const RollDropdownIconButton: React.FC<RollDropdownIconButtonProps> = ({
     left: 0,
   });
   const [isCreating, setIsCreating] = useState(false);
+  const router = useRouter();
   const [newRollName, setNewRollName] = useState("");
   const { rolls, fetchRolls, isLoading, createRoll } = useRollsStore();
   const { showToast } = useToast();
   const buttonRef = useRef<HTMLDivElement>(null);
-
-  const dropdownRef = useOutsideClick<HTMLDivElement>(() => {
+  const { user } = useAuthStore();
+  const dropdownRef = useOutsideClick<HTMLDivElement>((event: MouseEvent) => {
     setIsCreating(false);
     setNewRollName("");
-    if (buttonRef.current?.contains(event?.target as Node)) return;
+    if (buttonRef.current?.contains(event.target as Node)) return;
     closeAll?.();
   });
   const listRef = useRef<HTMLUListElement>(null);
@@ -61,6 +66,10 @@ const RollDropdownIconButton: React.FC<RollDropdownIconButtonProps> = ({
     }
   }, [isCreating]);
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    if (!user?.id) {
+      router.push("/login");
+      return;
+    }
     e.stopPropagation();
     e.preventDefault();
     setIsOpen((prev) => !prev);
@@ -69,9 +78,25 @@ const RollDropdownIconButton: React.FC<RollDropdownIconButtonProps> = ({
   useEffect(() => {
     if (isOpen) {
       fetchRolls();
-      updateDropdownPosition();
+      const button = buttonRef.current;
+      const dropdown = dropdownRef.current;
+
+      if (button && dropdown) {
+        const buttonRect = button.getBoundingClientRect();
+        const dropdownRect = dropdown.getBoundingClientRect();
+
+        setDropdownPosition({
+          top: buttonRect.bottom + window.scrollY + 4,
+          left:
+            buttonRect.left +
+            window.scrollX +
+            buttonRect.width / 2 -
+            dropdownRect.width / 2,
+        });
+      }
     }
-  }, [isOpen]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, fetchRolls]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -83,7 +108,7 @@ const RollDropdownIconButton: React.FC<RollDropdownIconButtonProps> = ({
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, []);
+  }, [setIsOpen]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -98,26 +123,8 @@ const RollDropdownIconButton: React.FC<RollDropdownIconButtonProps> = ({
 
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const updateDropdownPosition = () => {
-    const button = buttonRef.current;
-    const dropdown = dropdownRef.current;
-
-    if (button && dropdown) {
-      const buttonRect = button.getBoundingClientRect();
-      const dropdownRect = dropdown.getBoundingClientRect();
-
-      setDropdownPosition({
-        top: buttonRect.bottom + window.scrollY + 4,
-        left:
-          buttonRect.left +
-          window.scrollX +
-          buttonRect.width / 2 -
-          dropdownRect.width / 2,
-      });
-    }
-  };
 
   const handleCreate = () => {
     setIsCreating(true);

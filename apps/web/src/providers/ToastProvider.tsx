@@ -28,6 +28,9 @@ export const useToast = () => {
 export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
+  const removeToast = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }, []);
   const showToast = useCallback(
     (message: string, type: ToastType = "info", duration = 3000) => {
       const id = crypto.randomUUID();
@@ -37,12 +40,8 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
       // auto remove
       setTimeout(() => removeToast(id), duration);
     },
-    []
+    [removeToast]
   );
-
-  const removeToast = useCallback((id: string) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
-  }, []);
 
   return (
     <ToastContext.Provider value={{ toasts, showToast, removeToast }}>
