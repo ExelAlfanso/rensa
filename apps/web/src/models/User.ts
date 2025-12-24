@@ -7,6 +7,7 @@ export interface UserDocument {
   password: string;
   avatar: string;
   bookmarks: ObjectId[];
+  verified: boolean;
 }
 
 const UserSchema = new Schema<UserDocument>(
@@ -27,8 +28,12 @@ const UserSchema = new Schema<UserDocument>(
     },
     avatar: {
       type: String,
-    },  
-    bookmarks:{type: [{ type: Schema.Types.ObjectId, ref: "Photo" }], default: []}
+    },
+    // verified: { type: Boolean, default: false }, // email verification
+    bookmarks: {
+      type: [{ type: Schema.Types.ObjectId, ref: "Photo" }],
+      default: [],
+    },
   },
   {
     timestamps: true,
