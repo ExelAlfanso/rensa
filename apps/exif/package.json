@@ -17,7 +17,9 @@
     "exiftool-vendored": "^30.5.0",
     "express": "^5.1.0",
     "fs": "^0.0.1-security",
-    "multer": "^2.0.2",
-    "nodemon": "^3.1.10"
+    "multer": "^2.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
   }
 }
