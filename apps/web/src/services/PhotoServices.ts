@@ -48,7 +48,7 @@ interface BackendPhotosResponse {
 
 // SINGLE unified response type for React Query
 export interface FetchPhotosResponse {
-  data: PopulatedPhoto[] | string[]; // Can be either Photo objects or string URLs
+  data: PopulatedPhoto[]; // Can be either Photo objects or string URLs
   urls: string[]; // Always array of URLs
   nextPage: number | undefined; // MUST be optional
 }
