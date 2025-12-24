@@ -28,7 +28,11 @@ export function useExifDetection(
     try {
       const formData = new FormData();
       formData.append("file", file);
-      const res = await expressApi.post("/exifread", formData);
+      const res = await expressApi.post("/exifread", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       const metadata = res?.data.metadata || {};
       console.log("Detected metadata:", metadata);
       return metadata;

@@ -40,16 +40,16 @@ export const authOptions: NextAuthOptions = {
         await connectDB();
         const user = await User.findOne({ email: credentials?.email });
         if (!user) {
-          console.log("  No user found for", credentials?.email);
-          throw new Error("No User found");
+          console.log("No user found for", credentials?.email);
+          throw new Error("Invalid email or password");
         }
         const isValid = await bcrypt.compare(
           credentials!.password,
           user.password
         );
         if (!isValid) {
-          console.log("  Invalid password for", credentials?.email);
-          throw new Error("Invalid password");
+          console.log("Invalid password for", credentials?.email);
+          throw new Error("Invalid email or password");
         }
         console.log("✅ User authenticated:", user.email);
         const accessToken = jwt.sign(
@@ -94,6 +94,12 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (token) {
+        if (process.env.NODE_ENV !== "production") {
+          console.log("Session callback id:", {
+            id: token.id,
+            accessToken: token.accessToken,
+          });
+        }
         session.user = {
           ...(session.user as Session["user"]),
           id: token.id as string,
@@ -109,6 +115,6 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: "/login",
     signOut: "/logout",
-    error: "/not-found", // Error code passed in query string as ?error=
+    error: "/not-found",
   },
 };

@@ -1,5 +1,5 @@
 // components/auth/AuthFormLayout.tsx
-import React, { ReactNode, FormEventHandler } from "react";
+import React, { ReactNode, FormEventHandler, useState } from "react";
 import Logo from "@/components/icons/Logo";
 
 type AuthFormLayoutProps = {

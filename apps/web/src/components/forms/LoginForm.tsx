@@ -25,17 +25,18 @@ export default function LoginForm() {
     if (errorMsg) return setError(errorMsg);
 
     setLoading(true);
-    try {
-      await signIn("credentials", {
-        email: form.email,
-        password: form.password,
-        callbackUrl: "/explore",
-      });
-    } catch {
-      setError("Login failed");
-    } finally {
-      setLoading(false);
+    const res = await signIn("credentials", {
+      email: form.email,
+      password: form.password,
+      redirect: false,
+      callbackUrl: "/explore",
+    });
+    if (res?.error) {
+      setError(res.error);
+    } else {
+      window.location.href = res?.url || "/explore";
     }
+    setLoading(false);
   };
 
   return (
@@ -65,7 +66,7 @@ export default function LoginForm() {
       <TextInputField
         type="email"
         name="email"
-        placeholder="Email or Username"
+        placeholder="Email"
         onChange={(e) => setForm({ ...form, email: e.target.value })}
       />
       <PasswordInputField

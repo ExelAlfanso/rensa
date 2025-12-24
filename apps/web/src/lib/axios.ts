@@ -13,7 +13,7 @@ const expressApi = axios.create({
     process.env.NEXT_PUBLIC_EXPRESS_BASE_URL || "http://localhost:3003/api",
   withCredentials: true,
   headers: {
-    "Content-Type": "multipart/form-data",
+    "Content-Type": "application/json",
   },
 });
 const elysiaApi = axios.create({
@@ -26,6 +26,7 @@ const elysiaApi = axios.create({
 });
 
 const fastApi = axios.create({
+  // Default to service name inside docker network
   baseURL: process.env.NEXT_PUBLIC_FAST_API_BASE_URL || "http://localhost:3001",
   withCredentials: true,
   headers: {
