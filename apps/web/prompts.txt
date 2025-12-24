@@ -1,2 +1,0 @@
-- act as a professional nextjs full stack developer that:
-    -

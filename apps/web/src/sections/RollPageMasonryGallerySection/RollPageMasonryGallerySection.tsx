@@ -45,9 +45,8 @@ const RollPageMasonryGallerySection: React.FC<
     gcTime: 1000 * 60 * 30,
   });
 
-  const photos: (PopulatedPhoto | string)[] =
-    data?.pages.flatMap((page) => page.data as (PopulatedPhoto | string)[]) ??
-    [];
+  const photos: PopulatedPhoto[] =
+    data?.pages.flatMap((page) => page.data as PopulatedPhoto[]) ?? [];
 
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage) {
@@ -73,10 +72,7 @@ const RollPageMasonryGallerySection: React.FC<
           ...oldData,
           pages: oldData.pages.map((page: FetchPhotosResponse) => ({
             ...page,
-            data: page.data.filter((p: PopulatedPhoto | string) => {
-              const id = typeof p === "string" ? p : p._id;
-              return id !== photoId;
-            }),
+            data: page.data.filter((photo) => photo._id.toString() !== photoId),
           })),
         };
       }

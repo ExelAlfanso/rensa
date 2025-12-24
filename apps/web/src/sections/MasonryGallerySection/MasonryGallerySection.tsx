@@ -50,7 +50,7 @@ const MasonryGallerySection: React.FC<MasonryGallerySectionProps> = ({
       rollId,
       userId,
     ],
-    queryFn: async ({ pageParam }) => {
+    queryFn: async ({ pageParam }): Promise<FetchPhotosResponse> => {
       const page = pageParam as number;
       if (rollId) {
         return await fetchPhotosFromRoll(rollId, page, filters, sort);
@@ -58,9 +58,8 @@ const MasonryGallerySection: React.FC<MasonryGallerySectionProps> = ({
         return await fetchPhotosFromDB(page, filters, sort);
       } else if (userId) {
         return await fetchBookmarkedPhotosFromDB(userId, page);
-      } else {
-        return await fetchImagesFromPicSum(page);
       }
+      return null as unknown as FetchPhotosResponse;
     },
     getNextPageParam: (lastPage) => lastPage.nextPage,
     initialPageParam: 1,
