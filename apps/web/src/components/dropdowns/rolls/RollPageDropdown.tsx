@@ -22,6 +22,7 @@ const RollPageDropdown: React.FC<RollPageDropdownProps> = ({
   return (
     <div className={`z-20`}>
       <IconDropdown
+        closeOnItemClick={false}
         weight="light"
         className="max-h-40 overflow-y-auto no-scrollbar flex flex-col items-center justify-center font-semibold font-figtree"
         Tag={DotsThreeCircleIcon}

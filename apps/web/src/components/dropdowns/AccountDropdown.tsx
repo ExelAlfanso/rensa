@@ -24,6 +24,7 @@ const AccountDropdown = ({ src, user }: AccountDropdownProps) => {
       <IconDropdown
         weight="regular"
         position="left"
+        closeOnItemClick={false}
         Tag={CaretDownIcon}
         iconSize={24}
       >

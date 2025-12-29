@@ -1,6 +1,8 @@
 import { connectDB } from "@/lib/mongodb";
 import Photo from "@/models/Photo";
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 /*
   GET /api/photos/[id]
@@ -34,6 +36,50 @@ export async function GET(
   } catch (error) {
     return NextResponse.json(
       { success: false, message: "Failed to fetch photo " + error },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(
+  request: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await context.params;
+  try {
+    await connectDB();
+
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    const photo = await Photo.findById(id);
+    if (!photo) {
+      return NextResponse.json(
+        { success: false, message: "Photo not found" },
+        { status: 404 }
+      );
+    }
+
+    if (photo.userId?.toString() !== session.user.id) {
+      return NextResponse.json(
+        { success: false, message: "Forbidden: You don't own this photo" },
+        { status: 403 }
+      );
+    }
+
+    const res = await Photo.findByIdAndDelete(id);
+    return NextResponse.json({
+      success: true,
+      message: "Photo deleted successfully.",
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, message: "Failed to delete photo " + error },
       { status: 500 }
     );
   }

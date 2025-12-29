@@ -94,12 +94,12 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (token) {
-        if (process.env.NODE_ENV !== "production") {
-          console.log("Session callback id:", {
-            id: token.id,
-            accessToken: token.accessToken,
-          });
-        }
+        // if (process.env.NODE_ENV !== "production") {
+        //   console.log("Session callback id:", {
+        //     id: token.id,
+        //     accessToken: token.accessToken,
+        //   });
+        // }
         session.user = {
           ...(session.user as Session["user"]),
           id: token.id as string,

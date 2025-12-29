@@ -62,6 +62,7 @@ const NotificationDropdown = () => {
   const { notifications, clearNotifications } = useNotificationContext();
   const unreadCount = notifications.filter((n) => !n.read).length;
   const handleClearAllNotifications = () => {
+    console.log("Clearing all notifications");
     clearNotifications();
   };
   return (
@@ -71,7 +72,7 @@ const NotificationDropdown = () => {
           {unreadCount}
         </div>
       )}
-      <IconDropdown Tag={BellIcon} className="h-100">
+      <IconDropdown Tag={BellIcon} closeOnItemClick={false} className="h-100">
         <Heading alignment="center" size="m" className="py-6 relative w-full">
           Notifications
           {notifications.length > 0 && (

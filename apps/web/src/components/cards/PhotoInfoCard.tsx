@@ -19,6 +19,7 @@ import { fetchUserBookmarkedPhotos } from "@/services/PhotoServices";
 import { useQuery } from "@tanstack/react-query";
 import { fetchProfile } from "@/services/ProfileServices";
 import { useRouter } from "next/navigation";
+import PhotoDropdown from "../dropdowns/PhotoDropdown";
 interface PhotoInfoCardProps {
   id: string;
   className?: string;
@@ -120,10 +121,14 @@ const PhotoInfoCard: React.FC<PhotoInfoCardProps> = ({
               savedToRolls={savedToRolls}
               disabled={isLoading || isSaved}
             />
-
             <PrimaryButton onClick={isSaved ? removeFromRoll : saveToRoll}>
               {isSaved ? "Saved" : "Save"}
             </PrimaryButton>
+
+            <PhotoDropdown
+              photoId={id}
+              isOwner={user?.id === ownerId}
+            ></PhotoDropdown>
           </div>
         </div>
       )}
