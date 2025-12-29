@@ -9,6 +9,7 @@ interface IconDropdownProps {
   Tag?: React.ElementType;
   iconSize?: number;
   position?: "left" | "right" | "center";
+  closeOnItemClick?: boolean;
   weight?:
     | "bold"
     | "duotone"
@@ -26,6 +27,7 @@ const IconDropdown: React.FC<IconDropdownProps> = ({
   iconSize = 32,
   Tag = undefined,
   position = "center",
+  closeOnItemClick = true,
   weight = "fill",
   className = "",
 }) => {
@@ -36,6 +38,17 @@ const IconDropdown: React.FC<IconDropdownProps> = ({
   };
   const [open, setOpen] = useState(false);
   const dropdownRef = useOutsideClick<HTMLDivElement>(() => setOpen(false));
+
+  const handleItemClick = (event: React.SyntheticEvent) => {
+    if (closeOnItemClick) {
+      setOpen(false);
+      return;
+    }
+
+    const target = event.target as HTMLElement | null;
+    const shouldClose = target?.closest('[data-close-dropdown="true"]');
+    if (shouldClose) setOpen(false);
+  };
 
   return (
     <div className={`relative text-black`} ref={dropdownRef}>
@@ -58,6 +71,7 @@ const IconDropdown: React.FC<IconDropdownProps> = ({
               : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
           }
         `}
+          onClickCapture={handleItemClick}
         >
           {children}
         </ul>

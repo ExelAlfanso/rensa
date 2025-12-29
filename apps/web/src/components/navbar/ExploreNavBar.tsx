@@ -6,7 +6,6 @@ import ProfileButton from "@/components/buttons/ProfileIconButton";
 import BookmarkButton from "../buttons/BookmarkButton";
 import Link from "next/link";
 import NotificationDropdown from "../dropdowns/Notification/NotificationDropdown";
-import SearchInputField from "@/components/inputfields/SearchInputField";
 import AccountDropdown from "../dropdowns/AccountDropdown";
 import { useAuthStore } from "@/stores/useAuthStore";
 import PrimaryButton from "../buttons/PrimaryButton";
@@ -22,7 +21,6 @@ const ExploreNavBar = () => {
         <Link className="hidden lg:block" href="/explore">
           <Heading size="s">Rensa</Heading>
         </Link>
-        <SearchInputField className="`w-[156px] md:w-[309px]"></SearchInputField>
       </div>
       <div className="flex flex-row items-center justify-center gap-6 mr-6">
         <span className="inline-flex items-center gap-2">

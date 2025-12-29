@@ -14,6 +14,8 @@ export async function fetchNotifications(
   const res = await elysiaApi.get(`/notifications`, {
     params: { recipientId, page, limit },
   });
+  // console.log(res);
+
   return res.data.data.notifications;
 }
 

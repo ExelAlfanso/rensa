@@ -53,7 +53,10 @@ export function NotificationProvider({
   };
   const { data: notifications = [], refetch } = useQuery<NotificationData[]>({
     queryKey: ["notifications", user?.id],
-    queryFn: async () => await fetchNotifications(user!.id),
+    queryFn: async () => {
+      const res = await fetchNotifications(user!.id);
+      return res;
+    },
     enabled: !!accessToken && !!user?.id,
     initialData: [],
   });
@@ -129,6 +132,7 @@ export function NotificationProvider({
 
     try {
       await clearUserNotifications(user.id);
+      console.log("Notifications cleared");
     } catch (err) {
       console.error("Failed to clear notifications", err);
       // Rollback on failure

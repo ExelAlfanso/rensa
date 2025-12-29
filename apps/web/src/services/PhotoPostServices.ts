@@ -15,7 +15,8 @@ export async function bookmarkPhoto(
       action,
       userId: userId,
     });
-    await sendBookmarkedNotification(userId || "", photoId);
+    if (action === "increment")
+      await sendBookmarkedNotification(userId || "", photoId);
     return res.data.bookmarks;
   } catch (error) {
     console.error("Error bookmarking photo:", error);
@@ -36,5 +37,14 @@ export async function commentPhoto(
     await sendCommentedNotification(userId || "", id);
   } catch (err) {
     console.error("Error posting comment:", err);
+  }
+}
+
+export async function removeUserPhoto(photoId: string) {
+  try {
+    await api.delete(`/photos/${photoId}`);
+  } catch (error) {
+    console.error("Error removing photo:", error);
+    throw error;
   }
 }
