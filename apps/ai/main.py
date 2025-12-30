@@ -12,6 +12,11 @@ app = FastAPI()
 nsfw_model = Model()
 
 
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+
+
 @app.post("/nsfw/predict")
 async def predict_image(file: UploadFile = File(...)):
     try:
