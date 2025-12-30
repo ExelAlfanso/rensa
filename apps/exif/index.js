@@ -44,7 +44,6 @@ process.on("exit", () => {
   exiftool.end();
 });
 
-const PORT = process.env.PORT || 3001;
 app.listen(process.env.PORT || 3003, "0.0.0.0", () =>
   console.log("Server running at http://0.0.0.0:3003")
 );
