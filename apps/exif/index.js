@@ -11,7 +11,7 @@ const app = express();
 // ✅ Enable CORS for Next.js frontend
 app.use(
   cors({
-    origin: "http://localhost:3000", // your frontend
+    origin: process.env.CORS_ORIGIN, // your frontend
     credentials: true,
   })
 );
