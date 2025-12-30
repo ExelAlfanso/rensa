@@ -1,10 +1,9 @@
 import User from "@/models/User";
 import jwt from "jsonwebtoken";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
-export default async function GET(req: Request) {
-  return NextResponse.json({ message: "Not Available" }, { status: 400 });
 
+export async function POST(req: NextRequest) {
   const { email } = await req.json();
   const user = await User.findOne({ email });
 
