@@ -45,6 +45,6 @@ process.on("exit", () => {
 });
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running at http://localhost:${PORT}`);
-});
+app.listen(process.env.PORT || 3003, "0.0.0.0", () =>
+  console.log("Server running at http://0.0.0.0:3003")
+);
