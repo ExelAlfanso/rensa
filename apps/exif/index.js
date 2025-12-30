@@ -9,10 +9,16 @@ dotenv.config();
 const app = express();
 
 // ✅ Enable CORS for Next.js frontend
-app.use(cors({
-  origin: "http://localhost:3000", // your frontend
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: "http://localhost:3000", // your frontend
+    credentials: true,
+  })
+);
+
+app.get("/health", (req, res) => {
+  res.json({ status: "ok" });
+});
 
 // Routes
 app.use("/api", readerRoutes);
@@ -21,7 +27,9 @@ app.use("/api", readerRoutes);
 app.use((error, req, res, next) => {
   if (error instanceof multer.MulterError) {
     if (error.code === "LIMIT_FILE_SIZE") {
-      return res.status(400).json({ error: "File too large. Maximum size is 50MB." });
+      return res
+        .status(400)
+        .json({ error: "File too large. Maximum size is 50MB." });
     }
   }
   if (error.message === "Only JPEG files are allowed!") {
