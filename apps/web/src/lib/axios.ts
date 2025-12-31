@@ -2,23 +2,21 @@ import axios from "axios";
 import { getSession } from "next-auth/react";
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000/api",
+  baseURL: "/api",
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
 });
 const expressApi = axios.create({
-  baseURL:
-    process.env.NEXT_PUBLIC_EXPRESS_BASE_URL || "http://localhost:3003/api",
+  baseURL: process.env.EXPRESS_BASE_URL,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
 });
 const elysiaApi = axios.create({
-  baseURL:
-    process.env.NEXT_PUBLIC_ELYSIA_BASE_URL || "http://localhost:3002/api",
+  baseURL: process.env.ELYSIA_BASE_URL,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
@@ -27,7 +25,7 @@ const elysiaApi = axios.create({
 
 const fastApi = axios.create({
   // Default to service name inside docker network
-  baseURL: process.env.NEXT_PUBLIC_FAST_API_BASE_URL || "http://localhost:3001",
+  baseURL: process.env.FAST_API_BASE_URL,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
