@@ -2,6 +2,10 @@
 FROM node:20-alpine AS base
 WORKDIR /app
 
+
+ARG NEXT_PUBLIC_ELYSIA_WS_URL
+ENV NEXT_PUBLIC_ELYSIA_WS_URL=$NEXT_PUBLIC_ELYSIA_WS_URL
+
 # ===== Dependencies =====
 FROM base AS deps
 COPY package*.json ./
