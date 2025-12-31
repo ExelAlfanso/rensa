@@ -23,3 +23,5 @@ jobs:
           context: .
           push: true
           tags: exelalfanso/rensa-frontend:prod
+          build-args: |
+            NEXT_PUBLIC_ELYSIA_WS_URL=${{ secrets.NEXT_PUBLIC_ELYSIA_WS_URL }}
