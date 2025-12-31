@@ -72,7 +72,7 @@ export async function DELETE(
       );
     }
 
-    const res = await Photo.findByIdAndDelete(id);
+    await Photo.findByIdAndDelete(id);
     return NextResponse.json({
       success: true,
       message: "Photo deleted successfully.",

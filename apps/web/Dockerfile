@@ -5,7 +5,6 @@ WORKDIR /app
 
 ARG NEXT_PUBLIC_ELYSIA_WS_URL
 ENV NEXT_PUBLIC_ELYSIA_WS_URL=$NEXT_PUBLIC_ELYSIA_WS_URL
-
 # ===== Dependencies =====
 FROM base AS deps
 COPY package*.json ./
@@ -13,6 +12,10 @@ RUN npm ci
 
 # ===== Build =====
 FROM deps AS build
+
+ARG NEXT_PUBLIC_ELYSIA_WS_URL
+ENV NEXT_PUBLIC_ELYSIA_WS_URL=$NEXT_PUBLIC_ELYSIA_WS_URL
+
 COPY . .
 RUN npm run build
 

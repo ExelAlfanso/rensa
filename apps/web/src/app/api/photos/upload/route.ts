@@ -3,7 +3,7 @@ import cloudinary from "@/lib/cloudinary";
 import { connectDB } from "@/lib/mongodb";
 import Photo from "@/models/Photo";
 import sharp from "sharp";
-import { fastApi } from "@/lib/axios";
+import { fastApi } from "@/lib/axios-server";
 
 async function compressImageUnder10MB(buffer: Buffer): Promise<Buffer> {
   let quality = 90; // start high

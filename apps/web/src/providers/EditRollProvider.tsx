@@ -4,7 +4,7 @@ import PrimaryButton from "@/components/buttons/PrimaryButton";
 import TertiaryButton from "@/components/buttons/TertiaryButton";
 import { createContext, useState, useContext, ReactNode } from "react";
 import { useToast } from "./ToastProvider";
-import { api } from "@/lib/axios";
+import { api } from "@/lib/axios-client";
 import Button from "@/components/buttons/Button";
 
 interface EditRollState {

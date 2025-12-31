@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { api } from "@/lib/axios";
+import { api } from "@/lib/axios-client";
 import { useAuthStore } from "./useAuthStore";
 
 interface Roll {

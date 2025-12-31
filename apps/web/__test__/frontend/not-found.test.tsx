@@ -4,9 +4,8 @@ import NotFound from "@/app/not-found";
 // Mock Next.js components
 jest.mock("next/image", () => {
   function NextImageMock(props: any) {
-    const { fill, ...rest } = props;
     // eslint-disable-next-line @next/next/no-img-element
-    return <img {...rest} alt={props.alt || "mocked image"} />;
+    return <img {...props} alt={props.alt || "mocked image"} />;
   }
   return NextImageMock;
 });

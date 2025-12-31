@@ -1,7 +1,7 @@
 import { CameraSettings, defaultCameraSettings } from "@/app/datas/cameraDatas";
 import { cameraFieldOptions } from "@/app/datas/cameraFieldDatas";
 import { brandModels } from "@/app/datas/cameraModelDatas";
-import { api, expressApi } from "@/lib/axios";
+import { api } from "@/lib/axios-client";
 import {
   detectValueinString,
   extractNumberFromString,
@@ -28,12 +28,13 @@ export function useExifDetection(
     try {
       const formData = new FormData();
       formData.append("file", file);
-      const res = await expressApi.post("/exifread", formData, {
+
+      const res = await api.post("/photos/exifread", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-      const metadata = res?.data.metadata || {};
+      const metadata = res.data.data;
       console.log("Detected metadata:", metadata);
       return metadata;
     } catch (err) {

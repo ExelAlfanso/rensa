@@ -1,4 +1,4 @@
-import { api } from "@/lib/axios";
+import { api } from "@/lib/axios-client";
 import { PopulatedPhoto } from "@/types/PopulatedPhoto";
 export async function fetchImagesFromPicSum(page: number) {
   const newImages = Array.from({ length: 10 }, () => {

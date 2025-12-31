@@ -56,7 +56,6 @@ jest.mock("@phosphor-icons/react", () => ({
 jest.mock("next/image", () => {
   function NextImageMock(props: any) {
     // eslint-disable-next-line @next/next/no-img-element
-    const { fill, ...rest } = props;
     return <img {...props} alt={props.alt || "mocked image"} />;
   }
   return NextImageMock;

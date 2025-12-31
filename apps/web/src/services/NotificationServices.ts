@@ -1,5 +1,5 @@
-import { elysiaApi } from "@/lib/axios";
 import { fetchPhotoOwnerByPhotoId } from "./PhotoServices";
+import { api } from "@/lib/axios-client";
 
 export type PhotoNotificationType =
   | "photo-saved"
@@ -11,12 +11,11 @@ export async function fetchNotifications(
   page = 1,
   limit = 10
 ) {
-  const res = await elysiaApi.get(`/notifications`, {
+  const res = await api.get("/notifications", {
     params: { recipientId, page, limit },
   });
-  // console.log(res);
-
-  return res.data.data.notifications;
+  // Next API responds with { success, data: notifications, message }
+  return res.data?.data ?? [];
 }
 
 async function sendPhotoNotification(
@@ -24,25 +23,20 @@ async function sendPhotoNotification(
   photoId: string,
   type: PhotoNotificationType
 ) {
-  try {
-    const recipientId = await fetchPhotoOwnerByPhotoId(photoId);
+  const recipientId = await fetchPhotoOwnerByPhotoId(photoId);
 
-    if (!recipientId || recipientId === actorId) {
-      return null;
-    }
-
-    const res = await elysiaApi.post(`/notifications`, {
-      actorId,
-      recipientId,
-      photoId,
-      type,
-    });
-
-    return res.data;
-  } catch (error) {
-    console.error(`Error sending ${type} notification:`, error);
-    throw error;
+  if (!recipientId || recipientId === actorId) {
+    return null;
   }
+
+  const res = await api.post(`/notifications`, {
+    actorId,
+    recipientId,
+    photoId,
+    type,
+  });
+
+  return res.data;
 }
 
 export const sendPhotoSavedNotification = (actorId: string, photoId: string) =>
@@ -55,21 +49,11 @@ export const sendCommentedNotification = (actorId: string, photoId: string) =>
   sendPhotoNotification(actorId, photoId, "photo-commented");
 
 export async function clearUserNotifications(userId: string) {
-  try {
-    const res = await elysiaApi.delete(`/notifications/${userId}`);
-    return res.data?.success ?? false;
-  } catch (error) {
-    console.error("Error clearing notifications:", error);
-    throw error;
-  }
+  const res = await api.delete(`/notifications/${userId}`);
+  return res.data.success ?? false;
 }
 
 export async function markUserNotificationAsRead(notificationId: string) {
-  try {
-    const res = await elysiaApi.put(`/notifications/${notificationId}/read`);
-    return res.data?.success ?? false;
-  } catch (error) {
-    console.error("Error marking notification as read:", error);
-    throw error;
-  }
+  const res = await api.put(`/notifications/${notificationId}/read`);
+  return res.data?.success ?? false;
 }

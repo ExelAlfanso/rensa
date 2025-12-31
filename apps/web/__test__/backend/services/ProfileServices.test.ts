@@ -1,5 +1,5 @@
 import { fetchProfile, fetchProfileByRollId } from "@/services/ProfileServices";
-import { api } from "@/lib/axios";
+import { api } from "@/lib/axios-client";
 
 // Mock the axios library
 jest.mock("@/lib/axios", () => ({

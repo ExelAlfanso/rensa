@@ -5,7 +5,6 @@ import "@/components/MasonryGallery.css";
 import { useInView } from "react-intersection-observer";
 import {
   fetchPhotosFromDB,
-  fetchImagesFromPicSum,
   fetchPhotosFromRoll,
   Photo,
   FetchPhotosResponse,

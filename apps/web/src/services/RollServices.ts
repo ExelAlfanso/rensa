@@ -1,4 +1,4 @@
-import { api } from "@/lib/axios";
+import { api } from "@/lib/axios-client";
 import { sendPhotoSavedNotification } from "./NotificationServices";
 
 export async function fetchRollById(rollId: string) {

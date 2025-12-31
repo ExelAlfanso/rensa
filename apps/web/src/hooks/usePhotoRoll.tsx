@@ -95,8 +95,6 @@ export function usePhotoRoll(photoId: string | null) {
   // -----------------------
   // Check if photo is in default roll
   // -----------------------
-  const isSaved = defaultRoll ? savedToRolls.includes(defaultRoll._id) : false;
-
   return {
     selectedRoll,
     isLoading: saveMutation.isPending || removeMutation.isPending,

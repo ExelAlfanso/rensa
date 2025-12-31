@@ -7,7 +7,7 @@ import {
   updateRollDetails,
   fetchDefaultRoll,
 } from "@/services/RollServices";
-import { api } from "@/lib/axios";
+import { api } from "@/lib/axios-client";
 import { sendPhotoSavedNotification } from "@/services/NotificationServices";
 
 // Mock dependencies

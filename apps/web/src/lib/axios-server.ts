@@ -1,13 +1,7 @@
 import axios from "axios";
-import { getSession } from "next-auth/react";
+import { authOptions } from "./auth";
+import { getServerSession } from "next-auth/next";
 
-const api = axios.create({
-  baseURL: "/api",
-  withCredentials: true,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
 const expressApi = axios.create({
   baseURL: process.env.EXPRESS_BASE_URL,
   withCredentials: true,
@@ -24,7 +18,6 @@ const elysiaApi = axios.create({
 });
 
 const fastApi = axios.create({
-  // Default to service name inside docker network
   baseURL: process.env.FAST_API_BASE_URL,
   withCredentials: true,
   headers: {
@@ -34,7 +27,7 @@ const fastApi = axios.create({
 elysiaApi.interceptors.request.use(
   async (config) => {
     try {
-      const session = await getSession();
+      const session = await getServerSession(authOptions);
       if (session?.accessToken) {
         config.headers.Authorization = `Bearer ${session.accessToken}`;
       }
@@ -47,4 +40,5 @@ elysiaApi.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-export { api, fastApi, elysiaApi, expressApi };
+
+export { fastApi, elysiaApi, expressApi };

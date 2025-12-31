@@ -1,11 +1,9 @@
-import User from "@/models/User";
 import jwt from "jsonwebtoken";
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 
 export async function POST(req: NextRequest) {
   const { email } = await req.json();
-  const user = await User.findOne({ email });
 
   if (!email) {
     return NextResponse.json({ message: "Email is required" }, { status: 400 });
@@ -36,7 +34,7 @@ export async function POST(req: NextRequest) {
       { success: true, message: "Verification email sent" },
       { status: 200 }
     );
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { success: false, message: "Failed to send verification email" },
       { status: 500 }

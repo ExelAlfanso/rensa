@@ -1,4 +1,4 @@
-import { api } from "@/lib/axios";
+import { api } from "@/lib/axios-client";
 
 export async function uploadFormData(formData: FormData) {
   const res = await api.post("/photos/upload", formData, {

@@ -6,11 +6,11 @@ import {
   clearUserNotifications,
   markUserNotificationAsRead,
 } from "@/services/NotificationServices";
-import { elysiaApi } from "@/lib/axios";
+import { elysiaApi } from "@/lib/axios-server";
 import { fetchPhotoOwnerByPhotoId } from "@/services/PhotoServices";
 
 // Mock dependencies
-jest.mock("@/lib/axios", () => ({
+jest.mock("@/lib/axios-server", () => ({
   elysiaApi: {
     get: jest.fn(),
     post: jest.fn(),

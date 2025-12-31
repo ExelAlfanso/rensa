@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import PhotoPage from "@/app/(explorable)/photo/[id]/page";
 
 // Mock next/navigation
@@ -38,7 +38,7 @@ jest.mock("@/components/ImagePreview", () => {
 
 // Mock PhotoInfoCard
 jest.mock("@/components/cards/PhotoInfoCard", () => {
-  function PhotoInfoCardMock({ id, title, description, ownerId }: any) {
+  function PhotoInfoCardMock({ title, description, ownerId }: any) {
     return (
       <div data-testid="photo-info-card">
         <h2>{title}</h2>
