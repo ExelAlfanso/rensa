@@ -62,9 +62,9 @@ export function NotificationProvider({
   });
 
   const connectWebSocket = useCallback(() => {
-    const WS_URL = process.env.ELYSIA_WS_URL;
+    const WS_URL = process.env.NEXT_PUBLIC_ELYSIA_WS_URL;
     if (!WS_URL) {
-      console.error("WebSocket URL is not configured" + WS_URL);
+      console.error("WebSocket URL is not configured");
       return;
     }
     const ws = new WebSocket(`${WS_URL}?token=${accessToken}`);
