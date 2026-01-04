@@ -35,7 +35,7 @@ export function useExifDetection(
         },
       });
       const metadata = res.data.data;
-      console.log("Detected metadata:", metadata);
+      // console.log("Detected metadata:", metadata);
       return metadata;
     } catch (err) {
       console.error("Metadata detection failed:", err);

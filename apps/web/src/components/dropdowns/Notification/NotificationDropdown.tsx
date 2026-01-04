@@ -62,7 +62,7 @@ const NotificationDropdown = () => {
   const { notifications, clearNotifications } = useNotificationContext();
   const unreadCount = notifications.filter((n) => !n.read).length;
   const handleClearAllNotifications = () => {
-    console.log("Clearing all notifications");
+    // console.log("Clearing all notifications");
     clearNotifications();
   };
   return (

@@ -133,7 +133,7 @@ const RollDropdownIconButton: React.FC<RollDropdownIconButtonProps> = ({
 
   const handleCreateRoll = async () => {
     if (!newRollName.trim()) return;
-    console.log("Saving new roll:", newRollName);
+    // console.log("Saving new roll:", newRollName);
     try {
       await createRoll({
         name: newRollName,
