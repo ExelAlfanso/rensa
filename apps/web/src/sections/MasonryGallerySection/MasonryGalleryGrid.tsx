@@ -32,7 +32,7 @@ const MasonryGalleryGrid: React.FC<MasonryGalleryGridProps> = ({ photos }) => {
     900: Math.min(getDynamicColumns(photos.length), 2),
     640: 2,
   };
-  const masonryWidthClass = photos.length > 5 ? "w-full" : "w-auto";
+  const masonryWidthClass = "w-auto";
 
   return (
     <AnimatePresence mode="popLayout">
