@@ -24,5 +24,8 @@ jobs:
           push: true
           tags: exelalfanso/rensa-frontend:prod
           build-args: |
-            NEXT_PUBLIC_ELYSIA_WS_URL=${{ secrets.NEXT_PUBLIC_ELYSIA_WS_URL }}
-            NEXT_PUBLIC_APP_URL=${{ secrets.NEXT_PUBLIC_APP_URL }}
+            NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
+            NEXT_PUBLIC_FAST_API_BASE_URL: ${{ secrets.NEXT_PUBLIC_FAST_API_BASE_URL }}
+            NEXT_PUBLIC_ELYSIA_BASE_URL: ${{ secrets.NEXT_PUBLIC_ELYSIA_BASE_URL }}
+            NEXT_PUBLIC_EXPRESS_BASE_URL: ${{ secrets.NEXT_PUBLIC_EXPRESS_BASE_URL }}
+            NEXT_PUBLIC_ELYSIA_WS_URL: ${{ secrets.NEXT_PUBLIC_ELYSIA_WS_URL }}
