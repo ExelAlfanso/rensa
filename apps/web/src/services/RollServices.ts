@@ -14,15 +14,41 @@ export async function addPhotoToRoll(
   rollId: string,
   photoId: string
 ) {
-  await sendPhotoSavedNotification(actorId, photoId);
-  return api.post(`/rolls/${rollId}/photos/${photoId}`, {
-    rollIds: [rollId],
-    photoId,
-  });
+  try {
+    console.debug("addPhotoToRoll", {
+      actorId,
+      rollId,
+      photoId,
+      baseURL: api.defaults.baseURL,
+    });
+    await sendPhotoSavedNotification(actorId, photoId);
+    return api.post(`/rolls/${rollId}/photos/${photoId}`, {
+      rollIds: [rollId],
+      photoId,
+    });
+  } catch (error) {
+    console.error("addPhotoToRoll failed:", {
+      actorId,
+      rollId,
+      photoId,
+      error,
+    });
+    throw error;
+  }
 }
 
 export async function removePhotoFromRoll(rollId: string, photoId: string) {
-  return api.delete(`/rolls/${rollId}/photos/${photoId}`);
+  try {
+    console.debug("removePhotoFromRoll", {
+      rollId,
+      photoId,
+      baseURL: api.defaults.baseURL,
+    });
+    return api.delete(`/rolls/${rollId}/photos/${photoId}`);
+  } catch (error) {
+    console.error("removePhotoFromRoll failed:", { rollId, photoId, error });
+    throw error;
+  }
 }
 
 export async function fetchIsSavedToRolls(photoId: string) {

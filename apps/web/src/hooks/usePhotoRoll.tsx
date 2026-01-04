@@ -62,7 +62,10 @@ export function usePhotoRoll(photoId: string | null) {
       showToast("Photo added to roll", "success");
       queryClient.invalidateQueries({ queryKey: ["savedRolls", photoId] });
     },
-    onError: () => showToast("Failed to add photo", "error"),
+    onError: (error) => {
+      console.error("saveMutation error:", error);
+      showToast("Failed to add photo", "error");
+    },
     onMutate: async (rollId: string) => {
       await queryClient.cancelQueries({ queryKey: ["savedRolls", photoId] });
       const previousSavedRolls = queryClient.getQueryData<string[]>([
@@ -89,7 +92,10 @@ export function usePhotoRoll(photoId: string | null) {
       showToast("Photo removed from roll", "success");
       queryClient.invalidateQueries({ queryKey: ["savedRolls", photoId] });
     },
-    onError: () => showToast("Failed to remove photo", "error"),
+    onError: (error) => {
+      console.error("removeMutation error:", error);
+      showToast("Failed to remove photo", "error");
+    },
   });
 
   // -----------------------
