@@ -172,6 +172,10 @@ export async function fetchPhotoOwnerByPhotoId(photoId: string) {
 
 export async function fetchPhotoById(photoId: string) {
   try {
+    // console.debug("fetchPhotoById request", {
+    //   photoId,
+    //   baseURL: api.defaults.baseURL,
+    // });
     const res = await api.get(`/photos/${photoId}`);
     return res.data.data;
   } catch (error) {

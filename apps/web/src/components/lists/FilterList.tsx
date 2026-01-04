@@ -78,7 +78,7 @@ const FilterList: React.FC<FilterListProps> = ({
       {activeFilters.length > 0 && (
         <button
           onClick={handleClearFiltersClick}
-          className="btn border-0 outline-0 ring-0 hover:bg-red-500 bg-[#BC0E0E] rounded-full"
+          className="border-0 outline-0 ring-0 hover:bg-red-500 bg-[#BC0E0E] rounded-full px-4 py-2 font-semibold text-white-500 hover:text-white-100 transition-colors duration-300 cursor-pointer"
         >
           Clear
         </button>
