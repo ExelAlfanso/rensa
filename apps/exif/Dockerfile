@@ -17,6 +17,9 @@ CMD ["npm", "run", "dev"]
 # ===== Production =====
 FROM node:20-alpine AS prod
 WORKDIR /app
+
+RUN apk add --no-cache perl
+
 ENV NODE_ENV=production
 
 COPY package*.json ./
