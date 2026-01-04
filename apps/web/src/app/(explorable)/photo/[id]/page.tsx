@@ -23,7 +23,7 @@ export default async function PhotoPage({
   }
   return (
     <div className="bg-white-500 w-full flex flex-col items-center justify-center px-[25px] md:px-[30px] lg:px-[70px] xl:px-[90px] 2xl:px-[260px] gap-10">
-      <div className="flex flex-col lg:flex-row items-center justify-center gap-[67px] pt-35 ">
+      <div className="flex flex-col lg:flex-row items-start justify-center gap-[67px] pt-35 ">
         <div className="flex flex-col items-center justify-center gap-2 md:items-start md:justify-start">
           <ImagePreview
             src={photo?.url ?? ""}

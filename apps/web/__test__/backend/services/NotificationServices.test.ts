@@ -6,12 +6,12 @@ import {
   clearUserNotifications,
   markUserNotificationAsRead,
 } from "@/services/NotificationServices";
-import { elysiaApi } from "@/lib/axios-server";
+import { api } from "@/lib/axios-client";
 import { fetchPhotoOwnerByPhotoId } from "@/services/PhotoServices";
 
 // Mock dependencies
-jest.mock("@/lib/axios-server", () => ({
-  elysiaApi: {
+jest.mock("@/lib/axios-client", () => ({
+  api: {
     get: jest.fn(),
     post: jest.fn(),
     delete: jest.fn(),
@@ -49,26 +49,26 @@ describe("NotificationServices", () => {
         },
       ];
 
-      (elysiaApi.get as jest.Mock).mockResolvedValue({
-        data: { data: { notifications: mockNotifications } },
+      (api.get as jest.Mock).mockResolvedValue({
+        data: { data: mockNotifications },
       });
 
       const result = await fetchNotifications("recipient1", 1, 10);
 
-      expect(elysiaApi.get).toHaveBeenCalledWith("/notifications", {
+      expect(api.get).toHaveBeenCalledWith("/notifications", {
         params: { recipientId: "recipient1", page: 1, limit: 10 },
       });
       expect(result).toEqual(mockNotifications);
     });
 
     it("should use default pagination values", async () => {
-      (elysiaApi.get as jest.Mock).mockResolvedValue({
-        data: { data: { notifications: [] } },
+      (api.get as jest.Mock).mockResolvedValue({
+        data: { data: [] },
       });
 
       await fetchNotifications("recipient1");
 
-      expect(elysiaApi.get).toHaveBeenCalledWith("/notifications", {
+      expect(api.get).toHaveBeenCalledWith("/notifications", {
         params: { recipientId: "recipient1", page: 1, limit: 10 },
       });
     });
@@ -79,12 +79,12 @@ describe("NotificationServices", () => {
       const mockResponse = { success: true, data: { _id: "notif123" } };
 
       (fetchPhotoOwnerByPhotoId as jest.Mock).mockResolvedValue("recipient123");
-      (elysiaApi.post as jest.Mock).mockResolvedValue({ data: mockResponse });
+      (api.post as jest.Mock).mockResolvedValue({ data: mockResponse });
 
       const result = await sendPhotoSavedNotification("actor123", "photo123");
 
       expect(fetchPhotoOwnerByPhotoId).toHaveBeenCalledWith("photo123");
-      expect(elysiaApi.post).toHaveBeenCalledWith("/notifications", {
+      expect(api.post).toHaveBeenCalledWith("/notifications", {
         actorId: "actor123",
         recipientId: "recipient123",
         photoId: "photo123",
@@ -98,7 +98,7 @@ describe("NotificationServices", () => {
 
       const result = await sendPhotoSavedNotification("actor123", "photo123");
 
-      expect(elysiaApi.post).not.toHaveBeenCalled();
+      expect(api.post).not.toHaveBeenCalled();
       expect(result).toBeNull();
     });
 
@@ -107,13 +107,13 @@ describe("NotificationServices", () => {
 
       const result = await sendPhotoSavedNotification("actor123", "photo123");
 
-      expect(elysiaApi.post).not.toHaveBeenCalled();
+      expect(api.post).not.toHaveBeenCalled();
       expect(result).toBeNull();
     });
 
     it("should handle errors gracefully", async () => {
       (fetchPhotoOwnerByPhotoId as jest.Mock).mockResolvedValue("recipient123");
-      (elysiaApi.post as jest.Mock).mockRejectedValue(new Error("API Error"));
+      (api.post as jest.Mock).mockRejectedValue(new Error("API Error"));
 
       await expect(
         sendPhotoSavedNotification("actor123", "photo123")
@@ -126,11 +126,11 @@ describe("NotificationServices", () => {
       const mockResponse = { success: true };
 
       (fetchPhotoOwnerByPhotoId as jest.Mock).mockResolvedValue("recipient123");
-      (elysiaApi.post as jest.Mock).mockResolvedValue({ data: mockResponse });
+      (api.post as jest.Mock).mockResolvedValue({ data: mockResponse });
 
       await sendBookmarkedNotification("actor123", "photo123");
 
-      expect(elysiaApi.post).toHaveBeenCalledWith("/notifications", {
+      expect(api.post).toHaveBeenCalledWith("/notifications", {
         actorId: "actor123",
         recipientId: "recipient123",
         photoId: "photo123",
@@ -144,11 +144,11 @@ describe("NotificationServices", () => {
       const mockResponse = { success: true };
 
       (fetchPhotoOwnerByPhotoId as jest.Mock).mockResolvedValue("recipient123");
-      (elysiaApi.post as jest.Mock).mockResolvedValue({ data: mockResponse });
+      (api.post as jest.Mock).mockResolvedValue({ data: mockResponse });
 
       await sendCommentedNotification("actor123", "photo123");
 
-      expect(elysiaApi.post).toHaveBeenCalledWith("/notifications", {
+      expect(api.post).toHaveBeenCalledWith("/notifications", {
         actorId: "actor123",
         recipientId: "recipient123",
         photoId: "photo123",
@@ -159,18 +159,18 @@ describe("NotificationServices", () => {
 
   describe("clearUserNotifications", () => {
     it("should clear user notifications successfully", async () => {
-      (elysiaApi.delete as jest.Mock).mockResolvedValue({
+      (api.delete as jest.Mock).mockResolvedValue({
         data: { success: true },
       });
 
       const result = await clearUserNotifications("user123");
 
-      expect(elysiaApi.delete).toHaveBeenCalledWith("/notifications/user123");
+      expect(api.delete).toHaveBeenCalledWith("/notifications/user123");
       expect(result).toBe(true);
     });
 
     it("should return false when success is undefined", async () => {
-      (elysiaApi.delete as jest.Mock).mockResolvedValue({ data: {} });
+      (api.delete as jest.Mock).mockResolvedValue({ data: {} });
 
       const result = await clearUserNotifications("user123");
 
@@ -178,9 +178,7 @@ describe("NotificationServices", () => {
     });
 
     it("should handle errors when clearing notifications", async () => {
-      (elysiaApi.delete as jest.Mock).mockRejectedValue(
-        new Error("Delete failed")
-      );
+      (api.delete as jest.Mock).mockRejectedValue(new Error("Delete failed"));
 
       await expect(clearUserNotifications("user123")).rejects.toThrow(
         "Delete failed"
@@ -190,20 +188,18 @@ describe("NotificationServices", () => {
 
   describe("markUserNotificationAsRead", () => {
     it("should mark notification as read successfully", async () => {
-      (elysiaApi.put as jest.Mock).mockResolvedValue({
+      (api.put as jest.Mock).mockResolvedValue({
         data: { success: true },
       });
 
       const result = await markUserNotificationAsRead("notif123");
 
-      expect(elysiaApi.put).toHaveBeenCalledWith(
-        "/notifications/notif123/read"
-      );
+      expect(api.put).toHaveBeenCalledWith("/notifications/notif123/read");
       expect(result).toBe(true);
     });
 
     it("should return false when success is undefined", async () => {
-      (elysiaApi.put as jest.Mock).mockResolvedValue({ data: {} });
+      (api.put as jest.Mock).mockResolvedValue({ data: {} });
 
       const result = await markUserNotificationAsRead("notif123");
 
@@ -211,9 +207,7 @@ describe("NotificationServices", () => {
     });
 
     it("should handle errors when marking notification as read", async () => {
-      (elysiaApi.put as jest.Mock).mockRejectedValue(
-        new Error("Update failed")
-      );
+      (api.put as jest.Mock).mockRejectedValue(new Error("Update failed"));
 
       await expect(markUserNotificationAsRead("notif123")).rejects.toThrow(
         "Update failed"

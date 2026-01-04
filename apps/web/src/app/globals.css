@@ -68,7 +68,7 @@
   --font-figtree: "Figtree", serif;
   --font-forum: "Forum", sans-serif;
 }
-@theme light {
+@theme {
   --color-primary: var(--primary);
   --color-secondary: var(--secondary);
   --color-background: var(--background);

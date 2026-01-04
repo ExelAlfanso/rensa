@@ -11,12 +11,15 @@ import { api } from "@/lib/axios-client";
 import { sendPhotoSavedNotification } from "@/services/NotificationServices";
 
 // Mock dependencies
-jest.mock("@/lib/axios", () => ({
+jest.mock("@/lib/axios-client", () => ({
   api: {
     get: jest.fn(),
     post: jest.fn(),
     delete: jest.fn(),
     patch: jest.fn(),
+    defaults: {
+      baseURL: "http://localhost:3000",
+    },
   },
 }));
 

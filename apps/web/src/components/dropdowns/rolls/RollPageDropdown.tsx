@@ -10,12 +10,14 @@ interface RollPageDropdownProps {
   rollId: string;
   name: string;
   isOwner: boolean;
+  ownerId?: string;
 }
 
 const RollPageDropdown: React.FC<RollPageDropdownProps> = ({
   rollId,
   name,
   isOwner,
+  ownerId,
 }) => {
   const { openEditor } = useEditRoll();
   const { showToast } = useToast();
@@ -49,7 +51,14 @@ const RollPageDropdown: React.FC<RollPageDropdownProps> = ({
         {isOwner && (
           <DropdownItem
             className="px-10"
-            onClick={() => openEditor({ rollId, name, type: "deleting" })}
+            onClick={() =>
+              openEditor({
+                rollId,
+                name,
+                type: "deleting",
+                callbackUrl: `/profile/${ownerId}`,
+              })
+            }
           >
             Delete
           </DropdownItem>

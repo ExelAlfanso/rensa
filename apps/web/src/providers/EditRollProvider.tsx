@@ -5,12 +5,14 @@ import TertiaryButton from "@/components/buttons/TertiaryButton";
 import { createContext, useState, useContext, ReactNode } from "react";
 import { useToast } from "./ToastProvider";
 import { api } from "@/lib/axios-client";
+import { useRouter } from "next/navigation";
 import Button from "@/components/buttons/Button";
 
 interface EditRollState {
   rollId: string;
   name: string;
   type: "deleting" | "renaming" | "default";
+  callbackUrl?: string;
 }
 
 interface EditRollContextType {
@@ -19,7 +21,7 @@ interface EditRollContextType {
   openEditor: (roll: EditRollState) => void;
   closeEditor: () => void;
   saveChanges: (rollId: string, name: string) => Promise<void>;
-  removeRoll: (rollId: string) => Promise<void>;
+  removeRoll: (rollId: string, callbackUrl?: string) => Promise<void>;
 }
 
 const EditRollContext = createContext<EditRollContextType | undefined>(
@@ -51,6 +53,7 @@ export const EditRollProvider = ({
   const [name, setName] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const { showToast } = useToast();
+  const router = useRouter();
 
   const openEditor = (roll: EditRollState) => {
     setType(roll.type);
@@ -70,7 +73,7 @@ export const EditRollProvider = ({
     setName("");
     setIsDeleting(false);
   };
-  const removeRoll = async (rollId: string) => {
+  const removeRoll = async (rollId: string, callbackUrl?: string) => {
     try {
       await api.delete(`/rolls/${rollId}`);
       showToast("Roll deleted successfully", "success");
@@ -78,6 +81,10 @@ export const EditRollProvider = ({
       if (onRollDelete) onRollDelete(rollId);
 
       closeEditor();
+
+      if (callbackUrl) {
+        router.push(callbackUrl);
+      }
     } catch (err) {
       showToast("Failed to delete roll", "error");
       console.error("Failed to delete roll:", err);
@@ -153,7 +160,7 @@ export const EditRollProvider = ({
                     className="bg-red-600 text-white hover:bg-red-700"
                     onClick={() => {
                       closeEditor();
-                      removeRoll(roll.rollId);
+                      removeRoll(roll.rollId, roll.callbackUrl);
                     }}
                   >
                     Yes
