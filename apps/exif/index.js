@@ -47,5 +47,6 @@ process.on("exit", () => {
 app.listen(process.env.PORT || 3003, "0.0.0.0", () =>
   console.log("Server running at http://0.0.0.0:3003")
 );
-
-console.log("CICD Triggered");
+// app.listen(process.env.PORT || 3003, () =>
+//   console.log("Server running at http://localhost:3003")
+// );

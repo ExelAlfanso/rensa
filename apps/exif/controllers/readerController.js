@@ -15,18 +15,20 @@ export const exifRead = async (req, res) => {
 
     // Read metadata
     const metadata = await exiftool.read(tempPath);
-
     res.json({
-      filename: req.file.originalname,
-      size: req.file.size,
-      mimetype: req.file.mimetype,
-      metadata,
+      success: true,
+      data: {
+        filename: req.file.originalname,
+        size: req.file.size,
+        mimetype: req.file.mimetype,
+        metadata,
+      },
+      message: "Metadata extracted successfully",
     });
-
-    // Cleanup
     fs.unlink(tempPath, (err) => {
       if (err) console.error("⚠️ Failed to delete temp file:", err);
     });
+    // Cleanup
   } catch (error) {
     console.error("❌ EXIF Read Error:", error);
     res.status(500).json({ error: "Failed to read metadata" });
