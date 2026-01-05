@@ -62,12 +62,16 @@ export function NotificationProvider({
   });
 
   const connectWebSocket = useCallback(() => {
-    const WS_URL = process.env.NEXT_PUBLIC_ELYSIA_WS_URL;
-    if (!WS_URL) {
-      console.error("WebSocket URL is not configured");
-      return;
+    const WS_URL =
+      process.env.NEXT_PUBLIC_ELYSIA_WS_URL + `?token=${accessToken}`;
+
+    if (process.env.NEXT_PUBLIC_ELYSIA_WS_URL) {
+      console.error("WS URL is not defined" + WS_URL);
     }
-    const ws = new WebSocket(`${WS_URL}?token=${accessToken}`);
+
+    const ws = new WebSocket(
+      WS_URL || `wss://rensa.site/api/ws?${accessToken}`
+    );
     wsRef.current = ws;
 
     ws.onopen = () => {
