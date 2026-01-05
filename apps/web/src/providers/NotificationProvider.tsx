@@ -65,9 +65,7 @@ export function NotificationProvider({
     const WS_URL =
       process.env.NEXT_PUBLIC_ELYSIA_WS_URL + `?token=${accessToken}`;
 
-    if (process.env.NEXT_PUBLIC_ELYSIA_WS_URL) {
-      console.error("WS URL is not defined" + WS_URL);
-    }
+    console.log(WS_URL);
 
     const ws = new WebSocket(
       WS_URL || `wss://rensa.site/api/ws?${accessToken}`
