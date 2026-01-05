@@ -62,14 +62,7 @@ export function NotificationProvider({
   });
 
   const connectWebSocket = useCallback(() => {
-    const WS_URL =
-      process.env.NEXT_PUBLIC_ELYSIA_WS_URL + `?token=${accessToken}`;
-
-    console.log(WS_URL);
-
-    const ws = new WebSocket(
-      WS_URL || `wss://rensa.site/api/ws?${accessToken}`
-    );
+    const ws = new WebSocket(`wss://rensa.site/api/ws?${accessToken}`);
     wsRef.current = ws;
 
     ws.onopen = () => {
