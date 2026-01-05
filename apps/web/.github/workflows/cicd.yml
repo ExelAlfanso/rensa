@@ -26,3 +26,13 @@ jobs:
           build-args: |
             NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
             NEXT_PUBLIC_ELYSIA_WS_URL: ${{ secrets.NEXT_PUBLIC_ELYSIA_WS_URL }}
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /opt/rensa/infra
+            docker compose -f docker-compose-production.yaml pull
+            docker compose -f docker-compose-production.yaml up -d
