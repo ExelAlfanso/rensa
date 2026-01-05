@@ -62,7 +62,7 @@ export function NotificationProvider({
   });
 
   const connectWebSocket = useCallback(() => {
-    const ws = new WebSocket(`wss://rensa.site/api/ws?${accessToken}`);
+    const ws = new WebSocket(`wss://rensa.site/api/ws?token=${accessToken}`);
     wsRef.current = ws;
 
     ws.onopen = () => {
