@@ -1,6 +1,7 @@
 // components/auth/AuthFormLayout.tsx
 import { ReactNode, FormEventHandler } from "react";
 import Logo from "@/components/icons/Logo";
+import { sanitizeInput } from "@/lib/validation";
 
 type AuthFormLayoutProps = {
   title: string;
@@ -32,12 +33,12 @@ export default function AuthFormLayout({
         <fieldset className="w-full p-4 fieldset">
           {message && (
             <div className="text-green-700 text-sm mb-2" role="status">
-              {message}
+              {sanitizeInput(message)}
             </div>
           )}
           {error && (
             <div className="text-orange-900 text-sm mb-2" role="alert">
-              {error}
+              {sanitizeInput(error)}
             </div>
           )}
           <div className="flex flex-col gap-4">{children}</div>

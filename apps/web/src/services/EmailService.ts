@@ -34,6 +34,9 @@ function getEmailTransporter() {
   });
 }
 
+function isValidEmail(email: string): boolean {
+  return /^[^\s@]@[^\s@]+\.[^\s@]+$/.test(email);
+}
 /**
  * Send email with error handling
  */
@@ -43,7 +46,10 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
       console.warn("Email service not configured");
       return false;
     }
-
+    if (!isValidEmail(options.to)) {
+      console.error("Invalid email address provided");
+      return false;
+    }
     const transporter = getEmailTransporter();
 
     await transporter.sendMail({
@@ -54,7 +60,7 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
     console.log(`Email sent.`);
     return true;
   } catch (error) {
-    console.error("Failed to send email:", error);
+    console.error("Failed to send email");
     // Don't throw - log and continue. Form submission should succeed even if email fails
     return false;
   }
