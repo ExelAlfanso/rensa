@@ -30,11 +30,13 @@ function getEmailTransporter() {
     secure: port === 465,
     auth: {
       user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD,
+      pass: process.env.EMAIL_PASS,
     },
   });
 }
 
+/** Simple email validation
+ */
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
@@ -43,7 +45,7 @@ function isValidEmail(email: string): boolean {
  */
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
   try {
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
       console.warn("Email service not configured");
       return false;
     }
@@ -51,18 +53,24 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
       console.error("Invalid email address provided");
       return false;
     }
+
+    const fromAddress = process.env.EMAIL_FROM;
+    if (!fromAddress || !isValidEmail(fromAddress)) {
+      console.error("Invalid EMAIL_FROM address in environment variables");
+      return false;
+    }
+
     const transporter = getEmailTransporter();
 
     await transporter.sendMail({
-      from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+      from: fromAddress,
       ...options,
     });
 
     console.log(`Email sent.`);
     return true;
   } catch (error) {
-    console.error("Failed to send email");
-    // Don't throw - log and continue. Form submission should succeed even if email fails
+    console.error("Failed to send email: " + error);
     return false;
   }
 }

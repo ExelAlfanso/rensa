@@ -9,16 +9,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Email is required" }, { status: 400 });
   }
 
-  // Apply rate limiting
-  const rateLimitResult = await verificationEmailLimiter.limit(email);
-  if (!rateLimitResult.success) {
-    return NextResponse.json(
-      {
-        message: "Too many verification requests. Please try again later.",
-      },
-      { status: 429 }
-    );
-  }
+  // // Apply rate limiting
+  // const rateLimitResult = await verificationEmailLimiter.limit(email);
+  // if (!rateLimitResult.success) {
+  //   return NextResponse.json(
+  //     {
+  //       message: "Too many verification requests. Please try again later.",
+  //     },
+  //     { status: 429 }
+  //   );
+  // }
   if (!process.env.NEXTAUTH_SECRET) {
     return NextResponse.json(
       { message: "Email verification is not configured." },
@@ -45,7 +45,8 @@ export async function POST(req: NextRequest) {
         {
           success: false,
           message:
-            "Failed to send verification email. Email service not configured.",
+            "Failed to send verification email. Email service not configured." +
+            emailSent,
         },
         { status: 500 }
       );
