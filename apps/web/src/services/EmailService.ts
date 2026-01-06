@@ -22,11 +22,12 @@ interface EmailOptions {
  * Configure based on your email provider
  */
 function getEmailTransporter() {
+  const port = parseInt(process.env.EMAIL_PORT || "587", 10);
   // Using Nodemailer with Gmail (or your SMTP provider)
   return nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
-    port: parseInt(process.env.EMAIL_PORT || "587", 10),
-    secure: false,
+    port,
+    secure: port === 465,
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASSWORD,
@@ -35,7 +36,7 @@ function getEmailTransporter() {
 }
 
 function isValidEmail(email: string): boolean {
-  return /^[^\s@]@[^\s@]+\.[^\s@]+$/.test(email);
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 /**
  * Send email with error handling
@@ -219,6 +220,14 @@ export async function sendBugReportToTeam(
   });
 }
 
+function isValidHttpUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
 /**
  * Send email verification link
  */
@@ -226,6 +235,10 @@ export async function sendVerificationEmail(
   email: string,
   verificationUrl: string
 ) {
+  if (!isValidHttpUrl(verificationUrl)) {
+    console.error("Invalid verification URL");
+    return false;
+  }
   const html = `
   <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
     <h2 style="color: #333;">Welcome to Rensa! 📸👋</h2>
