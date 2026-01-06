@@ -10,13 +10,21 @@ export async function POST(req: NextRequest) {
   }
 
   // // Apply rate limiting
-  const rateLimitResult = await verificationEmailLimiter.limit(email);
-  if (!rateLimitResult.success) {
-    return NextResponse.json(
-      {
-        message: "Too many verification requests. Please try again later.",
-      },
-      { status: 429 }
+  try {
+    const rateLimitResult = await verificationEmailLimiter.limit(email);
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        {
+          message: "Too many verification requests. Please try again later.",
+        },
+        { status: 429 }
+      );
+    }
+  } catch (e) {
+    // If Redis is not configured, skip rate limiting but log for visibility
+    console.warn(
+      "Verification rate limiting skipped: Redis not configured or unreachable.",
+      e
     );
   }
   if (!process.env.NEXTAUTH_SECRET) {
@@ -25,17 +33,13 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
-  if (!process.env.NEXT_PUBLIC_APP_URL) {
-    return NextResponse.json(
-      { message: "Application URL is not configured." },
-      { status: 500 }
-    );
-  }
+  // Prefer configured app URL, but fall back to request origin
+  const appOrigin = process.env.NEXT_PUBLIC_APP_URL || req.nextUrl.origin;
   const token = jwt.sign({ email }, process.env.NEXTAUTH_SECRET!, {
     expiresIn: "1h",
   });
 
-  const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/verify-email?token=${token}`;
+  const verificationUrl = `${appOrigin}/verify-email?token=${token}`;
 
   try {
     const emailSent = await sendVerificationEmail(email, verificationUrl);

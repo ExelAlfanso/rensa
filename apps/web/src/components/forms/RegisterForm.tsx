@@ -45,10 +45,19 @@ export default function RegisterForm() {
         redirect: false,
       });
 
-      const message = encodeURIComponent(
-        "Sent a verification to your email. Please verify to continue."
-      );
-      router.push(`/login?message=${message}`);
+      // Trigger verification email
+      // try {
+      //   await api.post("/auth/send-verification", { email: form.email });
+      // } catch (sendErr) {
+      //   // Non-blocking: show message but continue to login
+      //   console.warn("Failed to send verification email:", sendErr);
+      // }
+
+      // const message = encodeURIComponent(
+      //   "Sent a verification to your email. Please verify to continue."
+      // );
+      // router.push(`/login?message=${message}`);
+      router.push(`/login`);
     } catch (err) {
       if (axios.isAxiosError(err)) {
         setError(
