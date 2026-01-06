@@ -39,13 +39,13 @@ export const authOptions: NextAuthOptions = {
       async authorize(credentials) {
         await connectDB();
         const user = await User.findOne({ email: credentials?.email });
+        if (!user) {
+          throw new Error("Invalid email or password");
+        }
         if (!user.verified) {
           throw new Error(
             "Email not verified. Please verify your email before logging in."
           );
-        }
-        if (!user) {
-          throw new Error("Invalid email or password");
         }
         const isValid = await bcrypt.compare(
           credentials!.password,

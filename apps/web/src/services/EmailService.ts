@@ -189,7 +189,7 @@ export async function sendBugReportToTeam(
     <p><strong>Reporter Email:</strong> <a href="mailto:${escapeHtml(
       email
     )}">${escapeHtml(email)}</a></p>
-    <p><strong>Report ID:</strong> <code>${reportId}</code></p>
+    <p><strong>Report ID:</strong> <code>${escapeHtml(reportId)}</code></p>
     <hr>
     <h3>Description:</h3>
     <p>${escapeHtml(description).replace(/\n/g, "<br>")}</p>
