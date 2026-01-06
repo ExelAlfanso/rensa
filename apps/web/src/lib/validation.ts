@@ -44,23 +44,29 @@ export function isValidLength(
 export function validateContactData(data: any) {
   const errors: Record<string, string> = {};
 
+  // Sanitize inputs first
+  const name = sanitizeInput(data.name || "");
+  const email = sanitizeInput(data.email || "").toLowerCase();
+  const subject = sanitizeInput(data.subject || "");
+  const message = sanitizeInput(data.message || "");
+
   // Name validation
-  if (!data.name || !isValidLength(data.name, 2, 100)) {
+  if (!name || !isValidLength(name, 2, 100)) {
     errors.name = "Name must be between 2-100 characters";
   }
 
   // Email validation
-  if (!data.email || !isValidEmail(data.email)) {
+  if (!email || !isValidEmail(email)) {
     errors.email = "Please provide a valid email address";
   }
 
   // Subject validation
-  if (!data.subject || !isValidLength(data.subject, 5, 200)) {
+  if (!subject || !isValidLength(subject, 5, 200)) {
     errors.subject = "Subject must be between 5-200 characters";
   }
 
   // Message validation
-  if (!data.message || !isValidLength(data.message, 10, 5000)) {
+  if (!message || !isValidLength(message, 10, 5000)) {
     errors.message = "Message must be between 10-5000 characters";
   }
 
@@ -68,10 +74,10 @@ export function validateContactData(data: any) {
     isValid: Object.keys(errors).length === 0,
     errors,
     data: {
-      name: sanitizeInput(data.name || ""),
-      email: sanitizeInput(data.email || "").toLowerCase(),
-      subject: sanitizeInput(data.subject || ""),
-      message: sanitizeInput(data.message || ""),
+      name,
+      email,
+      subject,
+      message,
     },
   };
 }
@@ -82,47 +88,54 @@ export function validateContactData(data: any) {
 export function validateBugReportData(data: any) {
   const errors: Record<string, string> = {};
 
+  // Sanitize inputs first
+  const title = sanitizeInput(data.title || "");
+  const email = sanitizeInput(data.email || "").toLowerCase();
+  const description = sanitizeInput(data.description || "");
+  const expectedBehavior = sanitizeInput(data.expectedBehavior || "");
+  const actualBehavior = sanitizeInput(data.actualBehavior || "");
+  const stepsToReproduce = sanitizeInput(data.stepsToReproduce || "");
+  const browser = sanitizeInput(data.browser || "");
+  const attachments = sanitizeInput(data.attachments || "");
+
   // Title validation
-  if (!data.title || !isValidLength(data.title, 10, 200)) {
+  if (!title || !isValidLength(title, 10, 200)) {
     errors.title = "Title must be between 10-200 characters";
   }
 
   // Email validation
-  if (!data.email || !isValidEmail(data.email)) {
+  if (!email || !isValidEmail(email)) {
     errors.email = "Please provide a valid email address";
   }
 
   // Description validation
-  if (!data.description || !isValidLength(data.description, 20, 3000)) {
+  if (!description || !isValidLength(description, 20, 3000)) {
     errors.description = "Description must be between 20-3000 characters";
   }
 
   // Expected behavior validation
-  if (
-    !data.expectedBehavior ||
-    !isValidLength(data.expectedBehavior, 10, 1000)
-  ) {
+  if (!expectedBehavior || !isValidLength(expectedBehavior, 10, 1000)) {
     errors.expectedBehavior =
       "Expected behavior must be between 10-1000 characters";
   }
 
   // Actual behavior validation
-  if (!data.actualBehavior || !isValidLength(data.actualBehavior, 10, 1000)) {
+  if (!actualBehavior || !isValidLength(actualBehavior, 10, 1000)) {
     errors.actualBehavior =
       "Actual behavior must be between 10-1000 characters";
   }
 
-  // Optional fields
-  if (data.stepsToReproduce && !isValidLength(data.stepsToReproduce, 0, 2000)) {
+  // Optional fields validation (only check length if provided)
+  if (stepsToReproduce && !isValidLength(stepsToReproduce, 0, 2000)) {
     errors.stepsToReproduce =
       "Steps to reproduce must not exceed 2000 characters";
   }
 
-  if (data.browser && !isValidLength(data.browser, 0, 200)) {
+  if (browser && !isValidLength(browser, 0, 200)) {
     errors.browser = "Browser info must not exceed 200 characters";
   }
 
-  if (data.attachments && !isValidLength(data.attachments, 0, 500)) {
+  if (attachments && !isValidLength(attachments, 0, 500)) {
     errors.attachments = "Attachments info must not exceed 500 characters";
   }
 
@@ -130,14 +143,14 @@ export function validateBugReportData(data: any) {
     isValid: Object.keys(errors).length === 0,
     errors,
     data: {
-      title: sanitizeInput(data.title || ""),
-      email: sanitizeInput(data.email || "").toLowerCase(),
-      description: sanitizeInput(data.description || ""),
-      stepsToReproduce: sanitizeInput(data.stepsToReproduce || ""),
-      expectedBehavior: sanitizeInput(data.expectedBehavior || ""),
-      actualBehavior: sanitizeInput(data.actualBehavior || ""),
-      browser: sanitizeInput(data.browser || ""),
-      attachments: sanitizeInput(data.attachments || ""),
+      title,
+      email,
+      description,
+      stepsToReproduce,
+      expectedBehavior,
+      actualBehavior,
+      browser,
+      attachments,
     },
   };
 }

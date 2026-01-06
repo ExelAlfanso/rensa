@@ -31,3 +31,9 @@ export const bugReportLimiter = new Ratelimit({
   limiter: Ratelimit.slidingWindow(3, "24 h"),
   prefix: "bugreport_limit",
 });
+
+export const verificationEmailLimiter = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(3, "1 h"),
+  prefix: "verification_limit",
+});

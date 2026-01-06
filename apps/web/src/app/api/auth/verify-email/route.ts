@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    if (user.isEmailVerified) {
+    if (user.verified) {
       return NextResponse.json(
         { message: "Email already verified" },
         { status: 200 }
@@ -64,10 +64,8 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error("[VERIFY_EMAIL_ERROR]", error);
-
     return NextResponse.json(
-      { message: "Internal server error " + error },
+      { message: "Internal server error " },
       { status: 500 }
     );
   }

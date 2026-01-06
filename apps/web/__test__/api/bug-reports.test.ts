@@ -145,14 +145,16 @@ describe("Bug Report API - Validation Logic", () => {
 
     it("should sanitize HTML in all fields", () => {
       const result = validateBugReportData({
-        title: "<script>Crash</script> Login page",
+        title: "<script>Crash</script> Login page crashes",
         email: "user@example.com",
-        description: "<img src=x> When I try to login",
-        expectedBehavior: "<b>Should</b> authenticate",
-        actualBehavior: "<p>Crashes</p>",
-        stepsToReproduce: "<div>1. Go to login</div>",
-        browser: "Chrome <img>",
-        attachments: "<a href>Error</a>",
+        description:
+          "<img src=x> When I try to login with special characters it fails",
+        expectedBehavior:
+          "<b>Should</b> authenticate successfully and redirect",
+        actualBehavior: "<p>Crashes with error message</p>",
+        stepsToReproduce: "<div>1. Go to login page and submit form</div>",
+        browser: "Chrome 120 <img>",
+        attachments: "<a href>Error log file</a>",
       });
       expect(result.isValid).toBe(true);
       expect(result.data.title).not.toContain("<script>");
