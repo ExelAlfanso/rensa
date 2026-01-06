@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Email is required" }, { status: 400 });
   }
 
-  // Apply rate limiting
+  // // Apply rate limiting
   const rateLimitResult = await verificationEmailLimiter.limit(email);
   if (!rateLimitResult.success) {
     return NextResponse.json(
@@ -45,7 +45,8 @@ export async function POST(req: NextRequest) {
         {
           success: false,
           message:
-            "Failed to send verification email. Email service not configured.",
+            "Failed to send verification email. Email service not configured." +
+            emailSent,
         },
         { status: 500 }
       );

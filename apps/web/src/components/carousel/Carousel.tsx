@@ -57,13 +57,13 @@ export default function Carousel() {
             <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 justify-between">
               <button
                 onClick={() => handleScroll(prevId)}
-                className="btn btn-circle"
+                className="rounded-full cursor-pointer w-8 h-8 flex items-center justify-center bg-white/70 text-black/70 hover:bg-white/90 hover:text-black/90 transition"
               >
                 ❮
               </button>
               <button
                 onClick={() => handleScroll(nextId)}
-                className="btn btn-circle"
+                className="rounded-full cursor-pointer w-8 h-8 flex items-center justify-center bg-white/70 text-black/70 hover:bg-white/90 hover:text-black/90 transition"
               >
                 ❯
               </button>
