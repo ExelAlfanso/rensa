@@ -14,7 +14,6 @@ export async function fetchNotifications(
   const res = await api.get("/notifications", {
     params: { recipientId, page, limit },
   });
-  // Next API responds with { success, data: notifications, message }
   return res.data?.data ?? [];
 }
 
