@@ -37,12 +37,18 @@ export default function RegisterForm() {
     setLoading(true);
     try {
       await api.post("/auth/register", form);
-      const res = await signIn("credentials", {
+
+      // Attempt sign-in (do not redirect) to keep NextAuth flow consistent
+      await signIn("credentials", {
         email: form.email,
         password: form.password,
-        callbackUrl: "/home",
+        redirect: false,
       });
-      if (res) router.push("/");
+
+      const message = encodeURIComponent(
+        "Sent a verification to your email. Please verify to continue."
+      );
+      router.push(`/login?message=${message}`);
     } catch (err) {
       if (axios.isAxiosError(err)) {
         setError(

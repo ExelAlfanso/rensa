@@ -54,7 +54,7 @@ export const authOptions: NextAuthOptions = {
         if (!isValid) {
           throw new Error("Invalid email or password");
         }
-        console.log("✅ User authenticated:", user.email);
+        // console.log("✅ User authenticated:", user.email);
         const accessToken = jwt.sign(
           {
             id: user._id.toString(),

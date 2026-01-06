@@ -7,11 +7,16 @@ import { useLoading } from "@/hooks/useLoading";
 import { signIn } from "next-auth/react";
 import PrimaryButton from "../buttons/PrimaryButton";
 import TextInputField from "../inputfields/TextInputField";
+import { useSearchParams } from "next/navigation";
+import { sanitizeInput } from "@/lib/validation";
 
 export default function LoginForm() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const { setLoading } = useLoading();
+  const searchParams = useSearchParams();
+  const infoMessage = sanitizeInput(searchParams.get("message") || "");
+  const displayMessage = error ? "" : infoMessage;
 
   const validateForm = () => {
     if (!form.email.trim()) return "Email is required";
@@ -44,6 +49,7 @@ export default function LoginForm() {
       title="Login"
       onSubmit={handleSubmit}
       error={error}
+      message={displayMessage}
       button={
         <PrimaryButton className="h-[52px] md:h-[62px] my-7" type="submit">
           Login
