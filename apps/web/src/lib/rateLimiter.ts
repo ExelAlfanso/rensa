@@ -19,3 +19,21 @@ export const logoutLimiter = new Ratelimit({
   limiter: Ratelimit.slidingWindow(10, "10 m"),
   prefix: "logout_limit",
 });
+
+export const contactFormLimiter = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(5, "1 h"),
+  prefix: "contact_limit",
+});
+
+export const bugReportLimiter = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(3, "24 h"),
+  prefix: "bugreport_limit",
+});
+
+export const verificationEmailLimiter = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(3, "1 h"),
+  prefix: "verification_limit",
+});

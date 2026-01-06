@@ -21,7 +21,7 @@ const figtree = Figtree({
 });
 
 export const metadata: Metadata = {
-  title: "Project Rensa",
+  title: "Rensa",
   description: "Where every picture tells its recipe",
 };
 
