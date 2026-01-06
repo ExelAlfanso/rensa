@@ -15,6 +15,7 @@ interface EmailOptions {
   subject: string;
   html: string;
   text?: string;
+  serviceType?: "contact" | "verify" | "bug-reports";
 }
 
 /**
@@ -35,11 +36,32 @@ function getEmailTransporter() {
   });
 }
 
-/** Simple email validation
+/**
+ * Get the appropriate FROM address based on service type
  */
-function isValidEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+function getFromAddress(
+  serviceType?: "contact" | "verify" | "bug-reports"
+): string | null {
+  switch (serviceType) {
+    case "contact":
+      return (
+        process.env.EMAIL_FROM_CONTACT_NOTIFICATION ||
+        process.env.EMAIL_FROM ||
+        null
+      );
+    case "verify":
+      return process.env.EMAIL_FROM_VERIFY || process.env.EMAIL_FROM || null;
+    case "bug-reports":
+      return (
+        process.env.EMAIL_FROM_BUG_REPORTS_NOTIFICATION ||
+        process.env.EMAIL_FROM ||
+        null
+      );
+    default:
+      return process.env.EMAIL_FROM || null;
+  }
 }
+
 /**
  * Send email with error handling
  */
@@ -54,7 +76,7 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
       return false;
     }
 
-    const fromAddress = process.env.EMAIL_FROM;
+    const fromAddress = getFromAddress(options.serviceType);
     if (!fromAddress || !isValidEmail(fromAddress)) {
       console.error("Invalid EMAIL_FROM address in environment variables");
       return false;
@@ -101,6 +123,7 @@ export async function sendContactConfirmationEmail(
     subject: `Re: ${subject}`,
     html,
     text: `Thank you for contacting us! We've received your message and will respond soon.`,
+    serviceType: "contact",
   });
 }
 
@@ -140,6 +163,7 @@ export async function sendContactToAdmin(
     to: adminEmail,
     subject: `[Contact Form] ${subject}`,
     html,
+    serviceType: "contact",
   });
 }
 
@@ -168,6 +192,7 @@ export async function sendBugReportConfirmationEmail(
     subject: `Bug Report Received: ${title}`,
     html,
     text: `Bug Report Received. Report ID: ${escapeHtml(reportId)}`,
+    serviceType: "bug-reports",
   });
 }
 
@@ -225,6 +250,7 @@ export async function sendBugReportToTeam(
     to: devEmail,
     subject: `[BUG - ${severity.toUpperCase()}] ${title}`,
     html,
+    serviceType: "bug-reports",
   });
 }
 
@@ -273,6 +299,7 @@ export async function sendVerificationEmail(
     subject: "Verify Your Rensa Account",
     html,
     text: `Welcome to Rensa! Please verify your email by visiting: ${verificationUrl}`,
+    serviceType: "verify",
   });
 }
 
@@ -288,4 +315,12 @@ function escapeHtml(text: string): string {
     "'": "&#039;",
   };
   return text.replace(/[&<>"']/g, (char) => map[char]);
+}
+
+/**
+ * Validate email address format
+ */
+function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email) && email.length <= 254;
 }
