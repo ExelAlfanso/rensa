@@ -5,7 +5,6 @@ import { sendVerificationEmail } from "@/services/EmailService";
 
 export async function POST(req: NextRequest) {
   const { email } = await req.json();
-
   if (!email) {
     return NextResponse.json({ message: "Email is required" }, { status: 400 });
   }
@@ -20,7 +19,18 @@ export async function POST(req: NextRequest) {
       { status: 429 }
     );
   }
-
+  if (!process.env.NEXTAUTH_SECRET) {
+    return NextResponse.json(
+      { message: "Email verification is not configured." },
+      { status: 500 }
+    );
+  }
+  if (!process.env.NEXT_PUBLIC_APP_URL) {
+    return NextResponse.json(
+      { message: "Application URL is not configured." },
+      { status: 500 }
+    );
+  }
   const token = jwt.sign({ email }, process.env.NEXTAUTH_SECRET!, {
     expiresIn: "1h",
   });

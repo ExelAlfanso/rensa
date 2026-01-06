@@ -29,7 +29,7 @@ const UserSchema = new Schema<UserDocument>(
     avatar: {
       type: String,
     },
-    // verified: { type: Boolean, default: false }, // email verification
+    verified: { type: Boolean, default: false }, // email verification
     bookmarks: {
       type: [{ type: Schema.Types.ObjectId, ref: "Photo" }],
       default: [],
