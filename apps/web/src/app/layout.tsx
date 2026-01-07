@@ -7,6 +7,7 @@ import QueryProvider from "@/providers/QueryProvider";
 import { ToastProvider } from "@/providers/ToastProvider";
 import Toast from "@/components/toast/Toast";
 import { NotificationProvider } from "@/providers/NotificationProvider";
+import SchemaMarkup from "@/components/SchemaMarkup";
 
 const forum = Forum({
   subsets: ["latin"],
@@ -21,8 +22,61 @@ const figtree = Figtree({
 });
 
 export const metadata: Metadata = {
-  title: "Rensa",
-  description: "Where every picture tells its recipe",
+  title: {
+    default: "Rensa - Where Every Picture Tells Its Recipe",
+    template: "%s | Rensa",
+  },
+  description:
+    "Discover photography inspiration on Rensa. Explore creative photo recipes, share your vision, and learn techniques behind stunning photos.",
+  keywords: [
+    "photography",
+    "photo sharing",
+    "photo inspiration",
+    "creative photos",
+    "photo community",
+  ],
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://rensa.site",
+    title: "Rensa - Where Every Picture Tells Its Recipe",
+    description:
+      "Discover photography inspiration on Rensa. Explore creative photo recipes and share your vision.",
+    siteName: "Rensa",
+    images: [
+      {
+        url: "/opengraph-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Rensa - Where Every Picture Tells Its Recipe",
+        type: "image/png",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    creator: "@rensaphoto",
+  },
+  alternates: {
+    canonical: "https://rensa.site",
+  },
 };
 
 export default function RootLayout({
@@ -32,6 +86,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <SchemaMarkup />
+      </head>
       <body className={`antialiased ${forum.variable} ${figtree.variable}`}>
         <ToastProvider>
           <QueryProvider>
