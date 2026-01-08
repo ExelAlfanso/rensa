@@ -6,11 +6,15 @@ import { ArrowArcRightIcon } from "@phosphor-icons/react";
 import Image from "next/image";
 import Link from "next/link";
 import Carousel from "@/components/carousel/Carousel";
+import { Metadata } from "next";
 
 import { cardData } from "@/app/datas/homeDatas";
 import HeroSection from "@/sections/HeroSection";
 import HomeNavbar from "@/components/navbar/HomeNavbar";
 import Footer from "@/components/footer/Footer";
+import { homeMetadata } from "./metadata";
+
+export const metadata: Metadata = homeMetadata;
 
 export default function Home() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -55,14 +59,14 @@ export default function Home() {
         className="static flex flex-col xl:flex-row w-full h-[50%] xl:h-screen p-10 xl:p-40 justfify-center lg:justify-between items-center"
       >
         <div className="flex flex-col pr-10 pb-8 xl:pb-[28vh]">
-          <div className="text-[32px] md:text-4xl lg:text-5xl xl:text-7xl font-figtree font-medium text-black-500 pb-[4vh] text-center xl:text-left">
+          <h2 className="text-[32px] md:text-4xl lg:text-5xl xl:text-7xl font-figtree font-medium text-black-500 pb-[4vh] text-center xl:text-left">
             Get an <span className="font-forum">Idea</span>
             <br />
             <span className="ml-[16px] lg:text-right">of What You Should </span>
             <br />
             <span className="font-forum">Shoot </span>
             Tomorrow
-          </div>
+          </h2>
           <div className="font-figtree font-light text-[10px] md:text-[1rem] text-center xl:text-left text-black-300 mx-4">
             <p>
               Stuck on what to capture next? Explore fresh perspectives from the

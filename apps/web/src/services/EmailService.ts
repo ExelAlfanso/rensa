@@ -71,6 +71,10 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
       console.warn("Email service not configured");
       return false;
     }
+    if (!process.env.EMAIL_HOST) {
+      console.error("EMAIL_HOST is not configured");
+      return false;
+    }
     if (!isValidEmail(options.to)) {
       console.error("Invalid email address provided");
       return false;
@@ -83,6 +87,14 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
     }
 
     const transporter = getEmailTransporter();
+
+    // Verify transporter connection for clearer diagnostics
+    try {
+      await transporter.verify();
+    } catch (verifyErr) {
+      console.error("SMTP transport verification failed:", verifyErr);
+      return false;
+    }
 
     await transporter.sendMail({
       from: fromAddress,

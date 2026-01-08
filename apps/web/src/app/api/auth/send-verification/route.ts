@@ -25,17 +25,13 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
-  if (!process.env.NEXT_PUBLIC_APP_URL) {
-    return NextResponse.json(
-      { message: "Application URL is not configured." },
-      { status: 500 }
-    );
-  }
+  // Prefer configured app URL, but fall back to request origin
+  const appOrigin = process.env.NEXT_PUBLIC_APP_URL || req.nextUrl.origin;
   const token = jwt.sign({ email }, process.env.NEXTAUTH_SECRET!, {
     expiresIn: "1h",
   });
 
-  const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/verify-email?token=${token}`;
+  const verificationUrl = `${appOrigin}/verify-email?token=${token}`;
 
   try {
     const isEmailAvailable = await User.findOne({ email });
