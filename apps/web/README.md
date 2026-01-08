@@ -8,9 +8,9 @@ A modern web application dedicated to the art of authentic photography. Share an
 
 ![Project Status](https://img.shields.io/badge/status-active-success.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Next.js](https://img.shields.io/badge/Next.js-14-black)
+![Next.js](https://img.shields.io/badge/Next.js-16-black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.0-38bdf8)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.0-38bdf8)
 ![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)
 ![Tests](https://img.shields.io/badge/tests-Jest-red.svg)
 
@@ -19,10 +19,8 @@ A modern web application dedicated to the art of authentic photography. Share an
 - [About](#-about)
 - [Features](#-key-features)
 - [Tech Stack](#-tech-stack)
-- [Project Structure](#-project-structure)
 - [Getting Started](#-getting-started)
 - [Usage](#-usage)
-- [Testing](#-testing)
 - [SEO Optimization](#-seo-optimization)
 - [Contributing](#-contributing)
 - [Support](#-support)
@@ -60,9 +58,9 @@ Whether you're shooting with Fujifilm, Ricoh, or other custom-profile capable ca
 
 ### Frontend
 
-- **Framework**: [Next.js](https://nextjs.org/) v14 (React 18)
+- **Framework**: [Next.js](https://nextjs.org/) v16 (React 18)
 - **Language**: [TypeScript](https://www.typescriptlang.org/) v5.0
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/) v3.0
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) v4.0
 - **UI Components**: Daisy UI, Phosphor Icons
 - **Animation**: [Framer Motion](https://www.framer.com/motion/)
 - **State Management**: [Jotai](https://jotai.org/), [TanStack Query](https://tanstack.com/query/latest), Zustand
@@ -77,6 +75,14 @@ Whether you're shooting with Fujifilm, Ricoh, or other custom-profile capable ca
 - **File Storage**: Cloudinary
 - **Caching**: Redis
 - **Authentication**: NextAuth.js
+- **Email Service**: AWS SES
+
+### Deployment Services
+
+- **Containerization**: Docker Compose
+- **Web Engine**: Nginx
+- **Virtual Server**: AWS EC2
+
 
 ### Development Tools
 
@@ -84,51 +90,6 @@ Whether you're shooting with Fujifilm, Ricoh, or other custom-profile capable ca
 - **Build Tool**: Next.js built-in
 - **Package Manager**: npm / yarn
 
-## 📁 Project Structure
-
-```
-rensa-frontend/
-├── src/
-│   ├── app/                      # Next.js app directory
-│   │   ├── (auth)/              # Authentication routes
-│   │   ├── (explorable)/        # Browsable routes
-│   │   ├── api/                 # API routes
-│   │   ├── home/                # Home page
-│   │   ├── upload/              # Photo upload
-│   │   ├── bug-reports/         # Bug report page
-│   │   ├── contact/             # Contact page
-│   │   ├── layout.tsx           # Root layout with global SEO
-│   │   ├── robots.ts            # Search engine crawling rules
-│   │   ├── sitemap.ts           # Dynamic sitemap generation
-│   │   └── page.tsx             # Home page entry
-│   ├── components/              # Reusable React components
-│   │   ├── buttons/
-│   │   ├── forms/
-│   │   ├── cards/
-│   │   ├── navbar/
-│   │   ├── footer/
-│   │   └── SchemaMarkup.tsx     # JSON-LD structured data
-│   ├── sections/                # Page sections
-│   ├── hooks/                   # Custom React hooks
-│   ├── lib/                     # Utility functions
-│   │   ├── auth.ts              # Authentication logic
-│   │   ├── axios-client.ts      # HTTP client setup
-│   │   ├── mongodb.ts           # Database connection
-│   │   └── validation.ts        # Form validation
-│   ├── models/                  # Data models/schemas
-│   ├── providers/               # Context providers
-│   ├── services/                # API service layer
-│   ├── stores/                  # State management
-│   └── types/                   # TypeScript types
-├── public/                      # Static assets
-├── __test__/                    # Test files
-├── jest.config.ts               # Jest configuration
-├── next.config.ts               # Next.js configuration
-├── tsconfig.json                # TypeScript configuration
-├── tailwind.config.js           # Tailwind CSS configuration
-├── package.json                 # Dependencies and scripts
-└── README.md                    # This file
-```
 
 ## 🚀 Getting Started
 
@@ -253,14 +214,7 @@ npm run test:coverage
 npm run test -- filename.test.tsx
 ```
 
-### Test Structure
 
-Tests are organized in the `__test__/` directory:
-
-- `__test__/frontend/` - React component tests
-- `__test__/api/` - API endpoint tests
-- `__test__/lib/` - Utility function tests
-- `__test__/fixtures/` - Test data and mocks
 
 ## 🔍 SEO Optimization
 
