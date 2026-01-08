@@ -182,6 +182,42 @@ export async function sendContactToAdmin(
   });
 }
 
+export async function sendContactToAdminDirect(
+  senderEmail: string,
+  senderName: string,
+  subject: string,
+  message: string
+) {
+  const adminEmail = process.env.ADMIN_EMAIL || "";
+
+  if (!adminEmail) {
+    console.warn("ADMIN_EMAIL not configured");
+    return false;
+  }
+
+  const html = `
+    <h2>New Contact Form Submission</h2>
+    <p><strong>From:</strong> ${escapeHtml(senderName)}</p>
+    <p><strong>Email:</strong> <a href="mailto:${escapeHtml(
+      senderEmail
+    )}">${escapeHtml(senderEmail)}</a></p>
+    <p><strong>Subject:</strong> ${escapeHtml(subject)}</p>
+    <hr>
+    <h3>Message:</h3>
+    <p>${escapeHtml(message).replace(/\n/g, "<br>")}</p>
+    <hr>
+    <p style="color: #666; font-size: 12px;">
+      Submitted at: ${new Date().toISOString()}
+    </p>
+  `;
+
+  return sendEmail({
+    to: adminEmail,
+    subject: `[Contact Form] ${subject}`,
+    html,
+    serviceType: "contact-admin",
+  });
+}
 export async function sendContactConfirmationEmail(
   userEmail: string,
   userName: string,

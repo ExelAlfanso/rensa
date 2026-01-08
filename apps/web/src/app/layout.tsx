@@ -21,6 +21,8 @@ const figtree = Figtree({
   variable: "--font-figtree",
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://rensa.site";
+
 export const metadata: Metadata = {
   title: {
     default: "Rensa - Where Every Picture Tells Its Recipe",
@@ -35,12 +37,7 @@ export const metadata: Metadata = {
     "creative photos",
     "photo community",
   ],
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
-    userScalable: true,
-  },
+  metadataBase: new URL(siteUrl),
   robots: {
     index: true,
     follow: true,
@@ -77,6 +74,13 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://rensa.site",
   },
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
 };
 
 export default function RootLayout({
