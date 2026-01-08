@@ -3,6 +3,10 @@ import BugReport from "@/models/BugReport";
 import { NextResponse } from "next/server";
 import { bugReportLimiter } from "@/lib/rateLimiter";
 import { validateBugReportData } from "@/lib/validation";
+import {
+  sendBugReportConfirmationEmail,
+  sendBugReportToTeam,
+} from "@/services/EmailService";
 
 /**
  * POST /api/bug-reports
@@ -115,9 +119,36 @@ export async function POST(req: Request) {
     // Save to database
     await bugReport.save();
 
-    // TODO: Send email notification to development team
-    // TODO: Send confirmation email to reporter
-    // TODO: Integrate with issue tracking (GitHub, Jira, etc.)
+    // Send email notifications (non-blocking on failure)
+    const reportId = bugReport._id.toString();
+    const notifyTeam = sendBugReportToTeam(
+      bugReport.title,
+      bugReport.email,
+      bugReport.description,
+      bugReport.severity,
+      reportId,
+      bugReport.stepsToReproduce
+    );
+    const notifyReporter = sendBugReportConfirmationEmail(
+      bugReport.email,
+      bugReport.title,
+      reportId
+    );
+    Promise.allSettled([notifyTeam, notifyReporter]).then((results) => {
+      results.forEach((r, i) => {
+        if (
+          r.status === "rejected" ||
+          (r.status === "fulfilled" && r.value === false)
+        ) {
+          console.warn(
+            `Bug report email ${
+              i === 0 ? "team" : "reporter"
+            } notification failed.`,
+            r.status === "rejected" ? r.reason : undefined
+          );
+        }
+      });
+    });
 
     return NextResponse.json(
       {

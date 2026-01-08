@@ -3,6 +3,10 @@ import Contact from "@/models/Contact";
 import { NextResponse } from "next/server";
 import { contactFormLimiter } from "@/lib/rateLimiter";
 import { validateContactData } from "@/lib/validation";
+import {
+  sendContactConfirmationEmail,
+  sendContactToAdmin,
+} from "@/services/EmailService";
 
 /**
  * POST /api/contact
@@ -88,8 +92,31 @@ export async function POST(req: Request) {
     // Save to database
     await contact.save();
 
-    // TODO: Send email notification to admin
-    // TODO: Send confirmation email to user
+    // Send email notifications (non-blocking on failure)
+    const notifyAdmin = sendContactToAdmin(
+      contact.email,
+      contact.name,
+      contact.subject,
+      contact.message
+    );
+    const notifyUser = sendContactConfirmationEmail(
+      contact.email,
+      contact.name,
+      contact.subject
+    );
+    Promise.allSettled([notifyAdmin, notifyUser]).then((results) => {
+      results.forEach((r, i) => {
+        if (
+          r.status === "rejected" ||
+          (r.status === "fulfilled" && r.value === false)
+        ) {
+          console.warn(
+            `Contact email ${i === 0 ? "admin" : "user"} notification failed.`,
+            r.status === "rejected" ? r.reason : undefined
+          );
+        }
+      });
+    });
 
     return NextResponse.json(
       {
@@ -123,7 +150,8 @@ export async function GET(req: Request) {
   try {
     // TODO: Add authentication check for admin users
     // if (!isAdmin) return unauthorized response
-
+    // const session = getServerSession(authOptions);
+    // if()
     await connectDB();
 
     const { searchParams } = new URL(req.url);
