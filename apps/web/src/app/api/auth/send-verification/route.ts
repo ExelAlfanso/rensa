@@ -24,12 +24,11 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
-  const appOrigin = process.env.NEXT_PUBLIC_APP_URL || req.nextUrl.origin;
   const token = jwt.sign({ email }, process.env.NEXTAUTH_SECRET!, {
     expiresIn: "1h",
   });
 
-  const verificationUrl = `${appOrigin}/verified?token=${token}`;
+  const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/verified?token=${token}`;
 
   try {
     const emailSent = await sendVerificationEmail(email, verificationUrl);
