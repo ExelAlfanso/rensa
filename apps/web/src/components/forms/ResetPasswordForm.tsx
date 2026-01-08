@@ -41,8 +41,6 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         password,
         confirmPassword,
       });
-      console.log("Reset password body:", { token, password, confirmPassword });
-      console.log(res.data);
       setMessage("Password reset successful. You can now log in.");
     } catch (err) {
       setError("Failed to reset password. Please try again.");

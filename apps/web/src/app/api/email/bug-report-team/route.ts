@@ -31,14 +31,34 @@ export async function POST(req: Request) {
 
     if (!devEmail) {
       console.warn("DEV_TEAM_EMAIL or ADMIN_EMAIL not configured");
-      return false;
+      return NextResponse.json(
+        { success: false, message: "Server email configuration error" },
+        { status: 500 }
+      );
     }
-
+    if (!description || typeof description !== "string") {
+      return NextResponse.json(
+        { success: false, message: "description is required" },
+        { status: 400 }
+      );
+    }
+    if (!severity || typeof severity !== "string") {
+      return NextResponse.json(
+        { success: false, message: "severity is required" },
+        { status: 400 }
+      );
+    }
+    if (!reportId || typeof reportId !== "string") {
+      return NextResponse.json(
+        { success: false, message: "reportId is required" },
+        { status: 400 }
+      );
+    }
     const html = `
     <h2>🐛 New Bug Report</h2>
     <p><strong style="color: ${
       SeverityColor[severity as keyof typeof SeverityColor]
-    }">Severity: ${(severity as string).toUpperCase()}</strong></p>
+    }">Severity: ${escapeHtml((severity as string).toUpperCase())}</strong></p>
     <p><strong>Title:</strong> ${escapeHtml(title)}</p>
     <p><strong>Reporter Email:</strong> <a href="mailto:${escapeHtml(
       email

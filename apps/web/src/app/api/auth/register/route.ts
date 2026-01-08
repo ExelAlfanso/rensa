@@ -56,8 +56,7 @@ export async function POST(req: Request) {
       description: "This is your default roll.",
     });
     try {
-      const response = await api.post("/auth/send-verification", { email });
-      console.log("✅ Verification email sent to:", email, response.data);
+      await api.post("/auth/send-verification", { email });
     } catch (err) {
       console.error("Error sending verification email:", err);
     }

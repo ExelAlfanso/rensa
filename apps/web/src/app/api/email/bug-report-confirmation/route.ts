@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
 
     return sendEmail({
       to: userEmail,
-      subject: `Bug Report Received: ${title}`,
+      subject: `Bug Report Received: ${escapeHtml(title)}`,
       html,
       text: `Bug Report Received. Report ID: ${escapeHtml(reportId)}`,
       serviceType: "bug-report-confirmation",

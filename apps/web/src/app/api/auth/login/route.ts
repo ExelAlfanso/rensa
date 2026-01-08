@@ -57,15 +57,15 @@ export async function POST(req: Request) {
         await api.post("/auth/send-verification", { email: user.email });
       } catch (err) {
         console.error("Error resending verification email:", err);
-        return NextResponse.json(
-          {
-            success: false,
-            message:
-              "Email not verified. Please verify your email before logging in.",
-          },
-          { status: 401 }
-        );
       }
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            "Email not verified. Please verify your email before logging in.",
+        },
+        { status: 401 }
+      );
     }
     // creates default "All Photos" roll
     const defaultRoll = await Roll.create({
