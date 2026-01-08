@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
       </p>
     `;
 
-    return sendEmail({
+    const success = sendEmail({
       to: userEmail,
       subject: `Re: ${subject}`,
       html,
@@ -44,7 +44,10 @@ export async function POST(req: NextRequest) {
       serviceType: "contact-confirmation",
     });
 
-    return NextResponse.json({ success: true }, { status: 200 });
+    return NextResponse.json(
+      { success, message: "Contact confirmation email sent" },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("[Email:contact-confirmation] Error", error);
     return NextResponse.json(

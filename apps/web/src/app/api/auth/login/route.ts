@@ -53,16 +53,19 @@ export async function POST(req: Request) {
       );
     }
     if (!user.verified) {
+      let emailSent = false;
       try {
         await api.post("/auth/send-verification", { email: user.email });
+        emailSent = true;
       } catch (err) {
         console.error("Error resending verification email:", err);
       }
       return NextResponse.json(
         {
           success: false,
-          message:
-            "Email not verified. Please verify your email before logging in.",
+          message: emailSent
+            ? "Email not verified. A new verification email has been sent."
+            : "Email not verified. Please check your inbox or try registering again.",
         },
         { status: 401 }
       );

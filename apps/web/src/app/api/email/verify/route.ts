@@ -37,13 +37,17 @@ export async function POST(req: NextRequest) {
   </div>
   `;
 
-    return sendEmail({
+    const success = sendEmail({
       to: email,
       subject: "Verify Your Rensa Account",
       html,
       text: `Welcome to Rensa! Please verify your email by visiting: ${verificationUrl}`,
       serviceType: "verify",
     });
+    return NextResponse.json(
+      { success, message: "Verification email sent" },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("[Email:verify] Error", error);
     return NextResponse.json(

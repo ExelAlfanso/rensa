@@ -80,12 +80,16 @@ export async function POST(req: Request) {
     </p>
   `;
 
-    return sendEmail({
+    const success = sendEmail({
       to: devEmail,
       subject: `[BUG - ${severity.toUpperCase()}] ${title}`,
       html,
       serviceType: "bug-report-team",
     });
+    return NextResponse.json(
+      { success, message: "Bug report email sent to team" },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("[Email:bug-report-team] Error", error);
     return NextResponse.json(

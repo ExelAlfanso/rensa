@@ -36,13 +36,17 @@ export async function POST(req: NextRequest) {
     </p>
   `;
 
-    return sendEmail({
+    const success = sendEmail({
       to: userEmail,
       subject: `Bug Report Received: ${escapeHtml(title)}`,
       html,
       text: `Bug Report Received. Report ID: ${escapeHtml(reportId)}`,
       serviceType: "bug-report-confirmation",
     });
+    return NextResponse.json(
+      { success, message: "Confirmation email sent" },
+      { status: 200 }
+    );
   } catch (error) {
     console.error("[Email:bug-report-confirmation] Error", error);
     return NextResponse.json(
