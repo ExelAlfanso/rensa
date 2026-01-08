@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
 
     if (!process.env.NEXTAUTH_SECRET) {
       return NextResponse.json(
-        { message: "Server configuration error" },
+        { success: false, message: "Server configuration error" },
         { status: 500 }
       );
     }
