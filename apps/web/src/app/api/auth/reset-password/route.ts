@@ -11,13 +11,6 @@ import User from "@/models/User";
 */
 export async function POST(req: NextRequest) {
   try {
-    if (!process.env.RESET_PASSWORD_SECRET) {
-      return NextResponse.json(
-        { message: "Server configuration error" },
-        { status: 500 }
-      );
-    }
-
     const ip =
       req.headers.get("x-forwarded-for") ||
       req.headers.get("x-real-ip") ||
@@ -72,9 +65,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (!process.env.NEXTAUTH_SECRET) {
+      return NextResponse.json(
+        { message: "Server configuration error" },
+        { status: 500 }
+      );
+    }
+
     let payload: { id: string; email: string };
     try {
-      payload = jwt.verify(token, process.env.RESET_PASSWORD_SECRET) as {
+      payload = jwt.verify(token, process.env.NEXTAUTH_SECRET) as {
         id: string;
         email: string;
       };
@@ -85,19 +85,32 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    await connectDB();
-    const user = await User.findById(payload.id);
-    if (!user || user.email !== payload.email) {
+    try {
+      await connectDB();
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const user = await User.findOneAndUpdate(
+        { email: payload.email },
+        {
+          password: hashedPassword,
+          passwordChangedAt: new Date(),
+        },
+        { new: true }
+      );
+
+      if (!user) {
+        return NextResponse.json(
+          { success: false, message: "User not found" },
+          { status: 404 }
+        );
+      }
+    } catch (err) {
+      console.error("Database error during password reset:", err);
       return NextResponse.json(
-        { success: false, message: "Invalid or expired token" },
-        { status: 400 }
+        { success: false, message: "Failed to update password" },
+        { status: 500 }
       );
     }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    user.password = hashedPassword;
-    user.passwordChangedAt = new Date();
-    await user.save();
 
     return NextResponse.json(
       { success: true, message: "Password reset successful" },

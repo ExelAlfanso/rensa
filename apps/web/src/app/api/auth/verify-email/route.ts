@@ -18,7 +18,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // verify token
     let payload: VerifyTokenPayload;
     try {
       payload = jwt.verify(

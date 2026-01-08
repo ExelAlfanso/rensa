@@ -4,6 +4,8 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   try {
     const { email, verificationUrl } = await req.json();
+    console.log("[Email:verify] Request received for:", email);
+    console.log("[Email:verify] Verification URL:", verificationUrl);
     if (!email || typeof email !== "string") {
       return NextResponse.json(
         { success: false, message: "Email is required" },

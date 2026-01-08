@@ -234,15 +234,6 @@ export async function sendPasswordResetEmail(email: string) {
   return postEmailApi("password-reset", { email });
 }
 
-function isValidHttpUrl(url: string): boolean {
-  try {
-    const parsed = new URL(url);
-    return parsed.protocol === "http:" || parsed.protocol === "https:";
-  } catch {
-    return false;
-  }
-}
-
 export async function sendVerificationEmail(
   email: string,
   verificationUrl: string
