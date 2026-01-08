@@ -355,28 +355,6 @@ describe("Reset Password API Route", () => {
     });
   });
 
-  describe("JWT Token Payload", () => {
-    it("should contain user id", () => {
-      const payload = {
-        id: "user123",
-        email: "user@example.com",
-      };
-
-      expect(payload).toHaveProperty("id");
-      expect(typeof payload.id).toBe("string");
-    });
-
-    it("should contain user email", () => {
-      const payload = {
-        id: "user123",
-        email: "user@example.com",
-      };
-
-      expect(payload).toHaveProperty("email");
-      expect(typeof payload.email).toBe("string");
-    });
-  });
-
   describe("Error Handling", () => {
     it("should return 400 for invalid token", () => {
       const tokenValid = false;
@@ -501,54 +479,6 @@ describe("Reset Password API Route", () => {
       );
       expect(mockBcrypt.hash).toHaveBeenCalledWith("newSecurePassword123!", 10);
       expect(mockUser.findOneAndUpdate).toHaveBeenCalled();
-    });
-  });
-
-  describe("Response Messages", () => {
-    it("should return success message on password reset", () => {
-      const successMessage = "Password reset successful";
-      expect(successMessage).toBe("Password reset successful");
-    });
-
-    it("should return specific error for invalid token", () => {
-      const errorMessage = "Invalid or expired token";
-      expect(errorMessage).toBe("Invalid or expired token");
-    });
-
-    it("should return specific error for user not found", () => {
-      const errorMessage = "User not found";
-      expect(errorMessage).toBe("User not found");
-    });
-
-    it("should return specific error for password mismatch", () => {
-      const errorMessage = "Passwords do not match";
-      expect(errorMessage).toBe("Passwords do not match");
-    });
-
-    it("should return generic error for database failures", () => {
-      const errorMessage = "Failed to update password";
-      expect(errorMessage).toBe("Failed to update password");
-    });
-  });
-
-  describe("Security", () => {
-    it("should separate JWT verification from database operations", () => {
-      // Token should be verified before any DB operations
-      const verifyFirst = true;
-      expect(verifyFirst).toBe(true);
-    });
-
-    it("should not expose internal errors to client", () => {
-      const internalError = "MongoError: Connection failed";
-      const clientMessage = "Failed to update password";
-
-      expect(clientMessage).not.toBe(internalError);
-      expect(clientMessage).not.toContain("Mongo");
-    });
-
-    it("should log database errors internally", () => {
-      const shouldLog = true;
-      expect(shouldLog).toBe(true);
     });
   });
 });

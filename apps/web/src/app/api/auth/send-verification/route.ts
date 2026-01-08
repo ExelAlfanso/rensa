@@ -37,8 +37,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message:
-            "Failed to send verification email. Email service not configured.",
+          message: "Failed to send verification email. Please try again later.",
         },
         { status: 500 }
       );
