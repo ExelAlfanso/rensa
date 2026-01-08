@@ -10,9 +10,8 @@ import User from "@/models/User";
   Reset password using token from email
 */
 export async function POST(req: NextRequest) {
-  console.log("Reset password request received");
   try {
-    if (!process.env.NEXTAUTH_SECRET) {
+    if (!process.env.RESET_PASSWORD_SECRET) {
       return NextResponse.json(
         { message: "Server configuration error" },
         { status: 500 }
@@ -29,7 +28,8 @@ export async function POST(req: NextRequest) {
     if (!success) {
       return NextResponse.json(
         {
-          message: "Too many reset attempts. Please try again later.",
+          success: false,
+          message: "Too many requests. Please try again later.",
         },
         {
           status: 429,
@@ -46,32 +46,35 @@ export async function POST(req: NextRequest) {
 
     if (!token || typeof token !== "string") {
       return NextResponse.json(
-        { message: "Invalid or missing token" },
+        { success: false, message: "Invalid or missing token" },
         { status: 400 }
       );
     }
     if (!password || typeof password !== "string") {
       return NextResponse.json(
-        { message: "Password is required" },
+        { success: false, message: "Password is required" },
         { status: 400 }
       );
     }
     if (password.trim().length < 8 || password.trim().length > 128) {
       return NextResponse.json(
-        { message: "Password must be between 8 and 128 characters" },
+        {
+          success: false,
+          message: "Password must be between 8 and 128 characters",
+        },
         { status: 400 }
       );
     }
     if (password !== confirmPassword) {
       return NextResponse.json(
-        { message: "Passwords do not match" },
+        { success: false, message: "Passwords do not match" },
         { status: 400 }
       );
     }
 
     let payload: { id: string; email: string };
     try {
-      payload = jwt.verify(token, process.env.NEXTAUTH_SECRET) as {
+      payload = jwt.verify(token, process.env.RESET_PASSWORD_SECRET) as {
         id: string;
         email: string;
       };
@@ -86,13 +89,14 @@ export async function POST(req: NextRequest) {
     const user = await User.findById(payload.id);
     if (!user || user.email !== payload.email) {
       return NextResponse.json(
-        { message: "Invalid or expired token" },
+        { success: false, message: "Invalid or expired token" },
         { status: 400 }
       );
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     user.password = hashedPassword;
+    user.passwordChangedAt = new Date();
     await user.save();
 
     return NextResponse.json(

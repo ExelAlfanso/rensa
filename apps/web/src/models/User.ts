@@ -8,6 +8,7 @@ export interface UserDocument {
   avatar: string;
   bookmarks: ObjectId[];
   verified: boolean;
+  passwordChangedAt: Date;
 }
 
 const UserSchema = new Schema<UserDocument>(
@@ -25,6 +26,10 @@ const UserSchema = new Schema<UserDocument>(
     password: {
       type: String,
       required: true,
+    },
+    passwordChangedAt: {
+      type: Date,
+      default: Date.now,
     },
     avatar: {
       type: String,

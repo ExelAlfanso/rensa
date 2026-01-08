@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 import { loginLimiter } from "@/lib/rateLimiter";
 import Roll from "@/models/Roll";
+import { api } from "@/lib/axios-client";
 
 /*
   POST /api/auth/login
@@ -50,6 +51,21 @@ export async function POST(req: Request) {
         { success: false, message: "Invalid credentials" },
         { status: 401 }
       );
+    }
+    if (!user.verified) {
+      try {
+        await api.post("/auth/send-verification", { email: user.email });
+      } catch (err) {
+        console.error("Error resending verification email:", err);
+        return NextResponse.json(
+          {
+            success: false,
+            message:
+              "Email not verified. Please verify your email before logging in.",
+          },
+          { status: 401 }
+        );
+      }
     }
     // creates default "All Photos" roll
     const defaultRoll = await Roll.create({

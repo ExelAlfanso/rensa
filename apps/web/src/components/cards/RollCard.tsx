@@ -37,10 +37,10 @@ const RollCard: React.FC<RollCardProps> = ({
 
   return (
     <Link href={`/roll/${id}`} className="group">
-      <div className="relative bg-white shadow-md rounded-2xl overflow-hidden hover:scale-[1.02] transition-transform duration-200 h-full w-[170px] md:w-[265px] p-3 border border-gray-300 cursor-pointer">
-        <div className={`gap-[10px] grid ${previewGridCols}`}>
+      <div className="relative bg-white shadow-md rounded-2xl overflow-hidden hover:scale-[1.02] transition-transform duration-200 h-full w-42.5 md:w-66.25 p-3 border border-gray-300 cursor-pointer">
+        <div className={`gap-2.5 grid ${previewGridCols}`}>
           {previews.length < 1 && (
-            <div className="w-full aspect-square max-h-[150px] md:max-h-[200px] bg-gray-200 rounded-lg flex items-center justify-center">
+            <div className="w-full aspect-square max-h-37.5 md:max-h-50 bg-gray-200 rounded-lg flex items-center justify-center">
               <span className="text-gray-500">No image</span>
             </div>
           )}
@@ -71,7 +71,7 @@ const RollCard: React.FC<RollCardProps> = ({
           })}
         </div>
 
-        <Heading size="s" className="text-black font-forum mt-2">
+        <Heading size="s" className="mt-2 text-black font-forum">
           {name}
         </Heading>
 
@@ -79,18 +79,18 @@ const RollCard: React.FC<RollCardProps> = ({
           <p className="text-sm text-gray-500">{formatDate(createdAt)}</p>
         )}
 
-        <div className="absolute inset-0 rounded-2xl bg-black opacity-0 group-hover:opacity-10 transition-opacity duration-300 pointer-events-none" />
+        <div className="absolute inset-0 transition-opacity duration-300 bg-black opacity-0 pointer-events-none rounded-2xl group-hover:opacity-10" />
 
         {/* Edit button (only for owner) */}
         {isOwner && (
-          <div className="absolute top-3 right-3 pointer-events-auto">
+          <div className="absolute pointer-events-auto top-3 right-3">
             <SmallIconButton
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 openEditor({ rollId: id, name, type: "default" });
               }}
-              className="p-2 bg-white rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              className="p-2 transition-opacity duration-300 bg-white rounded-full shadow-md opacity-0 group-hover:opacity-100"
             >
               <PencilIcon size={16} weight="bold" />
             </SmallIconButton>

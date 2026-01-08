@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verificationEmailLimiter } from "@/lib/rateLimiter";
 import { sendVerificationEmail } from "@/services/EmailServices";
+import User from "@/models/User";
 
 export async function POST(req: NextRequest) {
   const { email } = await req.json();
@@ -37,18 +38,20 @@ export async function POST(req: NextRequest) {
   const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/verify-email?token=${token}`;
 
   try {
-    const emailSent = await sendVerificationEmail(email, verificationUrl);
-
-    if (!emailSent) {
-      return NextResponse.json(
-        {
-          success: false,
-          message:
-            "Failed to send verification email. Email service not configured." +
-            emailSent,
-        },
-        { status: 500 }
-      );
+    const isEmailAvailable = await User.findOne({ email });
+    if (isEmailAvailable) {
+      const emailSent = await sendVerificationEmail(email, verificationUrl);
+      if (!emailSent) {
+        return NextResponse.json(
+          {
+            success: false,
+            message:
+              "Failed to send verification email. Email service not configured." +
+              emailSent,
+          },
+          { status: 500 }
+        );
+      }
     }
 
     return NextResponse.json(

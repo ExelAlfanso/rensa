@@ -36,11 +36,13 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
     setError("");
     setMessage("");
     try {
-      await api.post("/auth/reset-password", {
+      const res = await api.post("/auth/reset-password", {
         token,
         password,
         confirmPassword,
       });
+      console.log("Reset password body:", { token, password, confirmPassword });
+      console.log(res.data);
       setMessage("Password reset successful. You can now log in.");
     } catch (err) {
       setError("Failed to reset password. Please try again.");
