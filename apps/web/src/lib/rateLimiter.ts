@@ -37,3 +37,15 @@ export const verificationEmailLimiter = new Ratelimit({
   limiter: Ratelimit.slidingWindow(3, "1 h"),
   prefix: "verification_limit",
 });
+
+export const forgotPasswordLimiter = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(3, "1 h"),
+  prefix: "forgot_password_limit",
+});
+
+export const resetPasswordLimiter = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(5, "10 m"),
+  prefix: "reset_password_limit",
+});
