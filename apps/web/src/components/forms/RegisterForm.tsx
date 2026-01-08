@@ -69,7 +69,7 @@ export default function RegisterForm() {
       onSubmit={handleSubmit}
       error={error}
       button={
-        <PrimaryButton className="h-[52px] md:h-[62px] my-7" type="submit">
+        <PrimaryButton className="h-13 md:h-15.5 my-7" type="submit">
           Register
         </PrimaryButton>
       }

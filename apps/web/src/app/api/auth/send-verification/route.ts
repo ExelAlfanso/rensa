@@ -1,7 +1,7 @@
 ﻿import jwt from "jsonwebtoken";
 import { NextRequest, NextResponse } from "next/server";
 import { verificationEmailLimiter } from "@/lib/rateLimiter";
-import { sendVerificationEmail } from "@/services/EmailService";
+import { sendVerificationEmail } from "@/services/EmailServices";
 
 export async function POST(req: NextRequest) {
   const { email } = await req.json();
@@ -9,16 +9,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Email is required" }, { status: 400 });
   }
 
-  // // Apply rate limiting
-  // const rateLimitResult = await verificationEmailLimiter.limit(email);
-  // if (!rateLimitResult.success) {
-  //   return NextResponse.json(
-  //     {
-  //       message: "Too many verification requests. Please try again later.",
-  //     },
-  //     { status: 429 }
-  //   );
-  // }
+  const rateLimitResult = await verificationEmailLimiter.limit(email);
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      {
+        message: "Too many verification requests. Please try again later.",
+      },
+      { status: 429 }
+    );
+  }
   if (!process.env.NEXTAUTH_SECRET) {
     return NextResponse.json(
       { message: "Email verification is not configured." },

@@ -5,6 +5,7 @@ import { sanitizeInput } from "@/lib/validation";
 
 type AuthFormLayoutProps = {
   title: string;
+  className?: string;
   onSubmit: FormEventHandler<HTMLFormElement>;
   error?: string;
   message?: string;
@@ -16,6 +17,7 @@ type AuthFormLayoutProps = {
 export default function AuthFormLayout({
   title,
   onSubmit,
+  className,
   error,
   message,
   children,
@@ -23,7 +25,9 @@ export default function AuthFormLayout({
   footer,
 }: AuthFormLayoutProps) {
   return (
-    <div className="w-[90%] md:w-[400px] lg:w-[450px] xl:w-[500px] 2xl:w-[550px] flex flex-col items-center justify-center">
+    <div
+      className={`$w-[90%] md:w-100 lg:w-112.5 xl:w-125 2xl:w-137.5 flex flex-col items-center justify-center ${className}`}
+    >
       <form onSubmit={onSubmit} className="w-full h-full gap-16 mb-5">
         <div className="flex flex-col items-center justify-center">
           <Logo size={"lg"} />
