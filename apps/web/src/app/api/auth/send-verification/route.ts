@@ -2,7 +2,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verificationEmailLimiter } from "@/lib/rateLimiter";
 import { sendVerificationEmail } from "@/services/EmailServices";
-import User from "@/models/User";
 
 export async function POST(req: NextRequest) {
   const { email } = await req.json();
@@ -25,29 +24,23 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
-  // Prefer configured app URL, but fall back to request origin
   const appOrigin = process.env.NEXT_PUBLIC_APP_URL || req.nextUrl.origin;
   const token = jwt.sign({ email }, process.env.NEXTAUTH_SECRET!, {
     expiresIn: "1h",
   });
 
-  const verificationUrl = `${appOrigin}/verify-email?token=${token}`;
+  const verificationUrl = `${appOrigin}/verified?token=${token}`;
 
   try {
-    const isEmailAvailable = await User.findOne({ email });
-    if (isEmailAvailable) {
-      const emailSent = await sendVerificationEmail(email, verificationUrl);
-      if (!emailSent) {
-        return NextResponse.json(
-          {
-            success: false,
-            message:
-              "Failed to send verification email. Email service not configured." +
-              emailSent,
-          },
-          { status: 500 }
-        );
-      }
+    const emailSent = await sendVerificationEmail(email, verificationUrl);
+    if (!emailSent) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Failed to send verification email. Please try again later.",
+        },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json(

@@ -2,28 +2,26 @@ import { notFound } from "next/navigation";
 import jwt from "jsonwebtoken";
 
 import VerifiedClient from "./VerifiedClient";
+import { api } from "@/lib/axios-client";
 
-type VerifiedPageProps = {
-  searchParams?: {
-    token?: string;
-  };
-};
-
-function checkTokenValidity(token?: string) {
+async function checkTokenValidity(token?: string) {
   try {
     const secret = process.env.NEXTAUTH_SECRET;
     if (!token || !secret) return false;
-
-    jwt.verify(token, secret);
+    await api.post("/auth/verify-email", { token });
     return true;
   } catch (err) {
     return false;
   }
 }
 
-export default function VerifiedPage({ searchParams }: VerifiedPageProps) {
-  const token = searchParams?.token;
-  const isValid = checkTokenValidity(token);
+export default async function VerifiedPage({
+  searchParams,
+}: {
+  searchParams: { token?: string };
+}) {
+  const { token } = await searchParams;
+  let isValid = await checkTokenValidity(token);
 
   if (!isValid) {
     notFound();
