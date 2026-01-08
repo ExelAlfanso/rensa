@@ -6,7 +6,7 @@ import { validateBugReportData } from "@/lib/validation";
 import {
   sendBugReportConfirmationEmail,
   sendBugReportToTeam,
-} from "@/services/EmailService";
+} from "@/services/EmailServices";
 
 /**
  * POST /api/bug-reports

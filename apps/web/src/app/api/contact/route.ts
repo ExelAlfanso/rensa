@@ -6,7 +6,7 @@ import { validateContactData } from "@/lib/validation";
 import {
   sendContactConfirmationEmail,
   sendContactToAdmin,
-} from "@/services/EmailService";
+} from "@/services/EmailServices";
 
 /**
  * POST /api/contact
