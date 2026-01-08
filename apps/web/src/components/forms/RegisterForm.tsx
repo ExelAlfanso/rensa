@@ -37,8 +37,6 @@ export default function RegisterForm() {
     setLoading(true);
     try {
       await api.post("/auth/register", form);
-
-      // Attempt sign-in (do not redirect) to keep NextAuth flow consistent
       await signIn("credentials", {
         email: form.email,
         password: form.password,

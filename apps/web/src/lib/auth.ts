@@ -5,6 +5,7 @@ import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import { DefaultSession, DefaultUser } from "next-auth";
 import jwt from "jsonwebtoken";
+import { api } from "./axios-client";
 
 declare module "next-auth" {
   interface Session {
@@ -42,11 +43,16 @@ export const authOptions: NextAuthOptions = {
         if (!user) {
           throw new Error("Invalid email or password");
         }
-        // if (!user.verified) {
-        //   throw new Error(
-        //     "Email not verified. Please verify your email before logging in."
-        //   );
-        // }
+        if (!user.verified) {
+          try {
+            await api.post("/auth/send-verification", { email: user.email });
+          } catch (err) {
+            console.error("Failed to resend verification email:", err);
+          }
+          throw new Error(
+            "Email not verified. We’ve sent a verification email to your email address."
+          );
+        }
         const isValid = await bcrypt.compare(
           credentials!.password,
           user.password

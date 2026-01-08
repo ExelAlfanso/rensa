@@ -1,7 +1,8 @@
 ﻿import jwt from "jsonwebtoken";
 import { NextRequest, NextResponse } from "next/server";
 import { verificationEmailLimiter } from "@/lib/rateLimiter";
-import { sendVerificationEmail } from "@/services/EmailService";
+import { sendVerificationEmail } from "@/services/EmailServices";
+import User from "@/models/User";
 
 export async function POST(req: NextRequest) {
   const { email } = await req.json();
@@ -9,22 +10,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Email is required" }, { status: 400 });
   }
 
-  // // Apply rate limiting
-  try {
-    const rateLimitResult = await verificationEmailLimiter.limit(email);
-    if (!rateLimitResult.success) {
-      return NextResponse.json(
-        {
-          message: "Too many verification requests. Please try again later.",
-        },
-        { status: 429 }
-      );
-    }
-  } catch (e) {
-    // If Redis is not configured, skip rate limiting but log for visibility
-    console.warn(
-      "Verification rate limiting skipped: Redis not configured or unreachable.",
-      e
+  const rateLimitResult = await verificationEmailLimiter.limit(email);
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      {
+        message: "Too many verification requests. Please try again later.",
+      },
+      { status: 429 }
     );
   }
   if (!process.env.NEXTAUTH_SECRET) {
@@ -42,18 +34,20 @@ export async function POST(req: NextRequest) {
   const verificationUrl = `${appOrigin}/verify-email?token=${token}`;
 
   try {
-    const emailSent = await sendVerificationEmail(email, verificationUrl);
-
-    if (!emailSent) {
-      return NextResponse.json(
-        {
-          success: false,
-          message:
-            "Failed to send verification email. Email service not configured." +
-            emailSent,
-        },
-        { status: 500 }
-      );
+    const isEmailAvailable = await User.findOne({ email });
+    if (isEmailAvailable) {
+      const emailSent = await sendVerificationEmail(email, verificationUrl);
+      if (!emailSent) {
+        return NextResponse.json(
+          {
+            success: false,
+            message:
+              "Failed to send verification email. Email service not configured." +
+              emailSent,
+          },
+          { status: 500 }
+        );
+      }
     }
 
     return NextResponse.json(

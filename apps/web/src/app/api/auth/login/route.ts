@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 import { loginLimiter } from "@/lib/rateLimiter";
 import Roll from "@/models/Roll";
+import { api } from "@/lib/axios-client";
 
 /*
   POST /api/auth/login
@@ -48,6 +49,24 @@ export async function POST(req: Request) {
     if (!user) {
       return NextResponse.json(
         { success: false, message: "Invalid credentials" },
+        { status: 401 }
+      );
+    }
+    if (!user.verified) {
+      let emailSent = false;
+      try {
+        await api.post("/auth/send-verification", { email: user.email });
+        emailSent = true;
+      } catch (err) {
+        console.error("Error resending verification email:", err);
+      }
+      return NextResponse.json(
+        {
+          success: false,
+          message: emailSent
+            ? "Email not verified. A new verification email has been sent."
+            : "Email not verified. Please check your inbox or try registering again.",
+        },
         { status: 401 }
       );
     }

@@ -1,3 +1,4 @@
+import { api } from "@/lib/axios-client";
 import { connectDB } from "@/lib/mongodb";
 import { registerLimiter } from "@/lib/rateLimiter";
 import Roll from "@/models/Roll";
@@ -12,13 +13,11 @@ import { NextResponse } from "next/server";
 */
 export async function POST(req: Request) {
   try {
-    // 🌐 Get client IP for rate limiting
     const ip =
       req.headers.get("x-forwarded-for") ||
       req.headers.get("x-real-ip") ||
       "unknown";
 
-    // 🚦 Check rate limit
     const { success, remaining, limit, reset } = await registerLimiter.limit(
       ip
     );
@@ -56,6 +55,11 @@ export async function POST(req: Request) {
       name: "All Photos",
       description: "This is your default roll.",
     });
+    try {
+      await api.post("/auth/send-verification", { email });
+    } catch (err) {
+      console.error("Error sending verification email:", err);
+    }
     const session = await startSession();
     session.startTransaction();
     try {

@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
 
     if (!token) {
       return NextResponse.json(
-        { message: "Token is required" },
+        { success: false, message: "Token is required" },
         { status: 400 }
       );
     }
@@ -28,13 +28,13 @@ export async function POST(req: NextRequest) {
     } catch (err: any) {
       if (err.name === "TokenExpiredError") {
         return NextResponse.json(
-          { message: "Verification link expired" },
+          { success: false, message: "Verification link expired" },
           { status: 400 }
         );
       }
 
       return NextResponse.json(
-        { message: "Invalid verification token" },
+        { success: false, message: "Invalid verification token" },
         { status: 400 }
       );
     }
@@ -46,12 +46,15 @@ export async function POST(req: NextRequest) {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
+      return NextResponse.json(
+        { success: false, message: "User not found" },
+        { status: 404 }
+      );
     }
 
     if (user.verified) {
       return NextResponse.json(
-        { message: "Email already verified" },
+        { success: true, message: "Email already verified" },
         { status: 200 }
       );
     }
@@ -60,12 +63,12 @@ export async function POST(req: NextRequest) {
     await user.save();
 
     return NextResponse.json(
-      { message: "Email verified successfully" },
+      { success: true, message: "Email verified successfully" },
       { status: 200 }
     );
   } catch (error) {
     return NextResponse.json(
-      { message: "Internal server error " },
+      { success: false, message: "Internal server error " },
       { status: 500 }
     );
   }

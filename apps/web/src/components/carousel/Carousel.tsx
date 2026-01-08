@@ -7,7 +7,7 @@ export default function Carousel() {
       el.scrollIntoView({
         behavior: "smooth",
         block: "nearest",
-        inline: "center", // important to center horizontally
+        inline: "center",
       });
     }
   };
@@ -25,26 +25,24 @@ export default function Carousel() {
             id={slide.id}
             className="carousel-item relative w-full h-[40vh] md:h-[52vh]"
           >
-            {/* Image wrapper */}
             <div className="absolute inset-0 overflow-hidden rounded-lg">
               <Image
                 src={slide.src}
                 alt={slide.title}
                 fill
                 className="object-cover"
-                priority={index === 0} // preload first image
+                priority={index === 0}
               />
             </div>
 
-            {/* Content */}
             <div className="absolute top-[25vh] md:top-[30vh] xl:right-[5vw] right-[5vw] w-[40vw] md:w-[25vw] xl:w-[15vw] bg-[#fafafa] z-20 rounded-3xl shadow-lg overflow-visible">
               <div className="p-6 md:text-[18px] flex flex-col font-figtree text-[12px] font-semibold text-primary">
                 {slide.title}
                 <div className="text-[8px] md:text-[10px] lg:text-[12px]">
                   {slide.specs.map((s, i) => (
-                    <div key={i} className="font-light mt-2 text-black-200">
+                    <div key={i} className="mt-2 font-light text-black-200">
                       {s.label}
-                      <div className="font-thin lg:mt-1 text-black">
+                      <div className="font-thin text-black lg:mt-1">
                         {s.value}
                       </div>
                     </div>
@@ -53,17 +51,16 @@ export default function Carousel() {
               </div>
             </div>
 
-            {/* Controls */}
-            <div className="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 justify-between">
+            <div className="absolute flex justify-between -translate-y-1/2 left-5 right-5 top-1/2">
               <button
                 onClick={() => handleScroll(prevId)}
-                className="rounded-full cursor-pointer w-8 h-8 flex items-center justify-center bg-white/70 text-black/70 hover:bg-white/90 hover:text-black/90 transition"
+                className="flex items-center justify-center w-8 h-8 transition rounded-full cursor-pointer bg-white/70 text-black/70 hover:bg-white/90 hover:text-black/90"
               >
                 ❮
               </button>
               <button
                 onClick={() => handleScroll(nextId)}
-                className="rounded-full cursor-pointer w-8 h-8 flex items-center justify-center bg-white/70 text-black/70 hover:bg-white/90 hover:text-black/90 transition"
+                className="flex items-center justify-center w-8 h-8 transition rounded-full cursor-pointer bg-white/70 text-black/70 hover:bg-white/90 hover:text-black/90"
               >
                 ❯
               </button>
