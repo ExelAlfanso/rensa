@@ -35,7 +35,6 @@ export async function POST(req: NextRequest) {
       );
     }
     const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`;
-
     const html = `
       <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border-radius: 12px; background: #f7f8f5; color: #0f1b0f; border: 1px solid #e1e5dc;">
         <div style="font-weight: 700; color: #ff9000; letter-spacing: 0.5px;">Rensa</div>

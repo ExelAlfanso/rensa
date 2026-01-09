@@ -57,7 +57,6 @@ export async function POST(req: Request) {
     });
     try {
       await api.post("/auth/send-verification", { email });
-      console.log("Verification email sent");
     } catch (err) {
       console.error("Error sending verification email:", err);
     }

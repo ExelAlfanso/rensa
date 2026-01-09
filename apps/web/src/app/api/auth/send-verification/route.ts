@@ -18,7 +18,8 @@ export async function POST(req: NextRequest) {
       { status: 429 }
     );
   }
-  if (!process.env.NEXTAUTH_SECRET) {
+  console.log("NEXT_PUBLIC_APP_URL:", process.env.NEXT_PUBLIC_APP_URL);
+  if (!process.env.NEXTAUTH_SECRET || !process.env.NEXT_PUBLIC_APP_URL) {
     return NextResponse.json(
       { message: "Email verification is not configured." },
       { status: 500 }

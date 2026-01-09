@@ -46,7 +46,6 @@ async function postEmailApi(
   path: string,
   payload: Record<string, unknown>
 ): Promise<boolean> {
-  console.log(`Posting to email API /email/${path}`, payload);
   try {
     const response = await api.post(`/email/${path}`, payload);
     return Boolean(response.data?.success);
