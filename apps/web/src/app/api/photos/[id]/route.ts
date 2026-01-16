@@ -1,8 +1,9 @@
 import { connectDB } from "@/lib/mongodb";
-import Photo from "@/models/Photo";
+import Photo, { PhotoDocument } from "@/models/Photo";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { validateCloudinaryUrl } from "@/lib/cloudinary";
 
 /*
   GET /api/photos/[id]
@@ -21,13 +22,27 @@ export async function GET(
   }
   try {
     await connectDB();
-    const photo = await Photo.findById(id).lean();
+    const photo = await Photo.findById(id).lean<PhotoDocument>();
     if (!photo) {
       return NextResponse.json(
         { success: false, message: "Photo not found" },
         { status: 404 }
       );
     }
+
+    // 🔒 SECURITY: Validate photo URL integrity before returning
+    if (photo.url && !validateCloudinaryUrl(photo.url)) {
+      console.error(`⚠️ Suspicious URL detected for photo ${id}: ${photo.url}`);
+      return NextResponse.json(
+        {
+          success: false,
+          message:
+            "Photo URL integrity check failed. This photo may have been tampered with.",
+        },
+        { status: 403 }
+      );
+    }
+
     return NextResponse.json({
       success: true,
       message: "Successfully fetched photo.",
@@ -56,15 +71,13 @@ export async function DELETE(
         { status: 401 }
       );
     }
-
-    const photo = await Photo.findById(id);
+    const photo = await Photo.findById(id).lean<PhotoDocument>();
     if (!photo) {
       return NextResponse.json(
         { success: false, message: "Photo not found" },
         { status: 404 }
       );
     }
-
     if (photo.userId?.toString() !== session.user.id) {
       return NextResponse.json(
         { success: false, message: "Forbidden: You don't own this photo" },

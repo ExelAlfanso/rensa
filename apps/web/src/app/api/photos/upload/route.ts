@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server";
-import cloudinary from "@/lib/cloudinary";
+import cloudinary, { validateCloudinaryUrl } from "@/lib/cloudinary";
 import { connectDB } from "@/lib/mongodb";
 import Photo from "@/models/Photo";
 import sharp from "sharp";
 import { fastApi } from "@/lib/axios-server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { photoUploadLimiter } from "@/lib/rateLimiter";
+import { sanitizeInput } from "@/lib/validation";
 
 async function compressImageUnder10MB(buffer: Buffer): Promise<Buffer> {
   let quality = 90; // start high
@@ -33,19 +37,160 @@ async function compressImageUnder10MB(buffer: Buffer): Promise<Buffer> {
   Upload a photo
 */
 export async function POST(req: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return NextResponse.json(
+      { success: false, error: "Unauthorized. Please login to upload photos." },
+      { status: 401 }
+    );
+  }
+
+  const ip =
+    req.headers.get("x-forwarded-for") ||
+    req.headers.get("x-real-ip") ||
+    "unknown";
+
+  const { success, remaining, limit, reset } =
+    await photoUploadLimiter.limit(ip);
+  if (!success) {
+    return NextResponse.json(
+      { success: false, message: "Too many photo upload attempts" },
+      {
+        status: 429,
+        headers: {
+          "X-RateLimit-Limit": limit.toString(),
+          "X-RateLimit-Remaining": remaining.toString(),
+          "X-RateLimit-Reset": reset.toString(),
+        },
+      }
+    );
+  }
   try {
     const formData = await req.formData();
 
     const file = formData.get("file") as File;
-    const userId = formData.get("userId") as string;
-    const title = formData.get("title") as string;
-    const description = formData.get("description") as string;
-    const category = formData.get("category") as string;
-    const style = formData.get("style") as string;
-    const color = formData.get("color") as string;
-    const exif = JSON.parse(formData.get("exif") as string);
-    const camera = exif.Brand as string;
-    const tags = JSON.parse(formData.get("tags") as string);
+    const userId = session.user.id;
+
+    // 🔒 SECURITY: Sanitize and validate all photo metadata
+    const rawTitle = formData.get("title") as string;
+    const rawDescription = formData.get("description") as string;
+    const rawCategory = formData.get("category") as string;
+    const rawStyle = formData.get("style") as string;
+    const rawColor = formData.get("color") as string;
+
+    // Sanitize text inputs to prevent XSS
+    const title = sanitizeInput(rawTitle || "");
+    const description = sanitizeInput(rawDescription || "");
+    const category = sanitizeInput(rawCategory || "");
+    const style = sanitizeInput(rawStyle || "");
+    const color = sanitizeInput(rawColor || "");
+
+    // Validate title (required, 1-200 chars)
+    if (!title || title.trim().length === 0) {
+      return NextResponse.json(
+        { success: false, error: "Title is required" },
+        { status: 400 }
+      );
+    }
+    if (title.length > 200) {
+      return NextResponse.json(
+        { success: false, error: "Title must be 200 characters or less" },
+        { status: 400 }
+      );
+    }
+
+    // Validate description (optional, 0-5000 chars)
+    if (description.length > 5000) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Description must be 5000 characters or less",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Validate category (optional, 1-100 chars)
+    if (category && category.length > 100) {
+      return NextResponse.json(
+        { success: false, error: "Category must be 100 characters or less" },
+        { status: 400 }
+      );
+    }
+
+    // Validate style (optional, 1-100 chars)
+    if (style && style.length > 100) {
+      return NextResponse.json(
+        { success: false, error: "Style must be 100 characters or less" },
+        { status: 400 }
+      );
+    }
+
+    // Validate color (optional, 1-100 chars)
+    if (color && color.length > 100) {
+      return NextResponse.json(
+        { success: false, error: "Color must be 100 characters or less" },
+        { status: 400 }
+      );
+    }
+
+    // Parse and validate tags
+    let tags: string[] = [];
+    try {
+      const rawTags = JSON.parse(formData.get("tags") as string);
+      if (!Array.isArray(rawTags)) {
+        throw new Error("Tags must be an array");
+      }
+
+      // Sanitize and validate each tag
+      tags = rawTags
+        .map((tag: any) => {
+          if (typeof tag !== "string") return null;
+          const sanitized = sanitizeInput(tag);
+          // Each tag: 1-50 chars
+          if (sanitized.length === 0 || sanitized.length > 50) return null;
+          return sanitized;
+        })
+        .filter((tag: string | null): tag is string => tag !== null);
+
+      // Limit to 20 tags max
+      if (tags.length > 20) {
+        return NextResponse.json(
+          { success: false, error: "Maximum 20 tags allowed" },
+          { status: 400 }
+        );
+      }
+    } catch (err) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Invalid tags format. Must be an array of strings.",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Parse and validate EXIF data
+    let exif: any = {};
+    let camera = "";
+    try {
+      const rawExif = JSON.parse(formData.get("exif") as string);
+      if (typeof rawExif !== "object" || rawExif === null) {
+        exif = {};
+      } else {
+        exif = rawExif;
+      }
+
+      if (exif.Brand && typeof exif.Brand === "string") {
+        camera = sanitizeInput(exif.Brand).substring(0, 200); // Max 200 chars
+      }
+    } catch (err) {
+      return NextResponse.json(
+        { success: false, error: "Invalid EXIF data format" },
+        { status: 400 }
+      );
+    }
+
     // Validate file
     if (!file) {
       return NextResponse.json(
@@ -90,6 +235,24 @@ export async function POST(req: Request) {
     });
 
     const { secure_url, width, height, format, bytes, created_at } = uploadRes;
+
+    if (!validateCloudinaryUrl(secure_url)) {
+      try {
+        const publicId = uploadRes.public_id;
+        await cloudinary.uploader.destroy(publicId);
+      } catch (deleteError) {
+        console.error("Failed to delete invalid upload:", deleteError);
+      }
+
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "Invalid or suspicious image URL detected. Upload rejected for security reasons.",
+        },
+        { status: 400 }
+      );
+    }
 
     const photo = await Photo.create({
       userId,

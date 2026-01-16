@@ -1,13 +1,16 @@
 /**
  * Email notification service
  * Handles sending emails for contact forms and bug reports
- *
- * Supports multiple providers:
- * - Nodemailer
  */
 
-import nodemailer from "nodemailer";
+import { BugReportConfirmationEmail } from "@/components/emailTemplates/BugReportConfirmationEmail";
+
+import { ContactAdminEmail } from "@/components/emailTemplates/ContactAdminEmail";
+import { ContactConfirmationEmail } from "@/components/emailTemplates/ContactConfirmationEmail";
+import EmailVerificationTemplate from "@/components/emailTemplates/EmailVerificationTemplate";
+import PasswordResetEmail from "@/components/emailTemplates/PasswordResetEmail";
 import { api } from "@/lib/axios-client";
+import type { JSX } from "react";
 
 export type EmailDispatchType =
   | "bug-report-confirmation"
@@ -20,80 +23,8 @@ export type EmailDispatchType =
 interface EmailOptions {
   to: string;
   subject: string;
-  html: string;
-  text?: string;
+  react?: JSX.Element;
   serviceType?: EmailDispatchType;
-}
-
-/**
- * Initialize email transporter
- * Configure based on your email provider
- */
-function getEmailTransporter() {
-  const port = parseInt(process.env.EMAIL_PORT || "587", 10);
-  return nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port,
-    secure: port === 465,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
-}
-
-async function postEmailApi(
-  path: string,
-  payload: Record<string, unknown>
-): Promise<boolean> {
-  try {
-    const response = await api.post(`/email/${path}`, payload);
-    return Boolean(response.data?.success);
-  } catch (error) {
-    console.error("Failed to call email API", error);
-    return false;
-  }
-}
-
-/**
- * Get the appropriate FROM address based on service type
- */
-function getFromAddress(
-  serviceType?:
-    | "contact-admin"
-    | "verify"
-    | "bug-report-confirmation"
-    | "bug-report-team"
-    | "contact-confirmation"
-    | "password-reset"
-): string | null {
-  switch (serviceType) {
-    case "bug-report-confirmation":
-    case "bug-report-team":
-      return (
-        process.env.EMAIL_FROM_BUG_REPORTS_NOTIFICATION ||
-        process.env.EMAIL_FROM ||
-        null
-      );
-    case "contact-confirmation":
-    case "contact-admin":
-      return (
-        process.env.EMAIL_FROM_CONTACT_NOTIFICATION ||
-        process.env.EMAIL_FROM ||
-        null
-      );
-    case "password-reset":
-      return (
-        process.env.EMAIL_FROM_PASSWORD_RESET ||
-        process.env.EMAIL_FROM_VERIFY ||
-        process.env.EMAIL_FROM ||
-        null
-      );
-    case "verify":
-      return process.env.EMAIL_FROM_VERIFY || process.env.EMAIL_FROM || null;
-    default:
-      return process.env.EMAIL_FROM || null;
-  }
 }
 
 /**
@@ -101,25 +32,12 @@ function getFromAddress(
  */
 export async function sendEmail(options: EmailOptions): Promise<boolean> {
   try {
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      console.warn("Email service not configured");
-      return false;
-    }
-    if (!isValidEmail(options.to)) {
-      console.error("Invalid email address provided");
+    if (!process.env.RESEND_API_KEY) {
+      console.warn("Resend API key not configured");
       return false;
     }
 
-    const fromAddress = getFromAddress(options.serviceType);
-    if (!fromAddress || !isValidEmail(fromAddress)) {
-      console.error("Invalid EMAIL_FROM address in environment variables");
-      return false;
-    }
-
-    const transporter = getEmailTransporter();
-
-    await transporter.sendMail({
-      from: fromAddress,
+    await api.post("/email/send", {
       ...options,
     });
 
@@ -129,115 +47,102 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
     return false;
   }
 }
-
-/**
- * Send bug report confirmation email to reporter
- */
-
-export async function sendBugReportConfirmationEmail(
-  userEmail: string,
-  title: string,
-  reportId: string
-) {
-  return postEmailApi("bug-report-confirmation", {
-    userEmail,
-    title,
-    reportId,
-  });
-}
-
 /**
  * Send bug report to development team
  */
 export async function sendBugReportToTeam(
   title: string,
-  email: string,
   description: string,
   severity: string,
   reportId: string,
-  stepsToReproduce?: string
+  email: string,
+  expectedBehavior: string,
+  actualBehavior: string,
+  stepsToReproduce?: string,
+  submittedAt?: string
 ) {
-  return postEmailApi("bug-report-team", {
+  return await api.post("/bug-reports", {
     title,
-    email,
     description,
     severity,
     reportId,
+    email,
     stepsToReproduce,
+    expectedBehavior,
+    actualBehavior,
+    submittedAt,
   });
 }
 
+/**
+ * Send contact confirmation email to sender
+ */
+export async function sendContactConfirmationEmail(
+  email: string,
+  name: string
+) {
+  return sendEmail({
+    to: email,
+    subject: `Contact Form Received`,
+    serviceType: "contact-confirmation",
+    react: ContactConfirmationEmail({ name, subject: `Contact Form Received` }),
+  });
+}
+
+/**
+ * Send contact confirmation email to admin
+ */
 export async function sendContactToAdmin(
   senderEmail: string,
   senderName: string,
   subject: string,
   message: string
 ) {
-  return postEmailApi("contact-admin", {
-    senderEmail,
-    senderName,
-    subject,
-    message,
-  });
-}
-
-export async function sendContactToAdminDirect(
-  senderEmail: string,
-  senderName: string,
-  subject: string,
-  message: string
-) {
-  const adminEmail = process.env.ADMIN_EMAIL || "";
-
-  if (!adminEmail) {
-    console.warn("ADMIN_EMAIL not configured");
-    return false;
-  }
-
-  const html = `
-    <h2>New Contact Form Submission</h2>
-    <p><strong>From:</strong> ${escapeHtml(senderName)}</p>
-    <p><strong>Email:</strong> <a href="mailto:${escapeHtml(
-      senderEmail
-    )}">${escapeHtml(senderEmail)}</a></p>
-    <p><strong>Subject:</strong> ${escapeHtml(subject)}</p>
-    <hr>
-    <h3>Message:</h3>
-    <p>${escapeHtml(message).replace(/\n/g, "<br>")}</p>
-    <hr>
-    <p style="color: #666; font-size: 12px;">
-      Submitted at: ${new Date().toISOString()}
-    </p>
-  `;
-
   return sendEmail({
-    to: adminEmail,
-    subject: `[Contact Form] ${subject}`,
-    html,
-    serviceType: "contact-admin",
-  });
-}
-export async function sendContactConfirmationEmail(
-  userEmail: string,
-  userName: string,
-  subject: string
-) {
-  return postEmailApi("contact-confirmation", {
-    userEmail,
-    userName,
+    to: process.env.ADMIN_EMAIL || "",
     subject,
+    serviceType: "contact-admin",
+    react: ContactAdminEmail({
+      senderEmail,
+      senderName,
+      subject,
+      message,
+    }),
   });
 }
 
-export async function sendPasswordResetEmail(email: string) {
-  return postEmailApi("password-reset", { email });
+/*
+ * Send password reset email
+ */
+export async function sendPasswordResetEmail(email: string, resetLink: string) {
+  return sendEmail({
+    to: email,
+    subject: "Password Reset Request",
+    serviceType: "password-reset",
+    react: PasswordResetEmail({
+      resetLink,
+    }),
+  });
 }
+
+/**
+ *
+ * @param text asdasdsads
+ * @returns
+ */
 
 export async function sendVerificationEmail(
   email: string,
-  verificationUrl: string
+  verificationLink: string
 ) {
-  return postEmailApi("verify", { email, verificationUrl });
+  return sendEmail({
+    to: email,
+    subject: "Email Verification",
+    serviceType: "verify",
+    react: EmailVerificationTemplate({
+      verificationLink,
+    }),
+  });
 }
 
 /**

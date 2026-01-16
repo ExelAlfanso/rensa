@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { forgotPasswordLimiter } from "@/lib/rateLimiter";
 import { sendPasswordResetEmail } from "@/services/EmailServices";
-
+import jwt from "jsonwebtoken";
+import PasswordResetEmail from "@/components/emailTemplates/PasswordResetEmail";
+import resend from "@/lib/resend";
 /*
   POST /api/auth/forgot-password
   Send password reset email endpoint
@@ -40,9 +42,25 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+    const token = jwt.sign({ email }, process.env.NEXTAUTH_SECRET!, {
+      expiresIn: "1h",
+    });
 
+    if (!token) {
+      console.error("Failed to generate password reset token.");
+      return NextResponse.json(
+        { success: false, message: "Could not generate reset token" },
+        { status: 500 }
+      );
+    }
+    const resetLink = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`;
     try {
-      await sendPasswordResetEmail(email);
+      const emailSent = await resend.emails.send({
+        from: process.env.NO_REPLY_EMAIL!,
+        to: email,
+        subject: "Password Reset Request",
+        react: PasswordResetEmail({ resetLink }),
+      });
     } catch (err) {
       console.error("Error sending password reset email:", err);
     }

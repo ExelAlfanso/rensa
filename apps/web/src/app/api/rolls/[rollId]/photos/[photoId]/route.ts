@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
-import Roll from "@/models/Roll";
+import Roll, { RollDocument } from "@/models/Roll";
 import { getToken } from "next-auth/jwt";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
@@ -21,6 +21,13 @@ export async function POST(
 
     if (!session || !session.user) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+    const roll = await Roll.findById(rollId).lean<RollDocument>();
+    if (!roll || roll.userId.toString() !== session.user.id) {
+      return NextResponse.json(
+        { success: false, message: "Forbidden" },
+        { status: 403 }
+      );
     }
     if (!rollId?.length || !photoId) {
       return NextResponse.json(

@@ -2,6 +2,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verificationEmailLimiter } from "@/lib/rateLimiter";
 import { sendVerificationEmail } from "@/services/EmailServices";
+import resend from "@/lib/resend";
+import EmailVerificationTemplate from "@/components/emailTemplates/EmailVerificationTemplate";
 
 export async function POST(req: NextRequest) {
   const { email } = await req.json();
@@ -32,16 +34,12 @@ export async function POST(req: NextRequest) {
   const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/verified?token=${token}`;
 
   try {
-    const emailSent = await sendVerificationEmail(email, verificationUrl);
-    if (!emailSent) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Failed to send verification email. Please try again later.",
-        },
-        { status: 500 }
-      );
-    }
+    const emailSent = await resend.emails.send({
+      from: process.env.NO_REPLY_EMAIL!,
+      to: email,
+      subject: "Verify your email address",
+      react: EmailVerificationTemplate({ verificationLink: verificationUrl }),
+    });
 
     return NextResponse.json(
       { success: true, message: "Verification email sent" },

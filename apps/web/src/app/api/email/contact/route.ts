@@ -7,6 +7,9 @@ import {
   sendContactConfirmationEmail,
   sendContactToAdmin,
 } from "@/services/EmailServices";
+import ContactAdminEmail from "@/components/emailTemplates/ContactAdminEmail";
+import resend from "@/lib/resend";
+import ContactConfirmationEmail from "@/components/emailTemplates/ContactConfirmationEmail";
 
 /**
  * POST /api/contact
@@ -38,15 +41,8 @@ export async function POST(req: Request) {
     }
 
     // Parse and validate request body
-    let body;
-    try {
-      body = await req.json();
-    } catch {
-      return NextResponse.json(
-        { success: false, message: "Invalid request body" },
-        { status: 400 }
-      );
-    }
+    const { email, name, subject, message } = await req.json();
+    const body = { email, name, subject, message };
 
     // Validate and sanitize input
     const validation = validateContactData(body);
@@ -93,31 +89,32 @@ export async function POST(req: Request) {
     await contact.save();
 
     // Send email notifications (non-blocking on failure)
-    const notifyAdmin = sendContactToAdmin(
-      contact.email,
-      contact.name,
-      contact.subject,
-      contact.message
-    );
-    const notifyUser = sendContactConfirmationEmail(
-      contact.email,
-      contact.name,
-      contact.subject
-    );
-    Promise.allSettled([notifyAdmin, notifyUser]).then((results) => {
-      results.forEach((r, i) => {
-        if (
-          r.status === "rejected" ||
-          (r.status === "fulfilled" && r.value === false)
-        ) {
-          console.warn(
-            `Contact email ${i === 0 ? "admin" : "user"} notification failed.`,
-            r.status === "rejected" ? r.reason : undefined
-          );
-        }
-      });
-    });
 
+    try {
+      const notifyAdmin = await resend.emails.send({
+        from: process.env.CONTACT_NOTIFICATION_EMAIL || "",
+        to: process.env.ADMIN_EMAIL || "",
+        subject: contact.subject,
+        react: ContactAdminEmail({
+          senderEmail: contact.email,
+          senderName: contact.name,
+          subject: contact.subject,
+          message: contact.message,
+        }),
+      });
+
+      const notifyUser = await resend.emails.send({
+        from: process.env.NO_REPLY_EMAIL || "",
+        to: contact.email,
+        subject: `New Contact Form Submission: ${contact.subject}`,
+        react: ContactConfirmationEmail({
+          name: contact.name,
+          subject: contact.subject,
+        }),
+      });
+    } catch (e) {
+      console.error("Failed to send contact form emails:", e);
+    }
     return NextResponse.json(
       {
         success: true,

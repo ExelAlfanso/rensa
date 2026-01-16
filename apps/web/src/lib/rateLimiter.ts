@@ -49,3 +49,8 @@ export const resetPasswordLimiter = new Ratelimit({
   limiter: Ratelimit.slidingWindow(5, "10 m"),
   prefix: "reset_password_limit",
 });
+export const photoUploadLimiter = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(5, "2 m"),
+  prefix: "photo_upload_limit",
+});

@@ -1,6 +1,6 @@
 import { authOptions } from "@/lib/auth";
 import { connectDB } from "@/lib/mongodb";
-import Roll from "@/models/Roll";
+import Roll, { RollDocument } from "@/models/Roll";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
@@ -40,6 +40,7 @@ export async function GET(
 /*
   PATCH /api/rolls/[rollId]
   Update roll details (name)
+  🔒 REQUIRES AUTHENTICATION & OWNERSHIP
 */
 
 export async function PATCH(
@@ -48,23 +49,47 @@ export async function PATCH(
 ) {
   const { rollId } = await context.params;
   const { name } = await req.json();
+
+  // ✅ SECURITY: Verify user is authenticated
   const session = await getServerSession(authOptions);
-  if (!session || !session.user) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  if (!session?.user?.id) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Unauthorized. Please login to update rolls.",
+      },
+      { status: 401 }
+    );
   }
+
   try {
     await connectDB();
-    const updatedRoll = await Roll.findByIdAndUpdate(
-      rollId,
-      { name, userId: session.user.id },
-      { new: true }
-    ).lean();
-    if (!updatedRoll) {
+
+    // 🔒 SECURITY FIX: First verify the roll exists and user owns it
+    const rollOwner = await Roll.findById(rollId).select("userId").lean();
+
+    if (!rollOwner) {
       return NextResponse.json(
-        { success: false, message: "Forbidden or roll not found" },
+        { success: false, message: "Roll not found" },
+        { status: 404 }
+      );
+    }
+
+    // ✅ SECURITY: Verify ownership - only the owner can update their roll
+    if (rollOwner.toString() !== session.user.id) {
+      return NextResponse.json(
+        { success: false, message: "Forbidden. You don't own this roll." },
         { status: 403 }
       );
     }
+
+    // ✅ SECURITY: Only update the name field, NEVER overwrite userId
+    const updatedRoll = await Roll.findByIdAndUpdate(
+      rollId,
+      { name }, // Only update name, not userId!
+      { new: true }
+    ).lean();
+
     return NextResponse.json(
       {
         success: true,
@@ -76,7 +101,7 @@ export async function PATCH(
   } catch (error) {
     console.error("Error updating roll:", error);
     return NextResponse.json(
-      { message: "Internal Server Error" },
+      { success: false, message: "Internal Server Error" },
       { status: 500 }
     );
   }
@@ -92,6 +117,26 @@ export async function DELETE(
   context: { params: Promise<{ rollId: string }> }
 ) {
   const { rollId } = await context.params;
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.id) {
+    return NextResponse.json(
+      { success: false, message: "Unauthorized" },
+      { status: 401 }
+    );
+  }
+  const roll = await Roll.findById(rollId).lean<RollDocument>();
+  if (!roll) {
+    return NextResponse.json(
+      { success: false, message: "Roll not found" },
+      { status: 404 }
+    );
+  }
+  if (roll.userId?.toString() !== session.user.id) {
+    return NextResponse.json(
+      { success: false, message: "Forbidden: You don't own this roll" },
+      { status: 403 }
+    );
+  }
   try {
     await connectDB();
     const deletedRoll = await Roll.findByIdAndDelete(rollId).lean();

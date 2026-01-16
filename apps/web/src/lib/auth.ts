@@ -4,7 +4,7 @@ import { connectDB } from "./mongodb";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import { DefaultSession, DefaultUser } from "next-auth";
-import jwt from "jsonwebtoken";
+// import jwt from "jsonwebtoken";
 
 declare module "next-auth" {
   interface Session {
@@ -60,19 +60,19 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid email or password");
         }
         // console.log("✅ User authenticated:", user.email);
-        const accessToken = jwt.sign(
-          {
-            id: user._id.toString(),
-            email: user.email,
-          },
-          process.env.NEXTAUTH_SECRET!,
-          { expiresIn: "7d" }
-        );
+        // const accessToken = jwt.sign(
+        //   {
+        //     id: user._id.toString(),
+        //     email: user.email,
+        //   },
+        //   process.env.NEXTAUTH_SECRET!,
+        //   { expiresIn: "7d" }
+        // );
         return {
           id: user._id.toString(),
           name: user.username,
           email: user.email,
-          accessToken,
+          // accessToken,
         };
       },
     }),

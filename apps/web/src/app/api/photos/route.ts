@@ -2,6 +2,7 @@ import { connectDB } from "@/lib/mongodb";
 import Photo, { PhotoDocument } from "@/models/Photo";
 import { FilterQuery, SortOrder } from "mongoose";
 import { NextResponse } from "next/server";
+import { validateCloudinaryUrl } from "@/lib/cloudinary";
 
 /*
   GET /api/photos?page=1&limit=10&filters=tag1,tag2&sort=recent||popular
@@ -49,11 +50,20 @@ export async function GET(req: Request) {
       Photo.countDocuments(filter),
     ]);
 
+    // 🔒 SECURITY: Filter out photos with invalid URLs
+    const validPhotos = photos.filter((photo) => {
+      if (!photo.url || !validateCloudinaryUrl(photo.url)) {
+        console.warn(`⚠️ Filtered out photo with suspicious URL: ${photo._id}`);
+        return false;
+      }
+      return true;
+    });
+
     const totalPages = Math.ceil(total / limit);
     const hasMore = page < totalPages;
 
     return NextResponse.json({
-      photos,
+      photos: validPhotos,
       currentPage: page,
       totalPages,
       hasMore,

@@ -98,6 +98,15 @@ export function validateBugReportData(data: any) {
   const browser = sanitizeInput(data.browser || "");
   const attachments = sanitizeInput(data.attachments || "");
 
+  console.log("Sanitized Data:", {
+    title,
+    email,
+
+    description,
+    expectedBehavior,
+    actualBehavior,
+    stepsToReproduce,
+  });
   // Title validation
   if (!title || !isValidLength(title, 10, 200)) {
     errors.title = "Title must be between 10-200 characters";
