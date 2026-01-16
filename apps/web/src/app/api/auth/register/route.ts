@@ -18,9 +18,8 @@ export async function POST(req: Request) {
       req.headers.get("x-real-ip") ||
       "unknown";
 
-    const { success, remaining, limit, reset } = await registerLimiter.limit(
-      ip
-    );
+    const { success, remaining, limit, reset } =
+      await registerLimiter.limit(ip);
     if (!success) {
       return NextResponse.json(
         { message: "Too many registration attempts. Please try again later." },
@@ -56,7 +55,7 @@ export async function POST(req: Request) {
       description: "This is your default roll.",
     });
     try {
-      await api.post("/auth/send-verification", { email });
+      await api.post("/email/send-verification", { email });
     } catch (err) {
       console.error("Error sending verification email:", err);
     }

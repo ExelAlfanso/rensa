@@ -55,7 +55,7 @@ export async function POST(req: Request) {
     if (!user.verified) {
       let emailSent = false;
       try {
-        await api.post("/auth/send-verification", { email: user.email });
+        await api.post("/email/send-verification", { email: user.email });
         emailSent = true;
       } catch (err) {
         console.error("Error resending verification email:", err);
