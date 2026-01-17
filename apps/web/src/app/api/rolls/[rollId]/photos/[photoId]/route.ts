@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import Roll, { RollDocument } from "@/models/Roll";
+import Photo from "@/models/Photo";
+import cloudinary from "@/lib/cloudinary";
 import { getToken } from "next-auth/jwt";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
@@ -101,12 +103,42 @@ export async function DELETE(
       );
     }
 
+    const photo = await Photo.findById(photoId);
+    if (!photo) {
+      return NextResponse.json(
+        { success: false, message: "Photo not found" },
+        { status: 404 }
+      );
+    }
+
+    if (photo.userId.toString() !== user?.id) {
+      return NextResponse.json(
+        { success: false, message: "Forbidden: You don't own this photo" },
+        { status: 403 }
+      );
+    }
+
+    try {
+      const photoUrl = photo.url;
+      const publicIdMatch = photoUrl.match(/user_uploads\/.+/);
+      if (publicIdMatch) {
+        const publicId = publicIdMatch[0].split(".")[0];
+        await cloudinary.uploader.destroy(publicId);
+        console.log(`✅ Deleted from Cloudinary: ${publicId}`);
+      }
+    } catch (cloudinaryError) {
+      console.error("⚠️ Failed to delete from Cloudinary:", cloudinaryError);
+    }
+
+    await Photo.findByIdAndDelete(photoId);
+    console.log(`✅ Deleted photo record from database: ${photoId}`);
+
     roll.photos = roll.photos.filter((id: string) => id.toString() !== photoId);
     await roll.save();
 
     return NextResponse.json({
       success: true,
-      message: "Photo removed from roll",
+      message: "Photo removed from roll and deleted permanently",
     });
   } catch (error) {
     console.error("Failed to remove photo from roll:", error);

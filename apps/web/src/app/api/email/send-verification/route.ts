@@ -1,7 +1,6 @@
 ﻿import jwt from "jsonwebtoken";
 import { NextRequest, NextResponse } from "next/server";
 import { verificationEmailLimiter } from "@/lib/rateLimiter";
-import { sendVerificationEmail } from "@/services/EmailServices";
 import resend from "@/lib/resend";
 import EmailVerificationTemplate from "@/components/emailTemplates/EmailVerificationTemplate";
 
@@ -20,7 +19,6 @@ export async function POST(req: NextRequest) {
       { status: 429 }
     );
   }
-  console.log("NEXT_PUBLIC_APP_URL:", process.env.NEXT_PUBLIC_APP_URL);
   if (!process.env.NEXTAUTH_SECRET || !process.env.NEXT_PUBLIC_APP_URL) {
     return NextResponse.json(
       { message: "Email verification is not configured." },

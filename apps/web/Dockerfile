@@ -24,6 +24,19 @@ ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 COPY . .
 RUN npm run build
 
+# ===== Development =====
+FROM deps AS dev
+
+ARG NEXT_PUBLIC_ELYSIA_WS_URL
+ENV NEXT_PUBLIC_ELYSIA_WS_URL=$NEXT_PUBLIC_ELYSIA_WS_URL
+
+ARG NEXT_PUBLIC_APP_URL
+ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+
+COPY . .
+EXPOSE 3000
+CMD ["npm", "run", "dev"]
+
 # ===== Production =====
 FROM node:20-alpine AS prod
 WORKDIR /app
