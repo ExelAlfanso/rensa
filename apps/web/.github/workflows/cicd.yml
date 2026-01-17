@@ -26,6 +26,9 @@ jobs:
           build-args: |
             NEXT_PUBLIC_APP_URL: ${{ secrets.NEXT_PUBLIC_APP_URL }}
             NEXT_PUBLIC_ELYSIA_WS_URL: ${{ secrets.NEXT_PUBLIC_ELYSIA_WS_URL }}
+            UPSTASH_REDIS_REST_TOKEN: ${{secrets.UPSTASH_REDIS_REST_TOKEN}}
+            UPSTASH_REDIS_REST_URL: ${{secrets.UPSTASH_REDIS_REST_URL}}
+            RESEND_API_KEY: ${{secrets.RESEND_API_KEY}}
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
