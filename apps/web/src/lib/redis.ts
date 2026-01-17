@@ -1,21 +1,5 @@
 import { Redis } from "@upstash/redis";
-
-let redis: Redis | null = null;
-
-export default function getRedis() {
-  if (!redis) {
-    if (
-      !process.env.UPSTASH_REDIS_REST_URL ||
-      !process.env.UPSTASH_REDIS_REST_TOKEN
-    ) {
-      throw new Error("Upstash Redis env is not configured");
-    }
-
-    redis = new Redis({
-      url: process.env.UPSTASH_REDIS_REST_URL,
-      token: process.env.UPSTASH_REDIS_REST_TOKEN,
-    });
-  }
-
-  return redis;
-}
+export const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+});

@@ -1,7 +1,5 @@
 import { Ratelimit } from "@upstash/ratelimit";
-import getRedis from "@/lib/redis";
-
-const redis = getRedis();
+import { redis } from "@/lib/redis";
 
 // Create a rate limiter that allows 5 requests per 10 minutes
 export const loginLimiter = new Ratelimit({
