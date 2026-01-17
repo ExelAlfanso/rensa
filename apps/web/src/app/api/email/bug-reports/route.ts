@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { bugReportLimiter } from "@/lib/rateLimiter";
 import { validateBugReportData } from "@/lib/validation";
 import { BugReportTeamEmail } from "@/components/emailTemplates/BugReportTeamEmail";
-import resend from "@/lib/resend";
+import getResend from "@/lib/resend";
 import { BugReportConfirmationEmail } from "@/components/emailTemplates/BugReportConfirmationEmail";
 
 /**
@@ -124,6 +124,7 @@ export async function POST(req: Request) {
 
   // Send email notifications (non-blocking on failure)
   try {
+    const resend = await getResend();
     await resend.emails.send({
       from: "bug_reports@rensa.site",
       to: process.env.DEV_TEAM_EMAIL || process.env.ADMIN_EMAIL || "",

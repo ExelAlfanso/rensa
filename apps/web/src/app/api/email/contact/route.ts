@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { contactFormLimiter } from "@/lib/rateLimiter";
 import { validateContactData } from "@/lib/validation";
 import ContactAdminEmail from "@/components/emailTemplates/ContactAdminEmail";
-import resend from "@/lib/resend";
+import getResend from "@/lib/resend";
 import ContactConfirmationEmail from "@/components/emailTemplates/ContactConfirmationEmail";
 
 /**
@@ -87,6 +87,7 @@ export async function POST(req: Request) {
     // Send email notifications (non-blocking on failure)
 
     try {
+      const resend = await getResend();
       await resend.emails.send({
         from: process.env.CONTACT_NOTIFICATION_EMAIL || "",
         to: process.env.ADMIN_EMAIL || "",

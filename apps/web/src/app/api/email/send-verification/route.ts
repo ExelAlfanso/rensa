@@ -1,7 +1,7 @@
 ﻿import jwt from "jsonwebtoken";
 import { NextRequest, NextResponse } from "next/server";
 import { verificationEmailLimiter } from "@/lib/rateLimiter";
-import resend from "@/lib/resend";
+import getResend from "@/lib/resend";
 import EmailVerificationTemplate from "@/components/emailTemplates/EmailVerificationTemplate";
 
 export async function POST(req: NextRequest) {
@@ -32,6 +32,7 @@ export async function POST(req: NextRequest) {
   const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/verified?token=${token}`;
 
   try {
+    const resend = await getResend();
     await resend.emails.send({
       from: process.env.NO_REPLY_EMAIL!,
       to: email,

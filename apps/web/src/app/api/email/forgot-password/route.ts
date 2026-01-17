@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { forgotPasswordLimiter } from "@/lib/rateLimiter";
 import jwt from "jsonwebtoken";
 import PasswordResetEmail from "@/components/emailTemplates/PasswordResetEmail";
-import resend from "@/lib/resend";
+import getResend from "@/lib/resend";
 /*
   POST /api/auth/forgot-password
   Send password reset email endpoint
@@ -54,6 +54,7 @@ export async function POST(req: NextRequest) {
     }
     const resetLink = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`;
     try {
+      const resend = await getResend();
       await resend.emails.send({
         from: process.env.NO_REPLY_EMAIL!,
         to: email,
