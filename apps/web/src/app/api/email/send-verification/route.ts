@@ -1,8 +1,8 @@
 ﻿import jwt from "jsonwebtoken";
 import { NextRequest, NextResponse } from "next/server";
 import { verificationEmailLimiter } from "@/lib/rateLimiter";
-import resend from "@/lib/resend";
 import EmailVerificationTemplate from "@/components/emailTemplates/EmailVerificationTemplate";
+import getResend from "@/lib/resend";
 
 export async function POST(req: NextRequest) {
   const { email } = await req.json();
@@ -16,13 +16,13 @@ export async function POST(req: NextRequest) {
       {
         message: "Too many verification requests. Please try again later.",
       },
-      { status: 429 }
+      { status: 429 },
     );
   }
   if (!process.env.NEXTAUTH_SECRET || !process.env.NEXT_PUBLIC_APP_URL) {
     return NextResponse.json(
       { message: "Email verification is not configured." },
-      { status: 500 }
+      { status: 500 },
     );
   }
   const token = jwt.sign({ email }, process.env.NEXTAUTH_SECRET!, {
@@ -32,7 +32,8 @@ export async function POST(req: NextRequest) {
   const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/verified?token=${token}`;
 
   try {
-    const emailSent = await resend.emails.send({
+    const resend = getResend();
+    await resend.emails.send({
       from: process.env.NO_REPLY_EMAIL!,
       to: email,
       subject: "Verify your email address",
@@ -41,12 +42,12 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { success: true, message: "Verification email sent" },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (err) {
     return NextResponse.json(
       { success: false, message: "Failed to send verification email" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

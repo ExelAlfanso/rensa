@@ -1,6 +1,4 @@
 "use client";
-
-import Footer from "@/components/footer/Footer";
 import ForestSection from "@/sections/ForestSection";
 import { ReactNode } from "react";
 

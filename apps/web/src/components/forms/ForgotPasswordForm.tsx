@@ -29,11 +29,11 @@ export default function ForgotPasswordForm() {
     try {
       await api.post("/auth/forgot-password", { email });
       setMessage(
-        "If your email exists, you will receive a password reset link."
+        "If your email exists, you will receive a password reset link.",
       );
-    } catch (error) {
+    } catch {
       setMessage(
-        "If your email exists, you will receive a password reset link."
+        "If your email exists, you will receive a password reset link.",
       );
     } finally {
       setLoading(false);

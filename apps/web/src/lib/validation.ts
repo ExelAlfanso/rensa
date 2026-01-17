@@ -9,7 +9,7 @@ export function sanitizeInput(input: string): string {
   if (typeof input !== "string") return "";
 
   // Remove all HTML tags including script tags
-  let sanitized = input
+  const sanitized = input
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "") // Remove entire script tags with content
     .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, "") // Remove entire style tags with content
     .replace(/<[^>]+>/g, "") // Remove all remaining HTML tags
@@ -32,7 +32,7 @@ export function isValidEmail(email: string): boolean {
 export function isValidLength(
   input: string,
   minLength: number,
-  maxLength: number
+  maxLength: number,
 ): boolean {
   const length = input.trim().length;
   return length >= minLength && length <= maxLength;

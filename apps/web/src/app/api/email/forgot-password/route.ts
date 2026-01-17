@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { forgotPasswordLimiter } from "@/lib/rateLimiter";
-import { sendPasswordResetEmail } from "@/services/EmailServices";
 import jwt from "jsonwebtoken";
 import PasswordResetEmail from "@/components/emailTemplates/PasswordResetEmail";
-import resend from "@/lib/resend";
+import getResend from "@/lib/resend";
 /*
   POST /api/auth/forgot-password
   Send password reset email endpoint
@@ -30,7 +29,7 @@ export async function POST(req: NextRequest) {
             "X-RateLimit-Remaining": remaining.toString(),
             "X-RateLimit-Reset": reset.toString(),
           },
-        }
+        },
       );
     }
 
@@ -39,7 +38,7 @@ export async function POST(req: NextRequest) {
     if (!email || typeof email !== "string") {
       return NextResponse.json(
         { success: false, message: "Invalid email" },
-        { status: 400 }
+        { status: 400 },
       );
     }
     const token = jwt.sign({ email }, process.env.NEXTAUTH_SECRET!, {
@@ -50,12 +49,13 @@ export async function POST(req: NextRequest) {
       console.error("Failed to generate password reset token.");
       return NextResponse.json(
         { success: false, message: "Could not generate reset token" },
-        { status: 500 }
+        { status: 500 },
       );
     }
     const resetLink = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`;
     try {
-      const emailSent = await resend.emails.send({
+      const resend = getResend();
+      await resend.emails.send({
         from: process.env.NO_REPLY_EMAIL!,
         to: email,
         subject: "Password Reset Request",
@@ -70,13 +70,13 @@ export async function POST(req: NextRequest) {
         message:
           "If an account with that email exists, a password reset email has been sent.",
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Forgot password error:", error);
     return NextResponse.json(
       { success: false, message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

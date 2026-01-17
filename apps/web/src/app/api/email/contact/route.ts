@@ -3,13 +3,9 @@ import Contact from "@/models/Contact";
 import { NextResponse } from "next/server";
 import { contactFormLimiter } from "@/lib/rateLimiter";
 import { validateContactData } from "@/lib/validation";
-import {
-  sendContactConfirmationEmail,
-  sendContactToAdmin,
-} from "@/services/EmailServices";
 import ContactAdminEmail from "@/components/emailTemplates/ContactAdminEmail";
-import resend from "@/lib/resend";
 import ContactConfirmationEmail from "@/components/emailTemplates/ContactConfirmationEmail";
+import getResend from "@/lib/resend";
 
 /**
  * POST /api/contact
@@ -36,7 +32,7 @@ export async function POST(req: Request) {
           success: false,
           message: "Too many requests. Please try again later.",
         },
-        { status: 429 }
+        { status: 429 },
       );
     }
 
@@ -53,7 +49,7 @@ export async function POST(req: Request) {
           message: "Validation failed",
           errors: validation.errors,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -81,7 +77,7 @@ export async function POST(req: Request) {
           message: "Validation failed",
           errors,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -91,7 +87,8 @@ export async function POST(req: Request) {
     // Send email notifications (non-blocking on failure)
 
     try {
-      const notifyAdmin = await resend.emails.send({
+      const resend = getResend();
+      await resend.emails.send({
         from: process.env.CONTACT_NOTIFICATION_EMAIL || "",
         to: process.env.ADMIN_EMAIL || "",
         subject: contact.subject,
@@ -102,8 +99,7 @@ export async function POST(req: Request) {
           message: contact.message,
         }),
       });
-
-      const notifyUser = await resend.emails.send({
+      await resend.emails.send({
         from: process.env.NO_REPLY_EMAIL || "",
         to: contact.email,
         subject: `New Contact Form Submission: ${contact.subject}`,
@@ -123,7 +119,7 @@ export async function POST(req: Request) {
           id: contact._id,
         },
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     console.error("[Contact API Error]:", error);
@@ -134,7 +130,7 @@ export async function POST(req: Request) {
         success: false,
         message: "An error occurred while processing your request",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -183,7 +179,7 @@ export async function GET(req: Request) {
         success: false,
         message: "Failed to retrieve contacts",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

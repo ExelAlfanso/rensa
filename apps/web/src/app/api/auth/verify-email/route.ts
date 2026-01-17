@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     if (!token) {
       return NextResponse.json(
         { success: false, message: "Token is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -22,19 +22,19 @@ export async function POST(req: NextRequest) {
     try {
       payload = jwt.verify(
         token,
-        process.env.NEXTAUTH_SECRET!
+        process.env.NEXTAUTH_SECRET!,
       ) as VerifyTokenPayload;
     } catch (err: any) {
       if (err.name === "TokenExpiredError") {
         return NextResponse.json(
           { success: false, message: "Verification link expired" },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
       return NextResponse.json(
         { success: false, message: "Invalid verification token" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -47,14 +47,14 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json(
         { success: false, message: "User not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     if (user.verified) {
       return NextResponse.json(
         { success: true, message: "Email already verified" },
-        { status: 200 }
+        { status: 200 },
       );
     }
 
@@ -63,12 +63,12 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { success: true, message: "Email verified successfully" },
-      { status: 200 }
+      { status: 200 },
     );
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { success: false, message: "Internal server error " },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,6 +1,4 @@
 import { notFound } from "next/navigation";
-import jwt from "jsonwebtoken";
-
 import VerifiedClient from "./VerifiedClient";
 import { api } from "@/lib/axios-client";
 

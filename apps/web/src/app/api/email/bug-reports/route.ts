@@ -4,8 +4,8 @@ import { NextResponse } from "next/server";
 import { bugReportLimiter } from "@/lib/rateLimiter";
 import { validateBugReportData } from "@/lib/validation";
 import { BugReportTeamEmail } from "@/components/emailTemplates/BugReportTeamEmail";
-import resend from "@/lib/resend";
 import { BugReportConfirmationEmail } from "@/components/emailTemplates/BugReportConfirmationEmail";
+import getResend from "@/lib/resend";
 
 /**
  * POST /api/bug-reports
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
         message:
           "You've submitted too many bug reports. Please try again in 24 hours.",
       },
-      { status: 429 }
+      { status: 429 },
     );
   }
 
@@ -63,7 +63,7 @@ export async function POST(req: Request) {
         message: "Validation failed",
         errors: validation.errors,
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -115,7 +115,7 @@ export async function POST(req: Request) {
         message: "Validation failed",
         errors,
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -124,7 +124,8 @@ export async function POST(req: Request) {
 
   // Send email notifications (non-blocking on failure)
   try {
-    const notifyTeam = await resend.emails.send({
+    const resend = getResend();
+    await resend.emails.send({
       from: "bug_reports@rensa.site",
       to: process.env.DEV_TEAM_EMAIL || process.env.ADMIN_EMAIL || "",
       subject: `New Bug Report: ${bugReport.title}`,
@@ -140,7 +141,7 @@ export async function POST(req: Request) {
         submittedAt: bugReport.createdAt.toISOString(),
       }),
     });
-    const notifyUser = await resend.emails.send({
+    await resend.emails.send({
       from: process.env.NO_REPLY_EMAIL || "",
       to: bugReport.email,
       subject: `Bug Report Received: ${bugReport.title}`,
@@ -158,7 +159,7 @@ export async function POST(req: Request) {
           severity,
         },
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (err) {
     console.error("Error sending bug report to team:", err);
@@ -168,7 +169,7 @@ export async function POST(req: Request) {
         message:
           "There was an error processing your bug report. Please try again later.",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -230,7 +231,7 @@ export async function GET(req: Request) {
         success: false,
         message: "Failed to retrieve bug reports",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -5,7 +5,6 @@ import { EditRollProvider } from "@/providers/EditRollProvider";
 import RollPageMasonryGallerySection from "@/sections/RollPageMasonryGallerySection/RollPageMasonryGallerySection";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 interface RollPageClientProps {
   id: string;
@@ -19,7 +18,6 @@ export default function RollPageClient({
   name,
 }: RollPageClientProps) {
   const { user } = useAuthStore();
-  const router = useRouter();
   const isOwner = user?.id === ownerId;
   const [rollName, setRollName] = useState(name);
   const handleOnRollUpdate = (roll: { rollId: string; name: string }) => {
