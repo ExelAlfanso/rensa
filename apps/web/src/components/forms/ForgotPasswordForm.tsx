@@ -27,7 +27,7 @@ export default function ForgotPasswordForm() {
     setError("");
     setMessage("");
     try {
-      await api.post("/auth/forgot-password", { email });
+      await api.post("/email/forgot-password", { email });
       setMessage(
         "If your email exists, you will receive a password reset link.",
       );

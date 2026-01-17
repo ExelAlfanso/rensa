@@ -33,27 +33,27 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { email } = await req.json();
-
-    if (!email || typeof email !== "string") {
-      return NextResponse.json(
-        { success: false, message: "Invalid email" },
-        { status: 400 },
-      );
-    }
-    const token = jwt.sign({ email }, process.env.NEXTAUTH_SECRET!, {
-      expiresIn: "1h",
-    });
-
-    if (!token) {
-      console.error("Failed to generate password reset token.");
-      return NextResponse.json(
-        { success: false, message: "Could not generate reset token" },
-        { status: 500 },
-      );
-    }
-    const resetLink = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`;
     try {
+      const { email } = await req.json();
+
+      if (!email || typeof email !== "string") {
+        return NextResponse.json(
+          { success: false, message: "Invalid email" },
+          { status: 400 },
+        );
+      }
+      const token = jwt.sign({ email }, process.env.NEXTAUTH_SECRET!, {
+        expiresIn: "1h",
+      });
+
+      if (!token) {
+        return NextResponse.json(
+          { success: false, message: "Could not generate reset token" },
+          { status: 500 },
+        );
+      }
+      const resetLink = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`;
+
       const resend = await getResend();
       await resend.emails.send({
         from: process.env.NO_REPLY_EMAIL!,

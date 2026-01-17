@@ -13,7 +13,7 @@ import { getServerSession } from "next-auth";
 */
 export async function POST(
   req: Request,
-  context: { params: Promise<{ rollId: string; photoId: string }> }
+  context: { params: Promise<{ rollId: string; photoId: string }> },
 ) {
   try {
     await connectDB();
@@ -28,13 +28,13 @@ export async function POST(
     if (!roll || roll.userId.toString() !== session.user.id) {
       return NextResponse.json(
         { success: false, message: "Forbidden" },
-        { status: 403 }
+        { status: 403 },
       );
     }
     if (!rollId?.length || !photoId) {
       return NextResponse.json(
         { success: false, message: "Missing rollId or photoId" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -44,12 +44,12 @@ export async function POST(
       },
       {
         $addToSet: { photos: photoId },
-      }
+      },
     );
     if (result.matchedCount === 0) {
       return NextResponse.json(
         { success: false, message: "Forbidden or roll not found" },
-        { status: 403 }
+        { status: 403 },
       );
     }
     return NextResponse.json({
@@ -61,7 +61,7 @@ export async function POST(
     console.error("Failed to add photo to roll:", error);
     return NextResponse.json(
       { success: false, message: "Failed to add photo to roll" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -75,7 +75,7 @@ const secret = process.env.NEXTAUTH_SECRET!;
 
 export async function DELETE(
   req: NextRequest,
-  context: { params: Promise<{ rollId: string; photoId: string }> }
+  context: { params: Promise<{ rollId: string; photoId: string }> },
 ) {
   const { rollId, photoId } = await context.params;
   const session = await getServerSession(authOptions);
@@ -92,14 +92,14 @@ export async function DELETE(
     if (!roll) {
       return NextResponse.json(
         { success: false, message: "Roll not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     if (roll.userId.toString() !== user?.id) {
       return NextResponse.json(
         { success: false, message: "Forbidden" },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -107,29 +107,16 @@ export async function DELETE(
     if (!photo) {
       return NextResponse.json(
         { success: false, message: "Photo not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     if (photo.userId.toString() !== user?.id) {
       return NextResponse.json(
         { success: false, message: "Forbidden: You don't own this photo" },
-        { status: 403 }
+        { status: 403 },
       );
     }
-
-    try {
-      const photoUrl = photo.url;
-      const publicIdMatch = photoUrl.match(/user_uploads\/.+/);
-      if (publicIdMatch) {
-        const publicId = publicIdMatch[0].split(".")[0];
-        await cloudinary.uploader.destroy(publicId);
-        console.log(`✅ Deleted from Cloudinary: ${publicId}`);
-      }
-    } catch (cloudinaryError) {
-      console.error("⚠️ Failed to delete from Cloudinary:", cloudinaryError);
-    }
-
     await Photo.findByIdAndDelete(photoId);
     console.log(`✅ Deleted photo record from database: ${photoId}`);
 
@@ -144,7 +131,7 @@ export async function DELETE(
     console.error("Failed to remove photo from roll:", error);
     return NextResponse.json(
       { success: false, message: "Failed to remove photo" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
