@@ -8,15 +8,16 @@ export async function sendVerificationEmail(email: string): Promise<void> {
     throw new Error("Email is required");
   }
 
-  if (!process.env.NEXTAUTH_SECRET || !process.env.NEXT_PUBLIC_APP_URL) {
+  if (!process.env.NEXTAUTH_SECRET) {
     throw new Error("Email verification is not configured.");
   }
 
+  const appUrl = process.env.BASE_URL || "https://rensa.site";
   const token = jwt.sign({ email }, process.env.NEXTAUTH_SECRET!, {
     expiresIn: "1h",
   });
 
-  const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/verified?token=${token}`;
+  const verificationUrl = `${appUrl}/verified?token=${token}`;
 
   const resend = await getResend();
   await resend.emails.send({
@@ -38,7 +39,9 @@ export async function sendPasswordResetEmail(email: string): Promise<void> {
   if (!token) {
     throw new Error("Could not generate reset token");
   }
-  const resetLink = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`;
+
+  const appUrl = process.env.BASE_URL || "https://rensa.site";
+  const resetLink = `${appUrl}/reset-password?token=${token}`;
 
   const resend = await getResend();
   await resend.emails.send({
