@@ -1,4 +1,3 @@
-import { api } from "@/lib/axios-client";
 import { connectDB } from "@/lib/mongodb";
 import { registerLimiter } from "@/lib/rateLimiter";
 import Roll from "@/models/Roll";
@@ -6,6 +5,7 @@ import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import { startSession } from "mongoose";
 import { NextResponse } from "next/server";
+import { sendVerificationEmail } from "@/services/EmailServices";
 
 /*
   POST /api/auth/register
@@ -30,14 +30,14 @@ export async function POST(req: Request) {
             "X-RateLimit-Remaining": remaining.toString(),
             "X-RateLimit-Reset": reset.toString(),
           },
-        }
+        },
       );
     }
     const { username, email, password, confirmPassword } = await req.json();
     if (password != confirmPassword)
       return NextResponse.json(
         { message: "Invalid Password" },
-        { status: 400 }
+        { status: 400 },
       );
     await connectDB();
 
@@ -45,7 +45,7 @@ export async function POST(req: Request) {
     if (userExists)
       return NextResponse.json(
         { message: "Email already exists" },
-        { status: 409 }
+        { status: 409 },
       );
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({ username, email, password: hashedPassword });
@@ -55,7 +55,7 @@ export async function POST(req: Request) {
       description: "This is your default roll.",
     });
     try {
-      await api.post("/email/send-verification", { email });
+      await sendVerificationEmail(email);
     } catch (err) {
       console.error("Error sending verification email:", err);
     }
@@ -74,12 +74,12 @@ export async function POST(req: Request) {
 
     return NextResponse.json(
       { message: "User registered successfully" },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (err) {
     return NextResponse.json(
       { message: `Error registering user: ${err}` },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

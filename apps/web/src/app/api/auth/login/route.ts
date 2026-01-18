@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 import { loginLimiter } from "@/lib/rateLimiter";
 import Roll from "@/models/Roll";
-import { api } from "@/lib/axios-client";
+import { sendVerificationEmail } from "@/services/EmailServices";
 
 /*
   POST /api/auth/login
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     if (!email || !password) {
       return NextResponse.json(
         { success: false, message: "Email and password are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
             "X-RateLimit-Remaining": remaining.toString(),
             "X-RateLimit-Reset": reset.toString(),
           },
-        }
+        },
       );
     }
 
@@ -49,13 +49,13 @@ export async function POST(req: Request) {
     if (!user) {
       return NextResponse.json(
         { success: false, message: "Invalid credentials" },
-        { status: 401 }
+        { status: 401 },
       );
     }
     if (!user.verified) {
       let emailSent = false;
       try {
-        await api.post("/email/send-verification", { email: user.email });
+        await sendVerificationEmail(user.email);
         emailSent = true;
       } catch (err) {
         console.error("Error resending verification email:", err);
@@ -67,7 +67,7 @@ export async function POST(req: Request) {
             ? "Email not verified. A new verification email has been sent."
             : "Email not verified. Please check your inbox or try registering again.",
         },
-        { status: 401 }
+        { status: 401 },
       );
     }
     // creates default "All Photos" roll
@@ -78,7 +78,7 @@ export async function POST(req: Request) {
     if (!defaultRoll) {
       return NextResponse.json(
         { success: false, message: "Error creating default roll" },
-        { status: 500 }
+        { status: 500 },
       );
     }
     // validate password
@@ -86,7 +86,7 @@ export async function POST(req: Request) {
     if (!isValid) {
       return NextResponse.json(
         { success: false, message: "Invalid credentials" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -104,7 +104,7 @@ export async function POST(req: Request) {
     console.error("Login error:", err);
     return NextResponse.json(
       { success: false, message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
