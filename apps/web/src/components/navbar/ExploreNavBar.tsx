@@ -27,7 +27,7 @@ const ExploreNavBar = () => {
           {user ? (
             <>
               <SecondaryButton href="/upload">Create</SecondaryButton>
-              <span className="hidden lg:flex ">
+              <span className="flex ">
                 <NotificationDropdown></NotificationDropdown>
                 <BookmarkButton></BookmarkButton>
               </span>

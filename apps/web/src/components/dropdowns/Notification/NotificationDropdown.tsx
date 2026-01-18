@@ -26,7 +26,7 @@ const NotificationItem = ({ notification, isLast }: NotificationItemProps) => {
   const ref = useReadOnVisible(
     notification.id,
     notification.read,
-    handleVisible
+    handleVisible,
   );
 
   return (
@@ -51,8 +51,8 @@ const NotificationItem = ({ notification, isLast }: NotificationItemProps) => {
         {notification.type === "photo-saved"
           ? "saved your photo."
           : notification.type === "photo-commented"
-          ? "commented on your photo."
-          : "bookmarked your photo."}
+            ? "commented on your photo."
+            : "bookmarked your photo."}
       </Text>
     </DropdownItem>
   );

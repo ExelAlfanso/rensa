@@ -1,6 +1,7 @@
 import React from "react";
 
 import Image from "next/image";
+import Link from "next/link";
 
 interface LogoProps {
   size?: string;
@@ -20,14 +21,17 @@ const Logo: React.FC<LogoProps> = ({
   };
 
   return (
-    <div className={`relative ${sizeClasses[size]} ${className}`}>
+    <Link
+      href="/explore"
+      className={`relative ${sizeClasses[size]} ${className}`}
+    >
       <Image
         src={`${color === "black" ? "/logo.svg" : "/whiteLogo.svg"}`}
         alt="Logo"
         fill
         className="object-contain aspect-square"
       />
-    </div>
+    </Link>
   );
 };
 
