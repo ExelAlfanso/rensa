@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     optimizePackageImports: ["@phosphor-icons/react"],
-    proxyClientMaxBodySize: "20mb",
+    proxyClientMaxBodySize: "30mb",
   },
 };
 

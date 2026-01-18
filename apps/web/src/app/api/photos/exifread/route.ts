@@ -15,12 +15,12 @@ export async function POST(req: Request) {
         data: res.data.data.metadata,
         message: "EXIF detection success",
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch {
     return NextResponse.json(
       { success: false, message: "EXIF detection failed" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
