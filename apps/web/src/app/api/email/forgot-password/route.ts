@@ -33,7 +33,9 @@ export async function POST(req: NextRequest) {
     const { email } = await req.json();
 
     try {
-      await sendPasswordResetEmail(email);
+      if (email) {
+        await sendPasswordResetEmail(email);
+      }
     } catch (err) {
       console.error("Error sending password reset email:", err);
     }
