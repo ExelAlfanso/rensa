@@ -75,7 +75,7 @@ const RollPageMasonryGallerySection: React.FC<
             data: page.data.filter((photo) => photo._id.toString() !== photoId),
           })),
         };
-      }
+      },
     );
   };
   return (

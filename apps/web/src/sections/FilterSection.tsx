@@ -1,8 +1,8 @@
 "use client";
 import FilterList from "@/components/lists/FilterList";
 import ExploreTabs from "@/components/tabs/ExploreTabs";
-import React, { useState } from "react";
-import MasonryGalleryPage from "./MasonryGallerySection/MasonryGallerySection";
+import { useState } from "react";
+import MasonryGallerySection from "./MasonryGallerySection/MasonryGallerySection";
 
 const FilterSection = () => {
   const [activeTab, setActiveTab] = useState("tab1");
@@ -19,11 +19,14 @@ const FilterSection = () => {
       ></FilterList>
       <div className="border-t border-white-700 my-11"></div>
       <ExploreTabs setActiveTab={setActiveTab} className="mb-10"></ExploreTabs>
-      <MasonryGalleryPage
-        activeTab={activeTab}
-        filters={filters}
-        useDatabase={true}
-      ></MasonryGalleryPage>
+      <div className="flex items-start">
+        <MasonryGallerySection
+          activeTab={activeTab}
+          filters={filters}
+          useDatabase={true}
+          type={"explore"}
+        ></MasonryGallerySection>
+      </div>
     </div>
   );
 };

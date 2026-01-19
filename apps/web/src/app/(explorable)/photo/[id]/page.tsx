@@ -41,12 +41,10 @@ export default async function PhotoPage({
           ownerId={photo?.userId.toString() || ""}
         />
       </div>
-      <div className="flex flex-col items-start justify-start min-h-screen bg-white-500">
-        <Heading className="text-primary" size="s">
-          We thought you will like this
-        </Heading>
-        <MasonryGalleryPage></MasonryGalleryPage>
-      </div>
+      <Heading className="text-primary" size="s">
+        We thought you will like this
+      </Heading>
+      <MasonryGalleryPage type="explore"></MasonryGalleryPage>
     </div>
   );
 }

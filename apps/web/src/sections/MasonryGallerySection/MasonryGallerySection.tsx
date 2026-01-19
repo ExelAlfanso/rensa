@@ -21,6 +21,7 @@ interface MasonryGallerySectionProps {
   rollId?: string;
   onPhotoClick?: (photo: Photo | string, index: number) => void;
   userId?: string;
+  type: "explore" | "roll" | "bookmarks";
 }
 
 const TAB_POPULAR = "tab2";
@@ -30,6 +31,7 @@ const MasonryGallerySection: React.FC<MasonryGallerySectionProps> = ({
   useDatabase = true,
   rollId,
   userId,
+  type,
 }) => {
   const { ref, inView } = useInView({ threshold: 0.5 });
   const sort = activeTab === TAB_POPULAR ? "popular" : "recent";
@@ -85,7 +87,7 @@ const MasonryGallerySection: React.FC<MasonryGallerySectionProps> = ({
   }
 
   return (
-    <div className="flex flex-col items-center justify-center">
+    <div className="flex flex-col items-start justify-start w-full">
       <MasonryGalleryGrid photos={photos} />
 
       <div
@@ -100,9 +102,9 @@ const MasonryGallerySection: React.FC<MasonryGallerySectionProps> = ({
         {isFetchingNextPage && (
           <div className="text-black loading loading-spinner loading-lg" />
         )}
-        {/* {!hasNextPage && photos.length > 0 && (
-          <p className="text-gray-500">No more images to load</p>
-        )} */}
+        {!hasNextPage && photos.length === 0 && type == "bookmarks" && (
+          <p className="text-gray-500">You have no bookmarked photos.</p>
+        )}
       </div>
     </div>
   );
