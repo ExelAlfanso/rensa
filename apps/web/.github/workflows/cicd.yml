@@ -52,4 +52,7 @@ jobs:
             echo "Current container status:"
             docker compose -f docker-compose-production.yaml ps
       
-            echo "Deployment finished successfully!"
+            echo "🧹 Cleaning up unused Docker resources..."
+            docker system prune -af
+
+            echo "✅ Deployment finished successfully!"
