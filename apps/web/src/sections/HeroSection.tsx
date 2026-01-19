@@ -71,7 +71,9 @@ export default function HeroSection() {
               fill
               src={data.src}
               className="w-full h-full object-cover rounded-lg"
-              priority={i === 0}
+              priority={i < 2}
+              quality={75}
+              loading={i < 2 ? "eager" : "lazy"}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           </motion.div>

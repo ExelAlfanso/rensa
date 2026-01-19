@@ -92,7 +92,7 @@ const MasonryGallerySection: React.FC<MasonryGallerySectionProps> = ({
 
       <div
         ref={ref}
-        className="flex items-center justify-center w-full py-20"
+        className="flex flex-col items-center justify-center w-full py-20"
         role="status"
         aria-live="polite"
       >
@@ -102,9 +102,12 @@ const MasonryGallerySection: React.FC<MasonryGallerySectionProps> = ({
         {isFetchingNextPage && (
           <div className="text-black loading loading-spinner loading-lg" />
         )}
-        {!hasNextPage && photos.length === 0 && type == "bookmarks" && (
-          <p className="text-gray-500">You have no bookmarked photos.</p>
-        )}
+        {status === "success" &&
+          !hasNextPage &&
+          photos.length === 0 &&
+          type == "bookmarks" && (
+            <p className="text-gray-500">You have no bookmarked photos.</p>
+          )}
       </div>
     </div>
   );

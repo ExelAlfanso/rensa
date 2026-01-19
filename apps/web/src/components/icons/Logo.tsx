@@ -21,10 +21,7 @@ const Logo: React.FC<LogoProps> = ({
   };
 
   return (
-    <Link
-      href="/explore"
-      className={`relative ${sizeClasses[size]} ${className}`}
-    >
+    <Link href="/home" className={`relative ${sizeClasses[size]} ${className}`}>
       <Image
         src={`${color === "black" ? "/logo.svg" : "/whiteLogo.svg"}`}
         alt="Logo"
