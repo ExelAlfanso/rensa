@@ -32,13 +32,12 @@ const MasonryGalleryGrid: React.FC<MasonryGalleryGridProps> = ({ photos }) => {
     900: Math.min(getDynamicColumns(photos.length), 2),
     640: 2,
   };
-  const masonryWidthClass = "w-auto";
 
   return (
     <AnimatePresence mode="popLayout">
       <Masonry
         breakpointCols={breakpointColumnsObj}
-        className={`${masonryWidthClass} my-masonry-grid`}
+        className={`max-w-5xl my-masonry-grid`}
         columnClassName="my-masonry-grid_column"
       >
         {photos.map((photo: PopulatedPhoto) => {
