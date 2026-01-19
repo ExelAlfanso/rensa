@@ -40,7 +40,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
-      className="m-3 mb-5"
+      className="m-3 mb-5 max-w-[256px]"
     >
       <Link href={id ? `/photo/${id}` : "#"} prefetch={false} className="block">
         <div
