@@ -37,7 +37,7 @@ const MasonryGalleryGrid: React.FC<MasonryGalleryGridProps> = ({ photos }) => {
     <AnimatePresence mode="popLayout">
       <Masonry
         breakpointCols={breakpointColumnsObj}
-        className={`max-w-5xl my-masonry-grid`}
+        className={`max-w-[256px] my-masonry-grid`}
         columnClassName="my-masonry-grid_column"
       >
         {photos.map((photo: PopulatedPhoto) => {

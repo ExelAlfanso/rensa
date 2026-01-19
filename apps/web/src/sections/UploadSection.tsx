@@ -61,7 +61,7 @@ const UploadSection: React.FC<UploadSectionProps> = ({ onFileSelect }) => {
 
   const handleExifChange = (
     field: string,
-    value: number | object | string | CameraSettings["Brand"]
+    value: number | object | string | CameraSettings["Brand"],
   ) => {
     if (field === "Brand") {
       const newExif = defaultCameraSettings[value as CameraSettings["Brand"]];
@@ -249,7 +249,7 @@ const UploadSection: React.FC<UploadSectionProps> = ({ onFileSelect }) => {
           {error && (
             <Text className="text-center mb-2 text-red-500">{error}</Text>
           )}
-          <div className="flex flex-col lg:flex-row items-center justify-center">
+          <div className="flex flex-col lg:flex-row items-start justify-center">
             <UploadPreview photo={photo}></UploadPreview>
             <UploadForm
               file={uploadedFile}
