@@ -8,6 +8,7 @@ export interface UserDocument {
   avatar: string;
   bookmarks: ObjectId[];
   verified: boolean;
+  role: string;
   passwordChangedAt: Date;
 }
 
@@ -31,9 +32,11 @@ const UserSchema = new Schema<UserDocument>(
       type: Date,
       default: Date.now,
     },
+
     avatar: {
       type: String,
     },
+    role: { type: String, enum: ["user", "admin"], default: "user" },
     verified: { type: Boolean, default: false }, // email verification
     bookmarks: {
       type: [{ type: Schema.Types.ObjectId, ref: "Photo" }],
@@ -42,7 +45,7 @@ const UserSchema = new Schema<UserDocument>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const User = mongoose.models?.User || model<UserDocument>("User", UserSchema);

@@ -11,6 +11,7 @@ declare module "next-auth" {
     user: {
       id: string;
       provider?: string;
+      role?: string;
     } & DefaultSession["user"];
     accessToken?: string;
   }
@@ -18,6 +19,7 @@ declare module "next-auth" {
   interface User extends DefaultUser {
     id: string;
     accessToken?: string;
+    role?: string;
   }
 }
 
@@ -49,17 +51,18 @@ export const authOptions: NextAuthOptions = {
         }
         if (!user.verified) {
           throw new Error(
-            "Email not verified. We’ve sent a verification email to your email address."
+            "Email not verified. We’ve sent a verification email to your email address.",
           );
         }
         const isValid = await bcrypt.compare(
           credentials.password,
-          user.password
+          user.password,
         );
         if (!isValid) {
           throw new Error("Invalid email or password");
         }
-        // console.log("✅ User authenticated:", user.email);
+
+        // console.log("User authenticated:", user.email);
         // const accessToken = jwt.sign(
         //   {
         //     id: user._id.toString(),
@@ -72,7 +75,7 @@ export const authOptions: NextAuthOptions = {
           id: user._id.toString(),
           name: user.username,
           email: user.email,
-          // accessToken,
+          role: user.role,
         };
       },
     }),
@@ -85,7 +88,6 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async jwt({ token, account, user }) {
-      // console.log("JWT callback:", { token });
       if (account) {
         token.accessToken = account.access_token;
         token.provider = account.provider;
@@ -97,23 +99,19 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.name = user.name;
         token.email = user.email;
+        token.role = user.role;
       }
       return token;
     },
     async session({ session, token }) {
       if (token) {
-        // if (process.env.NODE_ENV !== "production") {
-        //   console.log("Session callback id:", {
-        //     id: token.id,
-        //     accessToken: token.accessToken,
-        //   });
-        // }
         session.user = {
           ...(session.user as Session["user"]),
           id: token.id as string,
           name: token.name,
           email: token.email,
           provider: token.provider as string | undefined,
+          role: token.role as string | undefined,
         };
         session.accessToken = token.accessToken as string;
       }
