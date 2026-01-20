@@ -6,6 +6,8 @@ import { validateBugReportData } from "@/lib/validation";
 import { BugReportTeamEmail } from "@/components/emailTemplates/BugReportTeamEmail";
 import getResend from "@/lib/resend";
 import { BugReportConfirmationEmail } from "@/components/emailTemplates/BugReportConfirmationEmail";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 
 /**
  * POST /api/bug-reports
@@ -19,7 +21,6 @@ import { BugReportConfirmationEmail } from "@/components/emailTemplates/BugRepor
  * - Error messages don't leak sensitive info
  */
 export async function POST(req: Request) {
-  // Rate limiting
   const ip =
     req.headers.get("x-forwarded-for") ||
     req.headers.get("x-real-ip") ||
@@ -37,7 +38,6 @@ export async function POST(req: Request) {
     );
   }
 
-  // Parse and validate request body
   const {
     title,
     email,
@@ -47,7 +47,6 @@ export async function POST(req: Request) {
     expectedBehavior,
   } = await req.json();
 
-  // Validate and sanitize input
   const validation = validateBugReportData({
     title,
     email,
@@ -67,10 +66,8 @@ export async function POST(req: Request) {
     );
   }
 
-  // Connect to database
   await connectDB();
 
-  // Auto-detect severity from report content if not specified
   let severity: "low" | "medium" | "high" | "critical" = "medium";
   const reportText = (
     validation.data.title +
@@ -93,7 +90,6 @@ export async function POST(req: Request) {
   } else if (highKeywords.some((keyword) => reportText.includes(keyword))) {
     severity = "high";
   }
-  // Create bug report document
   const bugReport = new BugReport({
     ...validation.data,
     severity,
@@ -101,7 +97,6 @@ export async function POST(req: Request) {
     userAgent: req.headers.get("user-agent") || "",
   });
   const reportId = bugReport._id.toString();
-  // Validate using Mongoose schema
   const validationError = bugReport.validateSync();
   if (validationError) {
     const errors: Record<string, string> = {};
@@ -119,10 +114,8 @@ export async function POST(req: Request) {
     );
   }
 
-  // Save to database
   await bugReport.save();
 
-  // Send email notifications (non-blocking on failure)
   try {
     const resend = await getResend();
     await resend.emails.send({
@@ -187,9 +180,16 @@ export async function POST(req: Request) {
  */
 export async function GET(req: Request) {
   try {
-    // TODO: Add authentication check for admin/dev team users
-    // if (!isAdmin && !isDeveloper) return unauthorized response
-
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== "admin") {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Unauthorized",
+        },
+        { status: 401 },
+      );
+    }
     await connectDB();
 
     const { searchParams } = new URL(req.url);
