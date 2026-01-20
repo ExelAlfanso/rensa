@@ -10,9 +10,10 @@ import { NextResponse } from "next/server";
   Add or remove bookmark for a photo
 */
 
+//TODO: update bookmark count based on user id that likes on a post
 export async function POST(
   request: Request,
-  context: { params: Promise<{ id: string }> }
+  context: { params: Promise<{ id: string }> },
 ) {
   const { id } = await context.params;
 
@@ -22,7 +23,7 @@ export async function POST(
     if (!session || !session.user) {
       return NextResponse.json(
         { success: false, message: "Unauthorized" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -30,7 +31,7 @@ export async function POST(
     if (!user) {
       return NextResponse.json(
         { success: false, message: "User not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -38,12 +39,12 @@ export async function POST(
     if (!photo) {
       return NextResponse.json(
         { success: false, message: "Photo not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
     const isBookmarked = user.bookmarks.some(
-      (pid: ObjectId) => pid.toString() === id
+      (pid: ObjectId) => pid.toString() === id,
     );
 
     if (action === "increment" && !isBookmarked) {
@@ -53,7 +54,7 @@ export async function POST(
 
     if (action === "decrement" && isBookmarked) {
       user.bookmarks = user.bookmarks.filter(
-        (pid: ObjectId) => pid.toString() !== id
+        (pid: ObjectId) => pid.toString() !== id,
       );
       photo.bookmarks = Math.max(0, photo.bookmarks - 1);
     }
@@ -67,15 +68,15 @@ export async function POST(
         action === "increment"
           ? true
           : action === "decrement"
-          ? false
-          : isBookmarked,
+            ? false
+            : isBookmarked,
       message: "Bookmark updated",
     });
   } catch (err) {
     console.error("Error updating bookmark:", err);
     return NextResponse.json(
       { error: "Failed to update bookmark" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

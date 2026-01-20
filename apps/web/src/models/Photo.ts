@@ -26,6 +26,7 @@ export interface PhotoDocument extends Document {
   metadata: PhotoMetadata;
 }
 
+//TODO: update bookmarks schema to include user ids who bookmarked the photo
 const PhotoSchema = new Schema<PhotoDocument>(
   {
     userId: {
@@ -61,7 +62,7 @@ const PhotoSchema = new Schema<PhotoDocument>(
 
   {
     timestamps: true,
-  }
+  },
 );
 
 const Photo =

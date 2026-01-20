@@ -6,6 +6,7 @@ export interface UserDocument {
   email: string;
   password: string;
   avatar: string;
+  role: string;
   bookmarks: ObjectId[];
   verified: boolean;
   passwordChangedAt: Date;
@@ -27,6 +28,11 @@ const UserSchema = new Schema<UserDocument>(
       type: String,
       required: true,
     },
+    role: {
+      type: String,
+      required: true,
+      default: "user",
+    },
     passwordChangedAt: {
       type: Date,
       default: Date.now,
@@ -42,7 +48,7 @@ const UserSchema = new Schema<UserDocument>(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const User = mongoose.models?.User || model<UserDocument>("User", UserSchema);
