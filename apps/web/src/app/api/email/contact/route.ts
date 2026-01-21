@@ -6,6 +6,8 @@ import { validateContactData } from "@/lib/validation";
 import ContactAdminEmail from "@/components/emailTemplates/ContactAdminEmail";
 import getResend from "@/lib/resend";
 import ContactConfirmationEmail from "@/components/emailTemplates/ContactConfirmationEmail";
+import { authOptions } from "@/lib/auth";
+import { getServerSession } from "next-auth";
 
 /**
  * POST /api/contact
@@ -142,10 +144,17 @@ export async function POST(req: Request) {
  */
 export async function GET(req: Request) {
   try {
-    // TODO: Add authentication check for admin users
-    // if (!isAdmin) return unauthorized response
-    // const session = getServerSession(authOptions);
-    // if()
+    const session = await getServerSession(authOptions);
+    if (!session || session.user.role !== "admin") {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Unauthorized",
+        },
+        { status: 401 },
+      );
+    }
+
     await connectDB();
 
     const { searchParams } = new URL(req.url);
