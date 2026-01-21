@@ -10,7 +10,6 @@ import { NextResponse } from "next/server";
   Add or remove bookmark for a photo
 */
 
-//TODO: update bookmark count based on user id that likes on a post
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },
@@ -49,14 +48,16 @@ export async function POST(
 
     if (action === "increment" && !isBookmarked) {
       user.bookmarks.push(photo._id);
-      photo.bookmarks += 1;
+      photo.bookmarkedBy.push(user._id);
     }
 
     if (action === "decrement" && isBookmarked) {
       user.bookmarks = user.bookmarks.filter(
         (pid: ObjectId) => pid.toString() !== id,
       );
-      photo.bookmarks = Math.max(0, photo.bookmarks - 1);
+      photo.bookmarkedBy = photo.bookmarkedBy.filter(
+        (uid: ObjectId) => uid.toString() !== user._id.toString(),
+      );
     }
 
     await Promise.all([user.save(), photo.save()]);

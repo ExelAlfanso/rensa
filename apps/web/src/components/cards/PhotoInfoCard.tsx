@@ -53,6 +53,7 @@ const PhotoInfoCard: React.FC<PhotoInfoCardProps> = ({
       const bookmarkedPhotos = await fetchUserBookmarkedPhotos(user.id);
       return bookmarkedPhotos.includes(id || "");
     },
+    enabled: !!user?.id && !!id,
   });
   useEffect(() => {
     setIsBookmarked(isBookmarked);
@@ -77,7 +78,7 @@ const PhotoInfoCard: React.FC<PhotoInfoCardProps> = ({
     if (!user?.id) router.push("/login");
     setIsBookmarked((prev: boolean) => !prev);
     setBookmarks((prev) =>
-      isBookmarkedState ? (prev || 0) - 1 : (prev || 0) + 1
+      isBookmarkedState ? (prev || 0) - 1 : (prev || 0) + 1,
     );
     try {
       const action = isBookmarkedState ? "decrement" : "increment";

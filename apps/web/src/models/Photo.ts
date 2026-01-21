@@ -15,7 +15,7 @@ export interface PhotoMetadata {
 export interface PhotoDocument extends Document {
   userId: Types.ObjectId;
   url: string;
-  bookmarks: number;
+  bookmarkedBy: Types.ObjectId[];
   title: string;
   description: string;
   tags: string[];
@@ -34,11 +34,10 @@ const PhotoSchema = new Schema<PhotoDocument>(
       ref: "User",
       required: true,
     },
-    bookmarks: {
-      type: Number,
-      default: 0,
+    bookmarkedBy: {
+      type: [{ type: Schema.Types.ObjectId, ref: "User" }],
+      default: [],
     },
-
     url: {
       type: String,
       required: true,

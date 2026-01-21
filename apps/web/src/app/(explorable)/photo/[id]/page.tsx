@@ -34,7 +34,7 @@ export default async function PhotoPage({
         </div>
         <PhotoInfoCard
           id={id}
-          initialBookmarks={photo?.bookmarks}
+          initialBookmarks={photo?.bookmarkedBy?.length || 0}
           title={photo?.title}
           description={photo?.description}
           metadata={photo?.metadata}

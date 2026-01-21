@@ -15,10 +15,13 @@ export default async function RollPageWrapper({
     rollData = await fetchRollById(id);
     ownerId = await fetchProfileByRollId(id);
   } catch {
-    rollData = null;
-    ownerId = null;
     redirect("/404");
   }
+
+  if (!rollData || !ownerId) {
+    redirect("/404");
+  }
+
   return (
     <RollPageClient
       ownerId={ownerId}
