@@ -47,17 +47,17 @@ export async function POST(
     );
 
     if (action === "increment" && !isBookmarked) {
-      user.bookmarks.push(photo._id);
-      photo.bookmarkedBy.push(user._id);
+      await Promise.all([
+        user.updateOne({ $push: { bookmarks: photo._id } }),
+        photo.updateOne({ $push: { bookmarkedBy: user._id } }),
+      ]);
     }
 
     if (action === "decrement" && isBookmarked) {
-      user.bookmarks = user.bookmarks.filter(
-        (pid: ObjectId) => pid.toString() !== id,
-      );
-      photo.bookmarkedBy = photo.bookmarkedBy.filter(
-        (uid: ObjectId) => uid.toString() !== user._id.toString(),
-      );
+      await Promise.all([
+        user.updateOne({ $pull: { bookmarks: photo._id } }),
+        photo.updateOne({ $pull: { bookmarkedBy: user._id } }),
+      ]);
     }
 
     await Promise.all([user.save(), photo.save()]);
