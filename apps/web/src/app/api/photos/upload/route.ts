@@ -9,7 +9,7 @@ import { authOptions } from "@/lib/auth";
 import { photoUploadLimiter } from "@/lib/rateLimiter";
 import { sanitizeInput } from "@/lib/validation";
 
-async function compressImageUnder10MB(buffer: Buffer): Promise<Buffer> {
+export async function compressImageUnder10MB(buffer: Buffer): Promise<Buffer> {
   let quality = 90; // start high
   let output = await sharp(buffer)
     .withMetadata()
@@ -41,7 +41,7 @@ export async function POST(req: Request) {
   if (!session?.user?.id) {
     return NextResponse.json(
       { success: false, error: "Unauthorized. Please login to upload photos." },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -62,7 +62,7 @@ export async function POST(req: Request) {
           "X-RateLimit-Remaining": remaining.toString(),
           "X-RateLimit-Reset": reset.toString(),
         },
-      }
+      },
     );
   }
   try {
@@ -89,13 +89,13 @@ export async function POST(req: Request) {
     if (!title || title.trim().length === 0) {
       return NextResponse.json(
         { success: false, error: "Title is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
     if (title.length > 200) {
       return NextResponse.json(
         { success: false, error: "Title must be 200 characters or less" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -106,7 +106,7 @@ export async function POST(req: Request) {
           success: false,
           error: "Description must be 5000 characters or less",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -114,7 +114,7 @@ export async function POST(req: Request) {
     if (category && category.length > 100) {
       return NextResponse.json(
         { success: false, error: "Category must be 100 characters or less" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -122,7 +122,7 @@ export async function POST(req: Request) {
     if (style && style.length > 100) {
       return NextResponse.json(
         { success: false, error: "Style must be 100 characters or less" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -130,7 +130,7 @@ export async function POST(req: Request) {
     if (color && color.length > 100) {
       return NextResponse.json(
         { success: false, error: "Color must be 100 characters or less" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -157,7 +157,7 @@ export async function POST(req: Request) {
       if (tags.length > 20) {
         return NextResponse.json(
           { success: false, error: "Maximum 20 tags allowed" },
-          { status: 400 }
+          { status: 400 },
         );
       }
     } catch (err) {
@@ -166,7 +166,7 @@ export async function POST(req: Request) {
           success: false,
           error: "Invalid tags format. Must be an array of strings.",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -187,7 +187,7 @@ export async function POST(req: Request) {
     } catch (err) {
       return NextResponse.json(
         { success: false, error: "Invalid EXIF data format" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -195,7 +195,7 @@ export async function POST(req: Request) {
     if (!file) {
       return NextResponse.json(
         { success: false, error: "No file provided" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -205,7 +205,7 @@ export async function POST(req: Request) {
     const compressedBuffer = await compressImageUnder10MB(buffer);
 
     const base64File = `data:${file.type};base64,${compressedBuffer.toString(
-      "base64"
+      "base64",
     )}`;
     const formPhoto = new FormData();
     formPhoto.append("file", file);
@@ -219,7 +219,7 @@ export async function POST(req: Request) {
     if (res.data[key].Label === "NSFW") {
       return NextResponse.json(
         { success: false, error: "NSFW content detected. Upload rejected." },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -250,7 +250,7 @@ export async function POST(req: Request) {
           error:
             "Invalid or suspicious image URL detected. Upload rejected for security reasons.",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 

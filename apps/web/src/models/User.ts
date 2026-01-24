@@ -32,9 +32,10 @@ const UserSchema = new Schema<UserDocument>(
       type: Date,
       default: Date.now,
     },
-
     avatar: {
       type: String,
+      required: true,
+      default: "",
     },
     role: { type: String, enum: ["user", "admin"], default: "user" },
     verified: { type: Boolean, default: false }, // email verification
