@@ -3,12 +3,12 @@ import {
   sendBookmarkedNotification,
   sendCommentedNotification,
 } from "./NotificationServices";
-import { CommentType } from "@/sections/CommentSection";
+import { CommentType } from "@/frontend/sections/CommentSection";
 
 export async function bookmarkPhoto(
   userId: string | undefined,
   photoId: string,
-  action: "increment" | "decrement"
+  action: "increment" | "decrement",
 ) {
   try {
     const res = await api.post(`/photos/bookmark/${photoId}`, {
@@ -27,7 +27,7 @@ export async function bookmarkPhoto(
 export async function commentPhoto(
   newComment: CommentType,
   id: string,
-  userId: string | undefined
+  userId: string | undefined,
 ) {
   try {
     await api.post(`/photos/${id}/comments`, {

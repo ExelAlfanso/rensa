@@ -3,9 +3,9 @@ import Contact from "@/models/Contact";
 import { NextResponse } from "next/server";
 import { contactFormLimiter } from "@/lib/rateLimiter";
 import { validateContactData } from "@/lib/validation";
-import ContactAdminEmail from "@/components/emailTemplates/ContactAdminEmail";
+import ContactAdminEmail from "@/frontend/components/emailTemplates/ContactAdminEmail";
 import getResend from "@/lib/resend";
-import ContactConfirmationEmail from "@/components/emailTemplates/ContactConfirmationEmail";
+import ContactConfirmationEmail from "@/frontend/components/emailTemplates/ContactConfirmationEmail";
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
 

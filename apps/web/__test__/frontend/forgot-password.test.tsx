@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import ForgotPasswordPage from "@/app/(auth)/forgot-password/page";
 
 // Mock the ForgotPasswordForm component
-jest.mock("@/components/forms/ForgotPasswordForm", () => {
+jest.mock("@/frontend/components/forms/ForgotPasswordForm", () => {
   function ForgotPasswordFormMock() {
     return (
       <div data-testid="forgot-password-form">
@@ -25,11 +25,11 @@ describe("ForgotPasswordPage", () => {
     render(<ForgotPasswordPage />);
 
     expect(
-      screen.getByRole("heading", { name: /forgot password/i })
+      screen.getByRole("heading", { name: /forgot password/i }),
     ).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/email/i)).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /send reset link/i })
+      screen.getByRole("button", { name: /send reset link/i }),
     ).toBeInTheDocument();
   });
 });

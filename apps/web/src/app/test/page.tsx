@@ -1,6 +1,6 @@
 "use client";
 
-import { useFileUpload } from "@/hooks/useFileUpload";
+import { useFileUpload } from "@/frontend/hooks/useFileUpload";
 
 export default function ProfilePage() {
   const {

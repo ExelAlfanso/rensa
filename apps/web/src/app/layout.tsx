@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { Forum, Figtree } from "next/font/google";
 import "./globals.css";
-import SessionProviderWrapper from "@/providers/SessionProviderWrapper";
-import { LoadingProvider } from "@/hooks/useLoading";
-import QueryProvider from "@/providers/QueryProvider";
-import { ToastProvider } from "@/providers/ToastProvider";
-import Toast from "@/components/toast/Toast";
-import { NotificationProvider } from "@/providers/NotificationProvider";
-import SchemaMarkup from "@/components/SchemaMarkup";
+import SessionProviderWrapper from "@/frontend/providers/SessionProviderWrapper";
+import { LoadingProvider } from "@/frontend/hooks/useLoading";
+import QueryProvider from "@/frontend/providers/QueryProvider";
+import { ToastProvider } from "@/frontend/providers/ToastProvider";
+import Toast from "@/frontend/components/toast/Toast";
+import { NotificationProvider } from "@/frontend/providers/NotificationProvider";
+import SchemaMarkup from "@/frontend/components/SchemaMarkup";
 
 const forum = Forum({
   subsets: ["latin"],

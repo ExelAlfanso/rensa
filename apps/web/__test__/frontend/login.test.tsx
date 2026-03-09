@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import LoginPage from "@/app/(auth)/login/page";
 
 // Mock the LoginForm component
-jest.mock("@/components/forms/LoginForm", () => {
+jest.mock("@/frontend/components/forms/LoginForm", () => {
   function LoginFormMock() {
     return (
       <div data-testid="login-form">
@@ -29,7 +29,7 @@ describe("LoginPage", () => {
     expect(screen.getByPlaceholderText(/email/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/password/i)).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /sign in/i })
+      screen.getByRole("button", { name: /sign in/i }),
     ).toBeInTheDocument();
   });
 });

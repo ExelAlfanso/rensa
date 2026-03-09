@@ -1,8 +1,8 @@
 "use client";
 
-import Heading from "@/components/Heading";
-import MasonryGallerySection from "@/sections/MasonryGallerySection/MasonryGallerySection";
-import { useAuthStore } from "@/stores/useAuthStore";
+import Heading from "@/frontend/components/Heading";
+import MasonryGallerySection from "@/frontend/sections/MasonryGallerySection/MasonryGallerySection";
+import { useAuthStore } from "@/frontend/stores/useAuthStore";
 
 export default function BookmarksPage() {
   const { user, isLoading } = useAuthStore();

@@ -1,15 +1,15 @@
 "use client";
 import { useRef } from "react";
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
-import IconButton from "@/components/buttons/IconButton";
+import IconButton from "@/frontend/components/buttons/IconButton";
 import { ArrowArcRightIcon } from "@phosphor-icons/react";
 import Image from "next/image";
 import Link from "next/link";
-import Carousel from "@/components/carousel/Carousel";
-import { cardData } from "@/app/datas/homeDatas";
-import HeroSection from "@/sections/HeroSection";
-import HomeNavbar from "@/components/navbar/HomeNavbar";
-import Footer from "@/components/footer/Footer";
+import Carousel from "@/frontend/components/carousel/Carousel";
+import { cardData } from "@/frontend/datas/homeDatas";
+import HeroSection from "@/frontend/sections/HeroSection";
+import HomeNavbar from "@/frontend/components/navbar/HomeNavbar";
+import Footer from "@/frontend/components/footer/Footer";
 export default function HomeClient() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({

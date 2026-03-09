@@ -1,7 +1,7 @@
-import MasonryGalleryPage from "@/sections/MasonryGallerySection/MasonryGallerySection";
-import Heading from "@/components/Heading";
-import PhotoInfoCard from "@/components/cards/PhotoInfoCard";
-import ImagePreview from "@/components/ImagePreview";
+import MasonryGalleryPage from "@/frontend/sections/MasonryGallerySection/MasonryGallerySection";
+import Heading from "@/frontend/components/Heading";
+import PhotoInfoCard from "@/frontend/components/cards/PhotoInfoCard";
+import ImagePreview from "@/frontend/components/ImagePreview";
 
 import { redirect } from "next/navigation";
 import { fetchPhotoById } from "@/services/PhotoServices";

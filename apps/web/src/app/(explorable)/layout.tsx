@@ -1,6 +1,6 @@
 "use client";
-import ExploreNavBar from "@/components/navbar/ExploreNavBar";
-import { EditPhotoProvider } from "@/providers/EditPhotoProvider";
+import ExploreNavBar from "@/frontend/components/navbar/ExploreNavBar";
+import { EditPhotoProvider } from "@/frontend/providers/EditPhotoProvider";
 
 export default function RootLayout({
   children,

@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import RegisterPage from "@/app/(auth)/register/page";
 
 // Mock the RegisterForm component
-jest.mock("@/components/forms/RegisterForm", () => {
+jest.mock("@/frontend/components/forms/RegisterForm", () => {
   function RegisterFormMock() {
     return (
       <div data-testid="register-form">
@@ -28,16 +28,16 @@ describe("RegisterPage", () => {
     render(<RegisterPage />);
 
     expect(
-      screen.getByRole("heading", { name: /register/i })
+      screen.getByRole("heading", { name: /register/i }),
     ).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/username/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/email/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/^password$/i)).toBeInTheDocument();
     expect(
-      screen.getByPlaceholderText(/confirm password/i)
+      screen.getByPlaceholderText(/confirm password/i),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /sign up/i })
+      screen.getByRole("button", { name: /sign up/i }),
     ).toBeInTheDocument();
   });
 });

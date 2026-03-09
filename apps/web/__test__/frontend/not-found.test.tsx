@@ -18,7 +18,7 @@ jest.mock("next/link", () => {
 });
 
 // Mock Footer component
-jest.mock("@/components/footer/Footer", () => {
+jest.mock("@/frontend/components/footer/Footer", () => {
   function FooterMock() {
     return <footer data-testid="footer">Footer</footer>;
   }
@@ -26,7 +26,7 @@ jest.mock("@/components/footer/Footer", () => {
 });
 
 // Mock IconButton
-jest.mock("@/components/buttons/IconButton", () => {
+jest.mock("@/frontend/components/buttons/IconButton", () => {
   function IconButtonMock({ children }: any) {
     return <button>{children}</button>;
   }
@@ -49,10 +49,10 @@ describe("NotFound Page", () => {
     render(<NotFound />);
 
     expect(
-      screen.getByRole("heading", { name: /you've reached an empty zone/i })
+      screen.getByRole("heading", { name: /you've reached an empty zone/i }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/the page you're looking for might have been moved/i)
+      screen.getByText(/the page you're looking for might have been moved/i),
     ).toBeInTheDocument();
   });
 

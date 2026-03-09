@@ -10,7 +10,7 @@ jest.mock("@/sections/MasonryGallerySection/MasonryGallerySection", () => {
 });
 
 // Mock the Heading component
-jest.mock("@/components/Heading", () => {
+jest.mock("@/frontend/components/Heading", () => {
   function HeadingMock({ children, ...props }: any) {
     return <h1 {...props}>{children}</h1>;
   }
@@ -49,7 +49,7 @@ describe("BookmarksPage", () => {
   it("renders the heading with correct text", () => {
     render(<BookmarksPage />);
     expect(
-      screen.getByRole("heading", { name: /your bookmarks/i })
+      screen.getByRole("heading", { name: /your bookmarks/i }),
     ).toBeInTheDocument();
   });
 

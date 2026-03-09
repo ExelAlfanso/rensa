@@ -13,21 +13,21 @@ jest.mock("framer-motion", () => ({
   useTransform: (_: any, __: any, values: any) => values[0],
 }));
 
-jest.mock("@/components/carousel/Carousel", () => {
+jest.mock("@/frontend/components/carousel/Carousel", () => {
   function CarouselMock() {
     return <div data-testid="carousel">CarouselMock</div>;
   }
   return CarouselMock;
 });
 
-jest.mock("@/components/navbar/HomeNavbar", () => {
+jest.mock("@/frontend/components/navbar/HomeNavbar", () => {
   function NavbarMock() {
     return <nav data-testid="navbar">NavbarMock</nav>;
   }
   return NavbarMock;
 });
 
-jest.mock("@/components/footer/Footer", () => {
+jest.mock("@/frontend/components/footer/Footer", () => {
   function FooterMock() {
     return <footer data-testid="footer">FooterMock</footer>;
   }
@@ -41,7 +41,7 @@ jest.mock("@/sections/HeroSection", () => {
   return HeroMock;
 });
 
-jest.mock("@/components/buttons/IconButton", () => {
+jest.mock("@/frontend/components/buttons/IconButton", () => {
   function IconButtonMock({ children, ...props }: any) {
     return <button {...props}>{children}</button>;
   }

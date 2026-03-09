@@ -1,4 +1,4 @@
-import UploadSection from "@/sections/UploadSection";
+import UploadSection from "@/frontend/sections/UploadSection";
 
 export default function UploadPage() {
   return (

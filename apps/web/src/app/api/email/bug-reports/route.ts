@@ -3,9 +3,9 @@ import BugReport from "@/models/BugReport";
 import { NextResponse } from "next/server";
 import { bugReportLimiter } from "@/lib/rateLimiter";
 import { validateBugReportData } from "@/lib/validation";
-import { BugReportTeamEmail } from "@/components/emailTemplates/BugReportTeamEmail";
+import { BugReportTeamEmail } from "@/frontend/components/emailTemplates/BugReportTeamEmail";
 import getResend from "@/lib/resend";
-import { BugReportConfirmationEmail } from "@/components/emailTemplates/BugReportConfirmationEmail";
+import { BugReportConfirmationEmail } from "@/frontend/components/emailTemplates/BugReportConfirmationEmail";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 

@@ -4,8 +4,8 @@ import { useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-import Footer from "@/components/footer/Footer";
-import Text from "@/components/Text";
+import Footer from "@/frontend/components/footer/Footer";
+import Text from "@/frontend/components/Text";
 
 export default function VerifiedClient() {
   const router = useRouter();

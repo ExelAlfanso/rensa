@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import getResend from "@/lib/resend";
-import EmailVerificationTemplate from "@/components/emailTemplates/EmailVerificationTemplate";
-import { PasswordResetEmail } from "@/components/emailTemplates/PasswordResetEmail";
+import EmailVerificationTemplate from "@/frontend/components/emailTemplates/EmailVerificationTemplate";
+import { PasswordResetEmail } from "@/frontend/components/emailTemplates/PasswordResetEmail";
 
 export async function sendVerificationEmail(email: string): Promise<void> {
   if (!email) {

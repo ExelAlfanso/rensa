@@ -29,7 +29,7 @@ jest.mock("@/sections/MasonryGallerySection/MasonryGallerySection", () => {
 });
 
 // Mock ImagePreview
-jest.mock("@/components/ImagePreview", () => {
+jest.mock("@/frontend/components/ImagePreview", () => {
   function ImagePreviewMock({ src, alt }: any) {
     return <img data-testid="image-preview" src={src} alt={alt} />;
   }
@@ -37,7 +37,7 @@ jest.mock("@/components/ImagePreview", () => {
 });
 
 // Mock PhotoInfoCard
-jest.mock("@/components/cards/PhotoInfoCard", () => {
+jest.mock("@/frontend/components/cards/PhotoInfoCard", () => {
   function PhotoInfoCardMock({ title, description, ownerId }: any) {
     return (
       <div data-testid="photo-info-card">
@@ -117,7 +117,7 @@ describe("PhotoPage", () => {
     render(await PhotoPage({ params }));
 
     expect(
-      screen.getByText(/we thought you will like this/i)
+      screen.getByText(/we thought you will like this/i),
     ).toBeInTheDocument();
     expect(screen.getByTestId("masonry-gallery")).toBeInTheDocument();
   });
@@ -156,7 +156,7 @@ describe("PhotoPage", () => {
     render(await PhotoPage({ params }));
 
     expect(
-      screen.queryByRole("button", { name: /delete/i })
+      screen.queryByRole("button", { name: /delete/i }),
     ).not.toBeInTheDocument();
   });
 

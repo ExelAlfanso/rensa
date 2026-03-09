@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import Heading from "@/components/Heading";
-import AccentButton from "@/components/buttons/AccentButton";
-import ProfileRollFilterDropdown from "@/components/dropdowns/profile/ProfileRollFilterDropdown";
-import RollList, { Roll } from "@/components/lists/RollList";
-import { EditRollProvider } from "@/providers/EditRollProvider";
-import { useAuthStore } from "@/stores/useAuthStore";
-import { CreateRollProvider } from "@/providers/CreateRollProvider";
-import ShareButton from "@/components/buttons/ShareButton";
+import Heading from "@/frontend/components/Heading";
+import AccentButton from "@/frontend/components/buttons/AccentButton";
+import ProfileRollFilterDropdown from "@/frontend/components/dropdowns/profile/ProfileRollFilterDropdown";
+import RollList, { Roll } from "@/frontend/components/lists/RollList";
+import { EditRollProvider } from "@/frontend/providers/EditRollProvider";
+import { useAuthStore } from "@/frontend/stores/useAuthStore";
+import { CreateRollProvider } from "@/frontend/providers/CreateRollProvider";
+import ShareButton from "@/frontend/components/buttons/ShareButton";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchRollsByUserId } from "@/services/RollServices";
 
@@ -43,9 +43,9 @@ export default function ProfilePageClient({
       (oldRolls) => {
         if (!oldRolls) return [];
         return oldRolls.map((r) =>
-          r._id === roll.rollId ? { ...r, name: roll.name } : r
+          r._id === roll.rollId ? { ...r, name: roll.name } : r,
         );
-      }
+      },
     );
   };
   const handleRollDelete = (rollId: string) => {
@@ -54,7 +54,7 @@ export default function ProfilePageClient({
       (oldRolls) => {
         if (!oldRolls) return [];
         return oldRolls.filter((r) => r._id !== rollId);
-      }
+      },
     );
   };
 
@@ -73,7 +73,7 @@ export default function ProfilePageClient({
           },
           ...oldRolls,
         ];
-      }
+      },
     );
   };
   return (

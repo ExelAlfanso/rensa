@@ -1,5 +1,5 @@
 "use client";
-import ForestSection from "@/sections/ForestSection";
+import ForestSection from "@/frontend/sections/ForestSection";
 import { ReactNode } from "react";
 
 export default function AuthLayout({ children }: { children: ReactNode }) {

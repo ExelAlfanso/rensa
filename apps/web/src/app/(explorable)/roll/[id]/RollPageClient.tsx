@@ -1,9 +1,9 @@
 "use client";
-import RollPageDropdown from "@/components/dropdowns/rolls/RollPageDropdown";
-import Heading from "@/components/Heading";
-import { EditRollProvider } from "@/providers/EditRollProvider";
-import RollPageMasonryGallerySection from "@/sections/RollPageMasonryGallerySection/RollPageMasonryGallerySection";
-import { useAuthStore } from "@/stores/useAuthStore";
+import RollPageDropdown from "@/frontend/components/dropdowns/rolls/RollPageDropdown";
+import Heading from "@/frontend/components/Heading";
+import { EditRollProvider } from "@/frontend/providers/EditRollProvider";
+import RollPageMasonryGallerySection from "@/frontend/sections/RollPageMasonryGallerySection/RollPageMasonryGallerySection";
+import { useAuthStore } from "@/frontend/stores/useAuthStore";
 import { useState } from "react";
 
 interface RollPageClientProps {

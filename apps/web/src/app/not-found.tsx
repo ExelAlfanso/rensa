@@ -1,7 +1,7 @@
 "use client";
-import Footer from "@/components/footer/Footer";
-import Text from "@/components/Text";
-import IconButton from "@/components/buttons/IconButton";
+import Footer from "@/frontend/components/footer/Footer";
+import Text from "@/frontend/components/Text";
+import IconButton from "@/frontend/components/buttons/IconButton";
 import { ArrowRightIcon } from "@phosphor-icons/react";
 import Image from "next/image";
 import Link from "next/link";

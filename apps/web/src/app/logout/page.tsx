@@ -1,7 +1,7 @@
 "use client";
 
-import LoadingOverlay from "@/components/LoadingOverlay";
-import { useAuthStore } from "@/stores/useAuthStore";
+import LoadingOverlay from "@/frontend/components/LoadingOverlay";
+import { useAuthStore } from "@/frontend/stores/useAuthStore";
 import { signOut } from "next-auth/react";
 import { useEffect } from "react";
 
