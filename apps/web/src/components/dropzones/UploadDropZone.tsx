@@ -3,13 +3,19 @@ import React from "react";
 
 interface UploadDropZoneProps {
   handleBrowseClick: () => void;
-  handleDrop: (event: React.DragEvent<HTMLDivElement>) => void;
+  handleDrop: (
+    event: React.DragEvent<HTMLDivElement>,
+    sizeLimit: number,
+  ) => void;
   handleDragOver: (event: React.DragEvent<HTMLDivElement>) => void;
   handleDragLeave: (event: React.DragEvent<HTMLDivElement>) => void;
   isDragOver: boolean;
   isUploading: boolean;
   fileInputRef: React.RefObject<HTMLInputElement | null>;
-  handleFileChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleFileChange: (
+    event: React.ChangeEvent<HTMLInputElement>,
+    size: number,
+  ) => void;
   content?: React.ReactNode;
 }
 
@@ -27,7 +33,7 @@ const UploadDropZone: React.FC<UploadDropZoneProps> = ({
   return (
     <div
       onClick={handleBrowseClick}
-      onDrop={handleDrop}
+      onDrop={(e) => handleDrop(e, 20)}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       className={`flex flex-col items-center justify-center max-w-2xl mx-auto my-20 transition-all duration-300 border-2 border-dashed cursor-pointer px-10 md:px-15 lg:px-28 border-white-700 ${
@@ -38,7 +44,7 @@ const UploadDropZone: React.FC<UploadDropZoneProps> = ({
         ref={fileInputRef}
         type="file"
         accept="image/jpeg,.jpg,.jpeg"
-        onChange={handleFileChange}
+        onChange={(e) => handleFileChange(e, 20)}
         className="hidden"
       />
       <div className="flex items-center justify-center">

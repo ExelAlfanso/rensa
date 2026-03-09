@@ -17,10 +17,7 @@ import PrimaryButton from "@/components/buttons/PrimaryButton";
 import { uploadFormData } from "@/services/UploadServices";
 import { useExifDetection } from "@/hooks/useExifDetection";
 
-interface UploadSectionProps {
-  onFileSelect?: (file: File) => void;
-}
-const UploadSection: React.FC<UploadSectionProps> = ({ onFileSelect }) => {
+const UploadSection: React.FC = () => {
   const {
     photo,
     uploadedFile,
@@ -34,7 +31,7 @@ const UploadSection: React.FC<UploadSectionProps> = ({ onFileSelect }) => {
     handleDrop,
     handleFileChange,
     handleCancel,
-  } = useFileUpload(onFileSelect);
+  } = useFileUpload();
   const user = useAuthStore((state) => state.user);
   const { setLoading } = useLoading();
 

@@ -19,7 +19,10 @@ export async function GET(
     await connectDB();
     const user = await User.findById(id).select("username email avatar").lean();
     if (!user) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
+      return NextResponse.json(
+        { success: false, message: "User not found" },
+        { status: 404 },
+      );
     }
 
     return NextResponse.json(
@@ -35,7 +38,7 @@ export async function GET(
   } catch (error) {
     console.error("Error fetching user:", error);
     return NextResponse.json(
-      { message: "Internal Server Error" },
+      { success: false, message: "Internal Server Error" },
       { status: 500 },
     );
   }
@@ -47,7 +50,7 @@ export async function POST(req: Request) {
     return NextResponse.json(
       {
         success: false,
-        error: "Unauthorized. Please login to update profile.",
+        message: "Unauthorized. Please login to update profile.",
       },
       { status: 401 },
     );
@@ -65,7 +68,19 @@ export async function POST(req: Request) {
         { status: 404 },
       );
     }
+    if (user._id.toString() !== session.user.id) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized to update this profile" },
+        { status: 403 },
+      );
+    }
 
+    if (!username || !email) {
+      return NextResponse.json(
+        { success: false, message: "Username and email are required" },
+        { status: 400 },
+      );
+    }
     // Delete old avatar from Cloudinary if it exists
     try {
       const idx = user.avatar.indexOf("user_profile/");
@@ -118,12 +133,6 @@ export async function POST(req: Request) {
       return NextResponse.json(
         { success: false, message: "Failed to upload new avatar." },
         { status: 500 },
-      );
-    }
-    if (!username || !email) {
-      return NextResponse.json(
-        { success: false, message: "Username and email are required" },
-        { status: 400 },
       );
     }
 
