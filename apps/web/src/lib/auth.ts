@@ -4,7 +4,7 @@ import { connectDB } from "./mongodb";
 import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import { DefaultSession, DefaultUser } from "next-auth";
-// import jwt from "jsonwebtoken";
+import { SupabaseAdapter } from "@auth/supabase-adapter";
 
 declare module "next-auth" {
   interface Session {
@@ -24,6 +24,10 @@ declare module "next-auth" {
 }
 
 export const authOptions: NextAuthOptions = {
+  adapter: SupabaseAdapter({
+    url: process.env.SUPABASE_URL!,
+    secret: process.env.SUPABASE_ROLE_SERVICE_KEY!,
+  }),
   providers: [
     // GoogleProvider({
     //   clientId: process.env.GOOGLE_CLIENT_ID!,
