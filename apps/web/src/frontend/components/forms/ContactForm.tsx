@@ -79,10 +79,7 @@ export default function ContactForm() {
 	return (
 		<AuthFormLayout
 			button={
-				<PrimaryButton
-					className="my-7 h-[52px] w-full md:h-[62px]"
-					type="submit"
-				>
+				<PrimaryButton className="my-7 h-13 w-full md:h-15.5" type="submit">
 					Send Message
 				</PrimaryButton>
 			}

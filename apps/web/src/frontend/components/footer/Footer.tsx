@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { footerData } from "@/frontend/data/footerDatas";
+import { cn } from "@/utils/cn";
 import Logo from "../icons/Logo";
 import Text from "../Text";
 
@@ -26,9 +27,10 @@ const Footer = () => {
 						<div className="grid grid-cols-2 gap-y-4 text-[14px] lg:text-[18px]">
 							{footerData.map((navigation, idx) => (
 								<div
-									className={`flex flex-col ${
-										navigation.column === 1 ? "" : "ml-[2vw]"
-									}`}
+									className={cn(
+										"flex flex-col",
+										navigation.column !== 1 && "ml-[2vw]"
+									)}
 									key={idx}
 								>
 									<Link href={navigation.href}>

@@ -8,7 +8,7 @@ const CreateNewRollCard: React.FC = () => {
 	const { openCreator } = useCreateRoll();
 	return (
 		<button
-			className="group relative flex h-[290px] w-[170px] cursor-pointer items-center justify-center overflow-hidden rounded-2xl border border-gray-300 bg-white p-3 shadow-md transition-transform duration-200 hover:scale-[1.02] md:w-[265px]"
+			className="group relative flex h-72.5 w-42.5 cursor-pointer items-center justify-center overflow-hidden rounded-2xl border border-gray-300 bg-white p-3 shadow-md transition-transform duration-200 hover:scale-[1.02] md:w-66.25"
 			onClick={() => openCreator()}
 			type="button"
 		>

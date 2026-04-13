@@ -1,6 +1,7 @@
 import { CheckIcon } from "@phosphor-icons/react";
 import { motion } from "motion/react";
 import Image from "next/image";
+import { cn } from "@/utils/cn";
 import { rollDropdownItemVariants } from "../../animations/dropdownAnimations";
 import Text from "../../Text";
 
@@ -33,9 +34,10 @@ const RollDropdownItem: React.FC<RollDropdownItemProps> = ({
 	return (
 		<motion.li
 			animate="visible"
-			className={`cursor-pointer rounded-3xl transition-colors duration-100 ${
-				isSelected ? "bg-gray-200" : ""
-			} mx-3 my-2`}
+			className={cn(
+				"mx-3 my-2 cursor-pointer rounded-3xl transition-colors duration-100",
+				isSelected && "bg-gray-200"
+			)}
 			exit="exit"
 			initial="hidden"
 			key={roll._id}
@@ -62,9 +64,10 @@ const RollDropdownItem: React.FC<RollDropdownItemProps> = ({
 					</p>
 				</div>
 				<CheckIcon
-					className={`ml-auto text-black transition-opacity duration-150 ${
+					className={cn(
+						"ml-auto text-black transition-opacity duration-150",
 						isSelected ? "opacity-100" : "opacity-0"
-					}`}
+					)}
 					size={24}
 					weight="bold"
 				/>

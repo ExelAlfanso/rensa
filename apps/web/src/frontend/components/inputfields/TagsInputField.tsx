@@ -40,7 +40,7 @@ const TagsInputField: React.FC<TagsInputFieldProps> = ({
 				))}
 			</div>
 			<BaseInputField
-				className="flex-grow"
+				className="grow"
 				label={label}
 				onChange={(e) => setInputValue(e.target.value)}
 				onKeyDown={handleKeyDown}

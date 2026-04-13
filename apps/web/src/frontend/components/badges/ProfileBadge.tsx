@@ -1,4 +1,5 @@
 import type React from "react";
+import { cn } from "@/utils/cn";
 import ProfileIconButton from "../buttons/ProfileIconButton";
 
 interface ProfileBadgeProps {
@@ -19,7 +20,7 @@ const ProfileBadge: React.FC<ProfileBadgeProps> = ({
 	href,
 }) => {
 	return (
-		<span className={`inline-flex items-center gap-3 ${className}`}>
+		<span className={cn("inline-flex items-center gap-3", className)}>
 			<ProfileIconButton
 				alt={alt}
 				href={href}

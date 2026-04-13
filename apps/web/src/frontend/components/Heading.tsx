@@ -1,4 +1,5 @@
 import type React from "react";
+import { cn } from "@/utils/cn";
 
 interface HeadingProps {
 	alignment?: "left" | "center" | "right";
@@ -30,7 +31,12 @@ const Heading: React.FC<HeadingProps> = ({
 	};
 	return (
 		<div
-			className={`font-forum ${className} ${sizeClasses[size]} ${alignmentClasses[alignment]}`}
+			className={cn(
+				"font-forum",
+				sizeClasses[size],
+				alignmentClasses[alignment],
+				className
+			)}
 			id={id}
 		>
 			{children}

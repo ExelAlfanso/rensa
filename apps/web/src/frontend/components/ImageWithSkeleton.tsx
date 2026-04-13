@@ -1,6 +1,7 @@
 import Image, { type ImageProps } from "next/image";
 import type React from "react";
 import { useState } from "react";
+import { cn } from "@/utils/cn";
 
 interface ImageWithSkeletonProps {
 	image: Omit<ImageProps, "width" | "height"> & {
@@ -31,9 +32,10 @@ export const ImageWithSkeleton: React.FC<ImageWithSkeletonProps> = ({
 			<Image
 				{...image}
 				alt="pic"
-				className={`h-full w-full object-cover ${
+				className={cn(
+					"h-full w-full object-cover",
 					loaded ? "opacity-100" : "opacity-0"
-				}`}
+				)}
 				loading="lazy"
 				onLoad={() => {
 					// console.log("Image loaded:", image.src);

@@ -1,6 +1,7 @@
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { FlatCompat } from "@eslint/eslintrc";
+import tailwindCanonicalClasses from "eslint-plugin-tailwind-canonical-classes";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -19,6 +20,17 @@ const eslintConfig = [
 			"build/**",
 			"next-env.d.ts",
 		],
+	},
+	...tailwindCanonicalClasses.configs["flat/recommended"],
+	{
+		rules: {
+			"tailwind-canonical-classes/tailwind-canonical-classes": [
+				"warn",
+				{
+					cssPath: "./src/app/globals.css",
+				},
+			],
+		},
 	},
 ];
 

@@ -1,6 +1,7 @@
 "use client";
 
 import type React from "react";
+import { cn } from "@/utils/cn";
 
 interface SmallIconButtonProps {
 	children?: React.ReactNode;
@@ -22,7 +23,10 @@ const SmallIconButton: React.FC<SmallIconButtonProps> = ({
 	};
 	return (
 		<button
-			className={`${className} cursor-pointer rounded-full text-black transition-opacity duration-300 hover:bg-white-700`}
+			className={cn(
+				"cursor-pointer rounded-full text-black transition-opacity duration-300 hover:bg-white-700",
+				className
+			)}
 			disabled={disabled}
 			onClick={onClickHandler}
 			type="button"

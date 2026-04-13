@@ -6,6 +6,7 @@ import Link from "next/link";
 import type React from "react";
 import { useEditRoll } from "@/frontend/providers/EditRollProvider";
 import { useAuthStore } from "@/frontend/stores/useAuthStore";
+import { cn } from "@/utils/cn";
 import { formatDate } from "@/utils/date-formatter";
 import SmallIconButton from "../buttons/SmallIconButton";
 import Heading from "../Heading";
@@ -42,7 +43,7 @@ const RollCard: React.FC<RollCardProps> = ({
 	return (
 		<Link className="group" href={`/roll/${id}`}>
 			<div className="relative h-full w-42.5 cursor-pointer overflow-hidden rounded-2xl border border-gray-300 bg-white p-3 shadow-md transition-transform duration-200 hover:scale-[1.02] md:w-66.25">
-				<div className={`grid gap-2.5 ${previewGridCols}`}>
+				<div className={cn("grid gap-2.5", previewGridCols)}>
 					{previews.length < 1 && (
 						<div className="flex aspect-square max-h-37.5 w-full items-center justify-center rounded-lg bg-gray-200 md:max-h-50">
 							<span className="text-gray-500">No image</span>

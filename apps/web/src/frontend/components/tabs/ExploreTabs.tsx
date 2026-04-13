@@ -2,6 +2,7 @@
 
 import type React from "react";
 import { tabDatas } from "@/frontend/data/exploreDatas";
+import { cn } from "@/utils/cn";
 import "./ExploreTabs.css";
 interface ExploreTabsProps {
 	className?: string;
@@ -13,7 +14,7 @@ const ExploreTabs: React.FC<ExploreTabsProps> = ({
 	setActiveTab,
 }) => {
 	return (
-		<div className={`tabs tabs-border gap-5 ${className}`}>
+		<div className={cn("tabs tabs-border gap-5", className)}>
 			{tabDatas.map((tab, idx) => (
 				<input
 					aria-label={tab.label}

@@ -3,6 +3,7 @@
 import { CaretDownIcon } from "@phosphor-icons/react";
 import Image from "next/image";
 import { accountDropdownDatas } from "@/frontend/data/accountDropdownDatas";
+import { cn } from "@/utils/cn";
 import Text from "../Text";
 import DropdownItem from "./DropdownItem";
 import IconDropdown from "./IconDropdown";
@@ -51,9 +52,9 @@ const AccountDropdown = ({ src, user }: AccountDropdownProps) => {
 				<div className="my-2 w-[90%] border-white-700 border-t" />
 				{accountDropdownDatas.map((item, idx) => (
 					<DropdownItem
-						className={`${
-							idx === accountDropdownDatas.length - 1 ? "rounded-b-2xl" : ""
-						}`}
+						className={cn(
+							idx === accountDropdownDatas.length - 1 && "rounded-b-2xl"
+						)}
 						href={item.href}
 						key={idx}
 					>

@@ -1,4 +1,5 @@
 import type React from "react";
+import { cn } from "@/utils/cn";
 import Button, { type ButtonProps } from "./Button";
 
 const TertiaryButton: React.FC<ButtonProps> = ({
@@ -11,7 +12,10 @@ const TertiaryButton: React.FC<ButtonProps> = ({
 }) => {
 	return (
 		<Button
-			className={`btn-ghost border-1 border-primary text-primary hover:border-white-600 hover:bg-transparent hover:text-black-200 ${className}`}
+			className={cn(
+				"btn-ghost border border-primary text-primary hover:border-white-600 hover:bg-transparent hover:text-black-200",
+				className
+			)}
 			href={href}
 			id={id}
 			onClick={onClick}

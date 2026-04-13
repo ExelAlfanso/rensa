@@ -2,6 +2,7 @@ import { CaretDownIcon } from "@phosphor-icons/react";
 import type React from "react";
 import { useState } from "react";
 import { useOutsideClick } from "@/frontend/hooks/use-outside-click";
+import { cn } from "@/utils/cn";
 import Text from "../Text";
 
 interface InputDropdownProps {
@@ -36,18 +37,21 @@ const InputDropdown: React.FC<InputDropdownProps> = ({
 				</label>
 			)}
 			<button
-				className={`w-full bg-gray-200 px-4 py-2 text-left ${
+				className={cn(
+					"w-full cursor-pointer rounded-3xl bg-gray-200 px-4 py-2 text-left outline-0 ring-0 hover:bg-gray-300",
 					value ? "text-black" : "text-gray-800"
-				} cursor-pointer rounded-3xl outline-0 ring-0 hover:bg-gray-300`}
+				)}
 				onClick={() => setIsOpen((prev) => !prev)}
 			>
 				<Text size="m">{value || placeholder || "Select an option"}</Text>
 			</button>
 
 			<div
-				className={`absolute top-12 z-10 origin-top rounded-2xl border border-gray-500 bg-white-200 transition-transform duration-300 ${
-					isOpen ? "scale-y-100" : "scale-y-0"
-				} ${(values?.length ?? 0) > 6 ? "grid grid-cols-2" : "flex flex-col"}`}
+				className={cn(
+					"absolute top-12 z-10 origin-top rounded-2xl border border-gray-500 bg-white-200 transition-transform duration-300",
+					isOpen ? "scale-y-100" : "scale-y-0",
+					(values?.length ?? 0) > 6 ? "grid grid-cols-2" : "flex flex-col"
+				)}
 			>
 				{values?.map((val, index) => (
 					<button

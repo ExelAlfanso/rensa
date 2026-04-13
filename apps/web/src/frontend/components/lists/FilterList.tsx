@@ -1,6 +1,7 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 import { FilterLists } from "@/frontend/data/filterDatas";
+import { cn } from "@/utils/cn";
 import Text from "../Text";
 
 interface FilterListProps {
@@ -43,9 +44,10 @@ const FilterList: React.FC<FilterListProps> = ({
 							{list.title}
 						</Text>
 						<div
-							className={`grid ${
+							className={cn(
+								"grid",
 								list.column === 1 ? "grid-cols-1" : "grid-cols-2 gap-x-10"
-							}`}
+							)}
 						>
 							{list.items.map((item, idx) => {
 								const isActive = activeFilters.includes(
@@ -63,9 +65,10 @@ const FilterList: React.FC<FilterListProps> = ({
 											<span>{item.label}</span>
 											{/* underline animation */}
 											<span
-												className={`absolute bottom-0 left-0 h-[2px] w-full origin-left transform bg-orange-500 transition-transform duration-300 ${
+												className={cn(
+													"absolute bottom-0 left-0 h-0.5 w-full origin-left transform bg-orange-500 transition-transform duration-300",
 													isActive ? "scale-x-100" : "scale-x-0"
-												}`}
+												)}
 											/>
 										</button>
 									</div>

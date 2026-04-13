@@ -1,4 +1,5 @@
 import type React from "react";
+import { cn } from "@/utils/cn";
 
 interface LoadingOverlayProps {
 	className?: string;
@@ -8,7 +9,10 @@ interface LoadingOverlayProps {
 const LoadingOverlay: React.FC<LoadingOverlayProps> = ({ id, className }) => {
 	return (
 		<div
-			className={`fixed inset-0 z-50 flex items-center justify-center bg-white ${className}`}
+			className={cn(
+				"fixed inset-0 z-50 flex items-center justify-center bg-white",
+				className
+			)}
 		>
 			<div
 				className="loading loading-spinner loading-xl text-primary"

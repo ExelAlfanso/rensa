@@ -62,7 +62,7 @@ export const EditPhotoProvider: React.FC<EditPhotoProviderProps> = ({
 			{children}
 			{isOpen && (
 				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 text-black">
-					<div className="w-[380px] rounded-2xl bg-white p-6 shadow-xl">
+					<div className="w-95 rounded-2xl bg-white p-6 shadow-xl">
 						<h2 className="mb-4 font-bold text-xl">
 							Are you sure you want to delete this photo?
 						</h2>

@@ -2,6 +2,7 @@
 import type { FormEventHandler, ReactNode } from "react";
 import Logo from "@/frontend/components/icons/Logo";
 import { sanitizeInput } from "@/lib/validation";
+import { cn } from "@/utils/cn";
 
 interface AuthFormLayoutProps {
 	button: ReactNode; // Submit button (so you can pass your <Button />)
@@ -26,7 +27,10 @@ export default function AuthFormLayout({
 }: AuthFormLayoutProps) {
 	return (
 		<div
-			className={`flex w-[90%] flex-col items-center justify-center md:w-100 lg:w-112.5 xl:w-125 2xl:w-137.5 ${className}`}
+			className={cn(
+				"flex w-[90%] flex-col items-center justify-center md:w-100 lg:w-112.5 xl:w-125 2xl:w-137.5",
+				className
+			)}
 		>
 			<form className="mb-5 h-full w-full gap-16" onSubmit={onSubmit}>
 				<div className="flex flex-col items-center justify-center">

@@ -4,6 +4,7 @@ import Link from "next/link";
 import usePhotoRoll from "@/frontend/hooks/use-photo-roll";
 import { useAuthStore } from "@/frontend/stores/useAuthStore";
 import type { PopulatedPhoto } from "@/types/PopulatedPhoto";
+import { cn } from "@/utils/cn";
 import RollDropdown from "./dropdowns/rolls/RollDropdown";
 import { ImageWithSkeleton } from "./ImageWithSkeleton";
 import Text from "./Text";
@@ -44,9 +45,10 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
 		>
 			<Link className="block" href={id ? `/photo/${id}` : "#"} prefetch={false}>
 				<div
-					className={`group relative cursor-pointer overflow-hidden rounded-3xl transition-transform duration-300 ${
+					className={cn(
+						"group relative cursor-pointer overflow-hidden rounded-3xl transition-transform duration-300",
 						isDropdownOpen ? "scale-103" : "scale-100"
-					}`}
+					)}
 				>
 					<ImageWithSkeleton
 						image={{
@@ -58,15 +60,17 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
 					/>
 
 					<div
-						className={`pointer-events-none absolute inset-0 bg-black opacity-0 transition-opacity duration-300 group-hover:opacity-40 ${
+						className={cn(
+							"pointer-events-none absolute inset-0 bg-black opacity-0 transition-opacity duration-300 group-hover:opacity-40",
 							isDropdownOpen ? "opacity-40" : "opacity-0"
-						}`}
+						)}
 					/>
 
 					<div
-						className={`pointer-events-none opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${
+						className={cn(
+							"pointer-events-none opacity-0 transition-opacity duration-300 group-hover:opacity-100",
 							isDropdownOpen ? "opacity-100" : "opacity-0"
-						}`}
+						)}
 					>
 						<div className="pointer-events-auto absolute top-0 right-0 flex w-full justify-between p-4">
 							{user ? (
@@ -82,12 +86,12 @@ const PhotoCard: React.FC<PhotoCardProps> = ({
 									/>
 
 									<button
-										className={`pointer-events-auto z-20 flex h-[32px] w-[32px] cursor-pointer items-center justify-center rounded-full text-black transition-colors duration-200 hover:bg-white-700 ${
+										className={cn(
+											"pointer-events-auto z-20 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full text-black transition-colors duration-200 hover:bg-white-700",
 											isSaved
 												? "border-black bg-black text-white"
 												: "border-white bg-white text-black"
-										}
-             `}
+										)}
 										disabled={!selectedRoll || isLoading}
 										onClick={(e) => {
 											e.stopPropagation(); // Stops click from bubbling to parent container

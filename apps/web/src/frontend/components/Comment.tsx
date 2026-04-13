@@ -1,5 +1,6 @@
 import type React from "react";
 import Text from "@/frontend/components/Text";
+import { cn } from "@/utils/cn";
 import { formatTimeAgo } from "@/utils/date-formatter";
 import ProfileBadge from "./badges/ProfileBadge";
 
@@ -25,7 +26,7 @@ const Comment: React.FC<CommentProps> = ({
 	disableBorder = false,
 }) => {
 	return (
-		<div className={`${className} text-[13px]`} id={id}>
+		<div className={cn("text-[13px]", className)} id={id}>
 			<div className="flex flex-row items-center justify-between">
 				<ProfileBadge
 					avatarUrl={avatarUrl}

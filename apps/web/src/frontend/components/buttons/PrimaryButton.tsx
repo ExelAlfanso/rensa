@@ -1,4 +1,5 @@
 import type React from "react";
+import { cn } from "@/utils/cn";
 import Button, { type ButtonProps } from "./Button";
 
 const PrimaryButton: React.FC<ButtonProps> = ({
@@ -12,7 +13,10 @@ const PrimaryButton: React.FC<ButtonProps> = ({
 }) => {
 	return (
 		<Button
-			className={`bg-black-500 text-white hover:bg-black-300 focus:bg-black-400 disabled:bg-black-200 ${className}`}
+			className={cn(
+				"bg-black-500 text-white hover:bg-black-300 focus:bg-black-400 disabled:bg-black-200",
+				className
+			)}
 			disabled={disabled}
 			href={href}
 			id={id}

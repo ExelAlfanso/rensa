@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type React from "react";
+import { cn } from "@/utils/cn";
 
 export interface ButtonProps {
 	children?: React.ReactNode;
@@ -26,7 +27,11 @@ const Button: React.FC<ButtonProps> = ({
 		return (
 			<Link href={href}>
 				<div
-					className={`btn flex h-8 rounded-[50px] border-0 font-semibold text-[12px] outline-0 ring-0 md:h-12 md:text-[16px] ${className} px-${paddingX} gap-1}`}
+					className={cn(
+						"btn flex h-8 gap-1 rounded-[50px] border-0 font-semibold text-[12px] outline-0 ring-0 md:h-12 md:text-[16px]",
+						`px-${paddingX}`,
+						className
+					)}
 				>
 					{children}
 				</div>
@@ -35,7 +40,11 @@ const Button: React.FC<ButtonProps> = ({
 	}
 	return (
 		<button
-			className={`btn flex h-8 rounded-[50px] border-0 font-semibold text-[12px] outline-0 ring-0 md:h-12 md:text-[16px] ${className} px-${paddingX} gap-1`}
+			className={cn(
+				"btn flex h-8 gap-1 rounded-[50px] border-0 font-semibold text-[12px] outline-0 ring-0 md:h-12 md:text-[16px]",
+				`px-${paddingX}`,
+				className
+			)}
 			disabled={disabled}
 			id={id}
 			onClick={onClick}

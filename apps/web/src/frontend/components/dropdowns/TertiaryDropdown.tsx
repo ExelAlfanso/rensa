@@ -4,6 +4,7 @@ import { CaretDownIcon } from "@phosphor-icons/react";
 import type React from "react";
 import { useState } from "react";
 import { useOutsideClick } from "@/frontend/hooks/use-outside-click";
+import { cn } from "@/utils/cn";
 import TertiaryButton from "../buttons/TertiaryButton";
 import Text from "../Text";
 
@@ -34,7 +35,7 @@ const TertiaryDropdown: React.FC<TertiaryDropdownProps> = ({
 		setIsOpen(false);
 	};
 	return (
-		<div className={`relative ${className} text-primary`} ref={dropdownRef}>
+		<div className={cn("relative text-primary", className)} ref={dropdownRef}>
 			{label && (
 				<label className="mb-1 font-figtree font-medium text-[13px] text-black-200">
 					{label}
@@ -47,10 +48,11 @@ const TertiaryDropdown: React.FC<TertiaryDropdownProps> = ({
 				<Text size="m">{value || placeholder || "Select an option"}</Text>
 			</TertiaryButton>
 			<div
-				className={`absolute left-0 z-10 mt-2 w-full origin-top transform rounded-2xl border border-gray-300 bg-white shadow-md transition-transform duration-200 ease-out ${isOpen ? "scale-y-100" : "scale-y-0"}
-              ${
-								(values?.length ?? 0) > 6 ? "grid grid-cols-2" : "flex flex-col"
-							}`}
+				className={cn(
+					"absolute left-0 z-10 mt-2 w-full origin-top transform rounded-2xl border border-gray-300 bg-white shadow-md transition-transform duration-200 ease-out",
+					isOpen ? "scale-y-100" : "scale-y-0",
+					(values?.length ?? 0) > 6 ? "grid grid-cols-2" : "flex flex-col"
+				)}
 			>
 				{values?.map((val, index) => (
 					<button

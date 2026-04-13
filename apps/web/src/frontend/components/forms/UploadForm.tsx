@@ -47,7 +47,6 @@ const UploadForm: React.FC<UploadFormProps> = ({
 		if (photo) {
 			detectAndApplyExif();
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [photo, detectAndApplyExif]);
 	const handleBrandChange = (brand: CameraSettings["Brand"]) => {
 		setSelectedCamera(brand);

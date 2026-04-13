@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type React from "react";
+import { cn } from "@/utils/cn";
 
 interface ProfileButtonProps {
 	alt: string;
@@ -25,7 +26,10 @@ const ProfileButton: React.FC<ProfileButtonProps> = ({
 
 	return (
 		<Link
-			className={`relative ${sizeClasses[size]} cursor-pointer rounded-full transition-all duration-300 hover:opacity-50`}
+			className={cn(
+				"relative cursor-pointer rounded-full transition-all duration-300 hover:opacity-50",
+				sizeClasses[size]
+			)}
 			href={href || "#"}
 		>
 			<Image

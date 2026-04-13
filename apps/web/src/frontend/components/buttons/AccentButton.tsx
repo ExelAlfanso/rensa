@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type React from "react";
+import { cn } from "@/utils/cn";
 import type { ButtonProps } from "./Button";
 
 const AccentButton: React.FC<ButtonProps> = ({
@@ -11,18 +12,21 @@ const AccentButton: React.FC<ButtonProps> = ({
 	disabled,
 	type,
 }) => {
-	const baseClasses = `btn flex border-0 outline-0 ring-0 h-[29px] rounded-[10px] text-[12px] md:text-[16px] font-semibold ${className} px-3 p-0 bg-gray-100 hover:bg-gray-200 text-primary gap-1`;
+	const baseClasses = cn(
+		"btn flex h-[29px] gap-1 rounded-[10px] border-0 bg-gray-100 p-0 px-3 font-semibold text-[12px] text-primary outline-0 ring-0 hover:bg-gray-200 md:text-[16px]",
+		className
+	);
 
 	if (href && !disabled) {
 		return (
 			<Link href={href}>
-				<div className={`${baseClasses}`}>{children}</div>
+				<div className={baseClasses}>{children}</div>
 			</Link>
 		);
 	}
 	return (
 		<button
-			className={`${baseClasses} `}
+			className={baseClasses}
 			disabled={disabled}
 			id={id}
 			onClick={onClick}

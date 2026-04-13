@@ -1,4 +1,5 @@
 import type React from "react";
+import { cn } from "@/utils/cn";
 
 interface TextProps {
 	children?: React.ReactNode;
@@ -22,7 +23,7 @@ const Text: React.FC<TextProps> = ({
 		xxl: "text-[24px] md:text-[30px]",
 	};
 	return (
-		<div className={`font-figtree ${className} ${sizeClasses[size]}`} id={id}>
+		<div className={cn("font-figtree", sizeClasses[size], className)} id={id}>
 			{children}
 		</div>
 	);

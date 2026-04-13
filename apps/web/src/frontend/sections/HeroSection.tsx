@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { heroImagesData } from "@/frontend/data/homeDatas";
+import { cn } from "@/utils/cn";
 
 export default function HeroSection() {
 	return (
@@ -53,7 +54,7 @@ export default function HeroSection() {
 				{heroImagesData.map((data, i) => (
 					<motion.div
 						animate={{ opacity: 1, scale: 1, y: 0 }}
-						className={`absolute ${data.className} bg-gray-100`}
+						className={cn("absolute bg-gray-100", data.className)}
 						initial={{ opacity: 0, scale: 0.9, y: 30 }}
 						key={data.id}
 						transition={{

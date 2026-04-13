@@ -2,6 +2,7 @@
 import { CaretDownIcon } from "@phosphor-icons/react";
 
 import type React from "react";
+import { cn } from "@/utils/cn";
 
 interface CaretIconProps {
 	children?: React.ReactNode;
@@ -12,7 +13,10 @@ interface CaretIconProps {
 const CaretIcon: React.FC<CaretIconProps> = ({ id, className, children }) => {
 	return (
 		<div
-			className={`cursor-pointer transition-colors duration-300 hover:text-gray-800 ${className}`}
+			className={cn(
+				"cursor-pointer transition-colors duration-300 hover:text-gray-800",
+				className
+			)}
 			id={id}
 		>
 			<CaretDownIcon size={32} />

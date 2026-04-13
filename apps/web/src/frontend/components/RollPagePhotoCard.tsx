@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useToast } from "@/frontend/providers/ToastProvider";
 import { removePhotoFromRoll } from "@/frontend/services/roll.service";
 import type { PopulatedPhoto } from "@/types/PopulatedPhoto";
+import { cn } from "@/utils/cn";
 import SmallIconButton from "./buttons/SmallIconButton";
 import { ImageWithSkeleton } from "./ImageWithSkeleton";
 
@@ -70,9 +71,10 @@ const RollPagePhotoCard: React.FC<RollPagePhotoCardProps> = ({
 						<div className="pointer-events-none absolute inset-0 rounded-3xl opacity-0 transition-opacity duration-300 group-hover:opacity-100">
 							<div className="pointer-events-auto absolute top-3 right-3">
 								<SmallIconButton
-									className={`flex h-[32px] w-[32px] items-center justify-center rounded-full bg-white text-black transition-colors duration-200 hover:bg-gray-200 ${
-										isLoading ? "cursor-wait opacity-70" : ""
-									}`}
+									className={cn(
+										"flex h-8 w-8 items-center justify-center rounded-full bg-white text-black transition-colors duration-200 hover:bg-gray-200",
+										isLoading && "cursor-wait opacity-70"
+									)}
 									disabled={isLoading}
 									onClick={handleUnsaveClick}
 								>

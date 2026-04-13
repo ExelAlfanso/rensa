@@ -1,6 +1,7 @@
 "use client";
 
 import { useFileUpload } from "@/frontend/hooks/use-file-upload";
+import { cn } from "@/utils/cn";
 
 export default function ProfilePage() {
 	const {
@@ -21,9 +22,10 @@ export default function ProfilePage() {
 	return (
 		<div className="flex min-h-screen bg-white-200">
 			<div
-				className={`flex h-50 w-50 cursor-pointer flex-col items-center justify-center rounded-full border-white-700 border-dashed transition-all duration-300 ${
+				className={cn(
+					"flex h-50 w-50 cursor-pointer flex-col items-center justify-center rounded-full border-white-700 border-dashed transition-all duration-300",
 					isDragOver ? "bg-white-600" : "hover:bg-white-600"
-				} `}
+				)}
 				onClick={handleBrowseClick}
 				onDragLeave={handleDragLeave}
 				onDragOver={handleDragOver}

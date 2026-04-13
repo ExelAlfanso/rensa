@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type React from "react";
+import { cn } from "@/utils/cn";
 
 interface LogoProps {
 	className?: string;
@@ -20,7 +21,7 @@ const Logo: React.FC<LogoProps> = ({
 	};
 
 	return (
-		<Link className={`relative ${sizeClasses[size]} ${className}`} href="/home">
+		<Link className={cn("relative", sizeClasses[size], className)} href="/home">
 			<Image
 				alt="Logo"
 				className="aspect-square object-contain"

@@ -7,6 +7,7 @@ import Text from "@/frontend/components/Text";
 import useReadOnVisible from "@/frontend/hooks/use-read-on-visible";
 import { useNotificationContext } from "@/frontend/providers/NotificationProvider";
 import type { NotificationData } from "@/frontend/types/notification";
+import { cn } from "@/utils/cn";
 import Heading from "../../Heading";
 import DropdownItem from "../DropdownItem";
 import IconDropdown from "../IconDropdown";
@@ -31,7 +32,7 @@ const NotificationItem = ({ notification, isLast }: NotificationItemProps) => {
 
 	return (
 		<DropdownItem
-			className={`w-full ${isLast ? "rounded-b-2xl" : ""}`}
+			className={cn("w-full", isLast && "rounded-b-2xl")}
 			href={`/photo/${notification.photoId}`}
 			key={notification.id}
 			ref={ref}

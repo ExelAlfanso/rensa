@@ -1,4 +1,5 @@
 import type React from "react";
+import { cn } from "@/utils/cn";
 import Button, { type ButtonProps } from "./Button";
 
 const SecondaryButton: React.FC<ButtonProps> = ({
@@ -11,7 +12,10 @@ const SecondaryButton: React.FC<ButtonProps> = ({
 }) => {
 	return (
 		<Button
-			className={`btn-secondary text-white hover:bg-orange-300 focus:bg-orange-700 ${className}`}
+			className={cn(
+				"btn-secondary text-white hover:bg-orange-300 focus:bg-orange-700",
+				className
+			)}
 			href={href}
 			id={id}
 			onClick={onClick}

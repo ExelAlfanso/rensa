@@ -2,6 +2,7 @@ import { AnimatePresence } from "motion/react";
 import Masonry from "react-masonry-css";
 import RollPagePhotoCard from "@/frontend/components/RollPagePhotoCard";
 import type { PopulatedPhoto } from "@/types/PopulatedPhoto";
+import { cn } from "@/utils/cn";
 
 interface RollPageMasonryGalleryGridProps {
 	isOwner: boolean;
@@ -46,7 +47,7 @@ const RollPageMasonryGalleryGrid: React.FC<RollPageMasonryGalleryGridProps> = ({
 		<AnimatePresence mode="popLayout">
 			<Masonry
 				breakpointCols={breakpointColumnsObj}
-				className={`${masonryWidthClass} my-masonry-grid`}
+				className={cn(masonryWidthClass, "my-masonry-grid")}
 				columnClassName="my-masonry-grid_column"
 			>
 				{photos.map((photo) => {

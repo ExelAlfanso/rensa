@@ -10,6 +10,7 @@ import Footer from "@/frontend/components/footer/Footer";
 import HomeNavbar from "@/frontend/components/navbar/HomeNavbar";
 import { cardData } from "@/frontend/data/homeDatas";
 import HeroSection from "@/frontend/sections/HeroSection";
+import { cn } from "@/utils/cn";
 export default function HomeClient() {
 	const sectionRef = useRef<HTMLDivElement>(null);
 	const { scrollYProgress } = useScroll({
@@ -56,7 +57,7 @@ export default function HomeClient() {
 					<h2 className="pb-[4vh] text-center font-figtree font-medium text-[32px] text-black-500 md:text-4xl lg:text-5xl xl:text-left xl:text-7xl">
 						Get an <span className="font-forum">Idea</span>
 						<br />
-						<span className="ml-[16px] lg:text-right">of What You Should </span>
+						<span className="ml-4 lg:text-right">of What You Should </span>
 						<br />
 						<span className="font-forum">Shoot </span>
 						Tomorrow
@@ -80,7 +81,10 @@ export default function HomeClient() {
 					<div className="sticky top-0 left-0 flex h-screen w-full flex-col items-center justify-center overflow-hidden">
 						{cardData.map((card, index) => (
 							<motion.div
-								className={`${card.position} overflow-hidden rounded-lg bg-gray-100`}
+								className={cn(
+									"overflow-hidden rounded-lg bg-gray-100",
+									card.position
+								)}
 								key={card.id}
 								style={{ y: motions[index] }}
 							>

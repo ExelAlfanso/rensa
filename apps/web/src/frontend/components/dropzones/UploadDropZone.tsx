@@ -1,5 +1,6 @@
 import { PanoramaIcon } from "@phosphor-icons/react";
 import type React from "react";
+import { cn } from "@/utils/cn";
 
 interface UploadDropZoneProps {
 	content?: React.ReactNode;
@@ -32,9 +33,10 @@ const UploadDropZone: React.FC<UploadDropZoneProps> = ({
 }) => {
 	return (
 		<div
-			className={`mx-auto my-20 flex max-w-2xl cursor-pointer flex-col items-center justify-center border-2 border-white-700 border-dashed px-10 transition-all duration-300 md:px-15 lg:px-28 ${
+			className={cn(
+				"mx-auto my-20 flex h-96 max-w-2xl cursor-pointer flex-col items-center justify-center rounded-3xl border-2 border-white-700 border-dashed px-10 transition-all duration-300 md:px-15 lg:px-28",
 				isDragOver ? "bg-white-600" : "hover:bg-white-600"
-			} h-96 rounded-3xl`}
+			)}
 			onClick={handleBrowseClick}
 			onDragLeave={handleDragLeave}
 			onDragOver={handleDragOver}

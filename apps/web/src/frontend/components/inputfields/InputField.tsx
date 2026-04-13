@@ -1,5 +1,6 @@
 "use client";
 import type React from "react";
+import { cn } from "@/utils/cn";
 import Text from "../Text";
 
 // import "./InputField.css";
@@ -54,7 +55,7 @@ const InputField: React.FC<InputFieldProps> = ({
 			)}
 			{!Icon && type !== "textarea" && (
 				<input
-					className={` ${defaultStyling} ${sizeClasses[size]} ${className}`}
+					className={cn(defaultStyling, sizeClasses[size], className)}
 					disabled={disabled}
 					name={name}
 					onChange={onChange}
@@ -67,7 +68,7 @@ const InputField: React.FC<InputFieldProps> = ({
 
 			{type === "textarea" && (
 				<textarea
-					className={`${defaultStyling} ${sizeClasses[size]} ${className}`}
+					className={cn(defaultStyling, sizeClasses[size], className)}
 					disabled={disabled}
 					name={name}
 					onChange={onChange}
@@ -80,9 +81,12 @@ const InputField: React.FC<InputFieldProps> = ({
 			{Icon && (
 				<div className="relative flex items-center">
 					<input
-						className={` ${defaultStyling} ${
-							iconPosition === "left" ? "pl-11" : "pl-6"
-						} pr-4 ${sizeClasses[size]} ${className}`}
+						className={cn(
+							defaultStyling,
+							iconPosition === "left" ? "pl-11" : "pl-6",
+							sizeClasses[size],
+							className
+						)}
 						disabled={disabled}
 						name={name}
 						onChange={onChange}
@@ -92,9 +96,10 @@ const InputField: React.FC<InputFieldProps> = ({
 						value={value as string | number | undefined}
 					/>
 					<div
-						className={`absolute inset-y-0 ${
+						className={cn(
+							"absolute inset-y-0 flex cursor-pointer items-center text-black",
 							iconPosition === "left" ? "left-0 pl-5" : "right-0 pr-5"
-						} flex cursor-pointer items-center text-black`}
+						)}
 					>
 						<Icon size={20} />
 					</div>

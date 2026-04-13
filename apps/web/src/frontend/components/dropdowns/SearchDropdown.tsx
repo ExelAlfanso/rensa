@@ -4,6 +4,7 @@ import { CaretDownIcon } from "@phosphor-icons/react";
 import type React from "react";
 import { useState } from "react";
 import { useOutsideClick } from "@/frontend/hooks/use-outside-click";
+import { cn } from "@/utils/cn";
 import Text from "../Text";
 
 interface SearchDropdownProps {
@@ -50,17 +51,19 @@ export const SearchDropdown: React.FC<SearchDropdownProps> = ({
 
 			{filteredModels.length > 0 && (
 				<div
-					className={`absolute top-15 z-10 origin-top rounded-2xl border border-gray-500 bg-white-200 transition-transform duration-300 ${
+					className={cn(
+						"absolute top-15 z-10 origin-top rounded-2xl border border-gray-500 bg-white-200 transition-transform duration-300",
 						isOpen ? "scale-y-100" : "scale-y-0"
-					}`}
+					)}
 				>
 					{/* Scrollable wrapper */}
 					<div
-						className={`${
+						className={cn(
+							"max-h-60 overflow-y-auto",
 							(filteredModels?.length ?? 0) > 6
 								? "grid grid-cols-2"
 								: "flex flex-col"
-						} max-h-60 overflow-y-auto`}
+						)}
 					>
 						{filteredModels.map((model) => (
 							<button

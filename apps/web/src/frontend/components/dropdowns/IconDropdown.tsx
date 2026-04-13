@@ -3,6 +3,7 @@
 import type React from "react";
 import { useState } from "react";
 import { useOutsideClick } from "@/frontend/hooks/use-outside-click";
+import { cn } from "@/utils/cn";
 
 interface IconDropdownProps {
 	children?: React.ReactNode;
@@ -65,13 +66,14 @@ const IconDropdown: React.FC<IconDropdownProps> = ({
 			)}
 			{open && (
 				<ul
-					className={`absolute top-10 mt-2 flex w-90 origin-top transform flex-col items-center rounded-2xl bg-white-200 p-0 shadow-lg transition-all duration-200 ease-out md:top-13 ${positionClasses[position]} ${className}
-          ${
+					className={cn(
+						"absolute top-10 mt-2 flex w-90 origin-top transform flex-col items-center rounded-2xl bg-white-200 p-0 shadow-lg transition-all duration-200 ease-out md:top-13",
+						positionClasses[position],
+						className,
 						open
 							? "translate-y-0 scale-100 opacity-100"
 							: "pointer-events-none -translate-y-2 scale-95 opacity-0"
-					}
-        `}
+					)}
 					onClickCapture={handleItemClick}
 				>
 					{children}

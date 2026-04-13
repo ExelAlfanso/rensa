@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { cn } from "@/utils/cn";
 
 interface CarouselSlideProps {
 	children: React.ReactNode;
@@ -24,7 +25,10 @@ const CarouselSlide: React.FC<CarouselSlideProps> = ({
 
 	return (
 		<div
-			className={`carousel-item relative h-[20vh] w-full lg:h-full ${className}`}
+			className={cn(
+				"carousel-item relative h-[20vh] w-full lg:h-full",
+				className
+			)}
 			id={id}
 		>
 			<div className="absolute inset-0 overflow-hidden">

@@ -15,7 +15,7 @@ import {
 	type Photo,
 } from "@/frontend/services/photo.service";
 import type { PopulatedPhoto } from "@/types/PopulatedPhoto";
-import RollPageMasonryGalleryGrid from "./RollPageMasonryGalleryGrid";
+import RollPageMasonryGalleryGrid from "./RollPageMasonryGallerySection/RollPageMasonryGalleryGrid";
 
 interface RollPageMasonryGallerySectionProps {
 	activeTab?: string;

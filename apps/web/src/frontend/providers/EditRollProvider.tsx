@@ -6,6 +6,7 @@ import Button from "@/frontend/components/buttons/Button";
 import PrimaryButton from "@/frontend/components/buttons/PrimaryButton";
 import TertiaryButton from "@/frontend/components/buttons/TertiaryButton";
 import { api } from "@/lib/axios-client";
+import { cn } from "@/utils/cn";
 import { useToast } from "./ToastProvider";
 
 interface EditRollState {
@@ -118,7 +119,7 @@ export const EditRollProvider = ({
 
 			{isOpen && roll && (
 				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 text-black">
-					<div className="w-[380px] rounded-2xl bg-white p-6 shadow-xl">
+					<div className="w-95 rounded-2xl bg-white p-6 shadow-xl">
 						{isDeleting ? (
 							<>
 								<h2 className="mb-4 font-semibold text-xl">
@@ -157,9 +158,10 @@ export const EditRollProvider = ({
 									value={name}
 								/>
 								<div
-									className={`${
+									className={cn(
+										"mt-5 flex gap-2",
 										type === "default" ? "justify-between" : "justify-end"
-									} mt-5 flex gap-2`}
+									)}
 								>
 									{type === "default" && (
 										<Button

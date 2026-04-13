@@ -111,7 +111,6 @@ const RollDropdown: React.FC<RollDropdownProps> = ({
 		return () => {
 			window.removeEventListener("resize", handleResize);
 		};
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [setIsOpen]);
 
 	useEffect(() => {
@@ -160,7 +159,7 @@ const RollDropdown: React.FC<RollDropdownProps> = ({
 
 	const dropdownContent = (
 		<div
-			className="item-start flex w-[200px] origin-top transform flex-col justify-center gap-4 rounded-2xl border border-gray-400 bg-white py-4 text-primary shadow-lg ease-out md:w-[328px]"
+			className="item-start flex w-50 origin-top transform flex-col justify-center gap-4 rounded-2xl border border-gray-400 bg-white py-4 text-primary shadow-lg ease-out md:w-82"
 			onClick={(e) => e.stopPropagation()}
 			ref={dropdownRef}
 			style={{
@@ -178,7 +177,7 @@ const RollDropdown: React.FC<RollDropdownProps> = ({
 				Rolls
 			</Heading>
 
-			<SearchInputField className="ml-2 w-[178px] md:w-[309px]" />
+			<SearchInputField className="ml-2 w-44.5 md:w-77.25" />
 
 			<ul className="max-h-60 w-full overflow-y-auto" ref={listRef}>
 				{isLoading ? (

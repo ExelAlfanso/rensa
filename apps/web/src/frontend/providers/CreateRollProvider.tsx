@@ -75,7 +75,7 @@ export const CreateRollProvider = ({
 
 			{isOpen && (
 				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 text-black">
-					<div className="w-[380px] rounded-2xl bg-white p-6 shadow-xl">
+					<div className="w-95 rounded-2xl bg-white p-6 shadow-xl">
 						<h2 className="mb-4 font-semibold text-xl">Create New Roll</h2>
 
 						<label className="font-medium text-sm">Roll Name</label>

@@ -101,7 +101,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ id }) => {
 							</Comment>
 							{hasMore && idx === comments.length - 1 && (
 								<div
-									className="absolute bottom-0 left-0 flex h-5 w-full cursor-pointer items-center justify-center bg-gradient-to-t from-white/95 via-white/60 to-transparent backdrop-blur-[1px]"
+									className="absolute bottom-0 left-0 flex h-5 w-full cursor-pointer items-center justify-center bg-linear-to-t from-white/95 via-white/60 to-transparent backdrop-blur-[1px]"
 									onClick={() => !loading && fetchMoreComments(id!)}
 								>
 									{loading ? (

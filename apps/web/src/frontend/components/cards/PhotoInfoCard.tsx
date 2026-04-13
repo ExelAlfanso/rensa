@@ -9,6 +9,7 @@ import CommentSection from "@/frontend/sections/CommentSection";
 import { fetchProfile } from "@/frontend/services/profile.service";
 import { useAuthStore } from "@/frontend/stores/useAuthStore";
 import type { PhotoMetadata } from "@/frontend/types/photo";
+import { cn } from "@/utils/cn";
 import { formatDate } from "@/utils/date-formatter";
 import ProfileBadge from "../badges/ProfileBadge";
 import PrimaryButton from "../buttons/PrimaryButton";
@@ -58,7 +59,10 @@ const PhotoInfoCard: React.FC<PhotoInfoCardProps> = ({
 
 	return (
 		<div
-			className={`flex flex-col gap-1.5 bg-white-200 ${className} w-full rounded-3xl p-10 text-primary shadow-lg lg:max-w-3xl xl:w-[40%]`}
+			className={cn(
+				"flex w-full flex-col gap-1.5 rounded-3xl bg-white-200 p-10 text-primary shadow-lg lg:max-w-3xl xl:w-[40%]",
+				className
+			)}
 			id={id}
 		>
 			{user?.id && (
@@ -98,9 +102,7 @@ const PhotoInfoCard: React.FC<PhotoInfoCardProps> = ({
 					href={`/profile/${ownerId}`}
 					username={profile?.username || "loading..."}
 				/>
-				<p className="max-w-[350px] text-[16px] text-black-200">
-					{description}
-				</p>
+				<p className="max-w-87.5 text-[16px] text-black-200">{description}</p>
 			</div>
 			<div>
 				<RecipeList metadata={metadata} />

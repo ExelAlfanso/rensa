@@ -8,6 +8,7 @@ import { NotificationProvider } from "@/frontend/providers/NotificationProvider"
 import QueryProvider from "@/frontend/providers/QueryProvider";
 import SessionProviderWrapper from "@/frontend/providers/SessionProviderWrapper";
 import { ToastProvider } from "@/frontend/providers/ToastProvider";
+import { cn } from "@/utils/cn";
 
 const forum = Forum({
 	subsets: ["latin"],
@@ -93,7 +94,7 @@ export default function RootLayout({
 			<head>
 				<SchemaMarkup />
 			</head>
-			<body className={`antialiased ${forum.variable} ${figtree.variable}`}>
+			<body className={cn("antialiased", forum.variable, figtree.variable)}>
 				<ToastProvider>
 					<QueryProvider>
 						<SessionProviderWrapper>

@@ -86,7 +86,7 @@ export default function ProfilePageClient({
 				onRollUpdate={handleRollUpdate}
 			>
 				<div className="flex min-h-screen w-full flex-col items-center justify-center bg-white">
-					<div className="relative h-[131px] w-[131px] overflow-hidden rounded-full">
+					<div className="relative h-32.75 w-32.75 overflow-hidden rounded-full">
 						<Image
 							alt={profileData.user?.username || "User Avatar"}
 							className="h-full w-full object-cover"
