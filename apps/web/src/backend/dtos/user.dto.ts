@@ -1,18 +1,16 @@
 import { z } from "zod";
+import { uuidDto } from "./common.dto";
 
 export const userResponseDto = z.object({
-	user_id: z.string(),
-	email: z.string(),
+	user_id: uuidDto,
+	email: z.email(),
 	username: z.string(),
+	avatar: z.string().default(""),
+	bookmarks: z.array(uuidDto).default([]),
 	role: z.enum(["user", "admin"]),
-	created_at: z.string(),
-	updated_at: z.string(),
-});
-
-export const userCreateDto = userResponseDto.omit({
-	user_id: true,
-	created_at: true,
-	updated_at: true,
+	verified: z.boolean().default(false),
+	createdAt: z.string().optional(),
+	updatedAt: z.string().optional(),
 });
 
 export const userUpdateDto = userResponseDto
@@ -20,22 +18,31 @@ export const userUpdateDto = userResponseDto
 		user_id: true,
 		email: true,
 		role: true,
-		created_at: true,
-		updated_at: true,
+		bookmarks: true,
+		verified: true,
+		createdAt: true,
+		updatedAt: true,
 	})
 	.partial();
 
 export const userLoginDto = z.object({
-	email: z.string(),
-	password: z.string(),
+	email: z.email(),
+	password: z.string().min(1),
 });
+
 export const userRegisterDto = z.object({
-	email: z.string(),
-	username: z.string(),
-	password: z.string(),
-	confirmPassword: z.string(),
+	email: z.email(),
+	username: z.string().min(1),
+	password: z.string().min(8),
 });
-export type UserCreateDto = z.infer<typeof userCreateDto>;
+
+export const userIdParamDto = z.object({
+	id: uuidDto,
+});
+
+export type UserWithPasswordResponseDto = z.infer<typeof userResponseDto> & {
+	password: string;
+};
 export type UserUpdateDto = z.infer<typeof userUpdateDto>;
 export type UserResponseDto = z.infer<typeof userResponseDto>;
 export type UserLoginDto = z.infer<typeof userLoginDto>;

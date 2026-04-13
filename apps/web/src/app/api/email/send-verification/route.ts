@@ -1,35 +1,35 @@
-﻿import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
+import { sendVerificationEmail } from "@/frontend/services/email.service";
 import { verificationEmailLimiter } from "@/lib/rateLimiter";
-import { sendVerificationEmail } from "@/services/EmailServices";
 
 export async function POST(req: NextRequest) {
-  const { email } = await req.json();
-  if (!email) {
-    return NextResponse.json({ message: "Email is required" }, { status: 400 });
-  }
+	const { email } = await req.json();
+	if (!email) {
+		return NextResponse.json({ message: "Email is required" }, { status: 400 });
+	}
 
-  const rateLimitResult = await verificationEmailLimiter.limit(email);
-  if (!rateLimitResult.success) {
-    return NextResponse.json(
-      {
-        message: "Too many verification requests. Please try again later.",
-      },
-      { status: 429 },
-    );
-  }
+	const rateLimitResult = await verificationEmailLimiter.limit(email);
+	if (!rateLimitResult.success) {
+		return NextResponse.json(
+			{
+				message: "Too many verification requests. Please try again later.",
+			},
+			{ status: 429 }
+		);
+	}
 
-  try {
-    await sendVerificationEmail(email);
+	try {
+		await sendVerificationEmail(email);
 
-    return NextResponse.json(
-      { success: true, message: "Verification email sent" },
-      { status: 200 },
-    );
-  } catch (err) {
-    console.error("Error sending verification email:", err);
-    return NextResponse.json(
-      { success: false, message: "Failed to send verification email" },
-      { status: 500 },
-    );
-  }
+		return NextResponse.json(
+			{ success: true, message: "Verification email sent" },
+			{ status: 200 }
+		);
+	} catch (err) {
+		console.error("Error sending verification email:", err);
+		return NextResponse.json(
+			{ success: false, message: "Failed to send verification email" },
+			{ status: 500 }
+		);
+	}
 }

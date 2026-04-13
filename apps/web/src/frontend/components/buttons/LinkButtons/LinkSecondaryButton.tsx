@@ -1,16 +1,16 @@
 import SecondaryButton from "../SecondaryButton";
-import { LinkButtonProps } from "./LinkPrimaryButton";
+import type { LinkButtonProps } from "./LinkPrimaryButton";
 
 const LinkSecondaryButton: React.FC<LinkButtonProps> = ({
-  href,
-  className,
-  children,
+	href,
+	className,
+	children,
 }) => {
-  return (
-    <SecondaryButton href={href} className={className}>
-      {children}
-    </SecondaryButton>
-  );
+	return (
+		<SecondaryButton className={className} href={href}>
+			{children}
+		</SecondaryButton>
+	);
 };
 
 export default LinkSecondaryButton;

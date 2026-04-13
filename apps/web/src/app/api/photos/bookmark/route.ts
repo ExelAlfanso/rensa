@@ -1,68 +1,57 @@
-import { connectDB } from "@/lib/mongodb";
-import Photo from "@/models/Photo";
-import User from "@/models/User";
 import { NextResponse } from "next/server";
+import { ZodError } from "zod";
+import { BackendError } from "@/backend/common/backend.error";
+import { photoDomain } from "@/backend/domains/photos/module";
+import { photoBookmarkQueryDto } from "@/backend/dtos/photo.dto";
 
 /*
-  GET /api/photos/bookmark?page=1&limit=10
-  Fetch paginated bookmarked photos for a user
+  GET /api/photos/bookmark?page=1&limit=10&userId=...
 */
-
 export async function GET(req: Request) {
-  await connectDB();
-  try {
-    const { searchParams } = new URL(req.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
-    const skip = (page - 1) * limit;
+	try {
+		const { searchParams } = new URL(req.url);
+		const query = photoBookmarkQueryDto.parse({
+			userId: searchParams.get("userId") ?? undefined,
+			page: searchParams.get("page") ?? undefined,
+			limit: searchParams.get("limit") ?? undefined,
+		});
 
-    const userId = searchParams.get("userId");
-    if (!userId) {
-      return NextResponse.json(
-        { success: false, message: "User ID is required" },
-        { status: 400 }
-      );
-    }
-    const user = await User.findById(userId);
-    if (!user) {
-      return NextResponse.json(
-        { success: false, message: "User not found" },
-        { status: 404 }
-      );
-    }
+		const result = await photoDomain.photosApplication.listBookmarkedByUser(
+			query.userId,
+			query.page,
+			query.limit
+		);
 
-    const [photos, total] = await Promise.all([
-      Photo.find({ _id: { $in: user!.bookmarks } })
-        .select("url")
-        .populate("userId", "username avatar")
-        .skip(skip)
-        .limit(limit),
-      Photo.countDocuments({ _id: { $in: user!.bookmarks } }),
-    ]);
+		return NextResponse.json(result);
+	} catch (error) {
+		if (error instanceof ZodError) {
+			return NextResponse.json(
+				{
+					success: false,
+					message: "Validation failed",
+					details: error.flatten(),
+				},
+				{ status: 400 }
+			);
+		}
 
-    const totalPages = Math.ceil(total / limit);
-    const hasMore = page < totalPages;
-    if (!photos) {
-      return NextResponse.json(
-        { success: false, message: "No bookmarked photos found" },
-        { status: 404 }
-      );
-    }
-    return NextResponse.json({
-      photos,
-      currentPage: page,
-      totalPages,
-      hasMore,
-      total,
-    });
-  } catch (err) {
-    console.error("Error fetching photos:", err);
-    return NextResponse.json(
-      {
-        error: "Failed to fetch photos",
-        details: err instanceof Error ? err.message : "Unknown error",
-      },
-      { status: 500 }
-    );
-  }
+		if (error instanceof BackendError) {
+			return NextResponse.json(
+				{
+					success: false,
+					message: error.message,
+					code: error.code,
+				},
+				{ status: error.statusCode }
+			);
+		}
+
+		return NextResponse.json(
+			{
+				error: "Failed to fetch photos",
+				details: error instanceof Error ? error.message : "Unknown error",
+			},
+			{ status: 500 }
+		);
+	}
 }

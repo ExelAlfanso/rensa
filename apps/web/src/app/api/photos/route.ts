@@ -1,82 +1,51 @@
-import { connectDB } from "@/lib/mongodb";
-import Photo, { PhotoDocument } from "@/models/Photo";
-import { FilterQuery, SortOrder } from "mongoose";
 import { NextResponse } from "next/server";
-import { validateCloudinaryUrl } from "@/lib/cloudinary";
+import { ZodError } from "zod";
+import { BackendError } from "@/backend/common/backend.error";
+import { photoDomain } from "@/backend/domains/photos/module";
+import { listPhotosQueryDto } from "@/backend/dtos/photo.dto";
 
 /*
-  GET /api/photos?page=1&limit=10&filters=tag1,tag2&sort=recent||popular
-  Fetch paginated photos with optional filters
+  GET /api/photos?page=1&limit=10&filters=tag1,tag2&sort=recent|popular
 */
-
 export async function GET(req: Request) {
-  await connectDB();
-  const { searchParams } = new URL(req.url);
+	try {
+		const { searchParams } = new URL(req.url);
+		const query = listPhotosQueryDto.parse({
+			page: searchParams.get("page") ?? undefined,
+			limit: searchParams.get("limit") ?? undefined,
+			sort: searchParams.get("sort") ?? undefined,
+			filters: searchParams.get("filters") ?? undefined,
+		});
 
-  const page = parseInt(searchParams.get("page") || "1");
-  const limit = parseInt(searchParams.get("limit") || "10");
+		const result = await photoDomain.photosApplication.list(query);
+		return NextResponse.json(result);
+	} catch (error) {
+		if (error instanceof ZodError) {
+			return NextResponse.json(
+				{
+					error: "Invalid request",
+					details: error.flatten(),
+				},
+				{ status: 400 }
+			);
+		}
 
-  const sortField = searchParams.get("sort") || "recent";
+		if (error instanceof BackendError) {
+			return NextResponse.json(
+				{
+					error: error.message,
+					code: error.code,
+				},
+				{ status: error.statusCode }
+			);
+		}
 
-  const sortOptions: Record<string, SortOrder> =
-    sortField === "popular"
-      ? { bookmarks: -1, createdAt: -1 }
-      : { createdAt: -1 };
-
-  const filtersParam = searchParams.get("filters") || "";
-  const filters = filtersParam ? filtersParam.split(",") : [];
-  const filter: FilterQuery<PhotoDocument> =
-    filters.length > 0
-      ? {
-          $or: [
-            { tags: { $in: filters } },
-            { category: { $in: filters } },
-            { color: { $in: filters } },
-            { style: { $in: filters } },
-          ],
-        }
-      : {};
-
-  try {
-    const skip = (page - 1) * limit;
-
-    const [photos, total] = await Promise.all([
-      Photo.find(filter)
-        .sort(sortOptions)
-        .skip(skip)
-        .limit(limit)
-        .populate("userId", "username avatar")
-        .lean(),
-      Photo.countDocuments(filter),
-    ]);
-
-    // 🔒 SECURITY: Filter out photos with invalid URLs
-    const validPhotos = photos.filter((photo) => {
-      if (!photo.url || !validateCloudinaryUrl(photo.url)) {
-        console.warn(`⚠️ Filtered out photo with suspicious URL: ${photo._id}`);
-        return false;
-      }
-      return true;
-    });
-
-    const totalPages = Math.ceil(total / limit);
-    const hasMore = page < totalPages;
-
-    return NextResponse.json({
-      photos: validPhotos,
-      currentPage: page,
-      totalPages,
-      hasMore,
-      total,
-    });
-  } catch (err) {
-    console.error("Error fetching photos:", err);
-    return NextResponse.json(
-      {
-        error: "Failed to fetch photos",
-        details: err instanceof Error ? err.message : "Unknown error",
-      },
-      { status: 500 }
-    );
-  }
+		return NextResponse.json(
+			{
+				error: "Failed to fetch photos",
+				details: error instanceof Error ? error.message : "Unknown error",
+			},
+			{ status: 500 }
+		);
+	}
 }

@@ -1,54 +1,54 @@
 "use client";
 
-import { useFileUpload } from "@/frontend/hooks/useFileUpload";
+import { useFileUpload } from "@/frontend/hooks/use-file-upload";
 
 export default function ProfilePage() {
-  const {
-    photo,
-    uploadedFile,
-    isUploading,
-    isDragOver,
-    message,
-    fileInputRef,
-    handleDragOver,
-    handleDragLeave,
-    handleBrowseClick,
-    handleDrop,
-    handleFileChange,
-    handleCancel,
-  } = useFileUpload();
+	const {
+		photo,
+		uploadedFile,
+		isUploading,
+		isDragOver,
+		message,
+		fileInputRef,
+		handleDragOver,
+		handleDragLeave,
+		handleBrowseClick,
+		handleDrop,
+		handleFileChange,
+		handleCancel,
+	} = useFileUpload();
 
-  return (
-    <div className="min-h-screen bg-white-200 flex">
-      <div
-        onClick={handleBrowseClick}
-        onDrop={(e) => handleDrop(e, 20)}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        className={`flex flex-col items-center justify-center transition-all w-50 h-50 duration-300 rounded-full border-dashed cursor-pointer border-white-700 ${
-          isDragOver ? "bg-white-600" : "hover:bg-white-600"
-        } `}
-      >
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/jpeg,.jpg,.jpeg"
-          onChange={(e) => handleFileChange(e, 20)}
-          className="hidden"
-        />
-        <div className="flex items-center justify-center">
-          {isUploading && (
-            <div className="mb-6 bg-gray-700 loading loading-spinner loading-xl"></div>
-          )}
-          {photo && !isUploading && (
-            <img
-              src={photo}
-              alt="Uploaded"
-              className="w-50 h-50 object-cover rounded-full"
-            />
-          )}
-        </div>
-      </div>
-    </div>
-  );
+	return (
+		<div className="flex min-h-screen bg-white-200">
+			<div
+				className={`flex h-50 w-50 cursor-pointer flex-col items-center justify-center rounded-full border-white-700 border-dashed transition-all duration-300 ${
+					isDragOver ? "bg-white-600" : "hover:bg-white-600"
+				} `}
+				onClick={handleBrowseClick}
+				onDragLeave={handleDragLeave}
+				onDragOver={handleDragOver}
+				onDrop={(e) => handleDrop(e, 20)}
+			>
+				<input
+					accept="image/jpeg,.jpg,.jpeg"
+					className="hidden"
+					onChange={(e) => handleFileChange(e, 20)}
+					ref={fileInputRef}
+					type="file"
+				/>
+				<div className="flex items-center justify-center">
+					{isUploading && (
+						<div className="loading loading-spinner loading-xl mb-6 bg-gray-700" />
+					)}
+					{photo && !isUploading && (
+						<img
+							alt="Uploaded"
+							className="h-50 w-50 rounded-full object-cover"
+							src={photo}
+						/>
+					)}
+				</div>
+			</div>
+		</div>
+	);
 }

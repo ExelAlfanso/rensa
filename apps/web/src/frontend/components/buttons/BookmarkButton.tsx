@@ -2,29 +2,29 @@
 
 import { BookmarkSimpleIcon } from "@phosphor-icons/react";
 import Link from "next/link";
-import React from "react";
+import type React from "react";
 
 interface BookmarkButtonProps {
-  id?: string;
-  className?: string;
-  children?: React.ReactNode;
+	children?: React.ReactNode;
+	className?: string;
+	id?: string;
 }
 
 const BookmarkButton: React.FC<BookmarkButtonProps> = ({
-  id,
-  className,
-  children,
+	id,
+	className,
+	children,
 }) => {
-  return (
-    <Link
-    href={"/bookmarks"}
-      id={id}
-      className={`cursor-pointer hover:text-gray-800 transition-colors duration-300 ${className}`}
-    >
-      <BookmarkSimpleIcon size={32} weight="fill"></BookmarkSimpleIcon>
-      {children}
-    </Link>
-  );
+	return (
+		<Link
+			className={`cursor-pointer transition-colors duration-300 hover:text-gray-800 ${className}`}
+			href={"/bookmarks"}
+			id={id}
+		>
+			<BookmarkSimpleIcon size={32} weight="fill" />
+			{children}
+		</Link>
+	);
 };
 
 export default BookmarkButton;

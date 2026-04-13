@@ -1,131 +1,122 @@
-import type { NextAuthOptions, Session } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-import { connectDB } from "./mongodb";
-import User from "@/models/User";
-import bcrypt from "bcryptjs";
-import { DefaultSession, DefaultUser } from "next-auth";
 import { SupabaseAdapter } from "@auth/supabase-adapter";
+import bcrypt from "bcryptjs";
+import type {
+	DefaultSession,
+	DefaultUser,
+	NextAuthOptions,
+	Session,
+} from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { userDomain } from "../backend/domains/users/module";
 
 declare module "next-auth" {
-  interface Session {
-    user: {
-      id: string;
-      provider?: string;
-      role?: string;
-    } & DefaultSession["user"];
-    accessToken?: string;
-  }
+	interface Session {
+		accessToken?: string;
+		user: {
+			id: string;
+			provider?: string;
+			role?: string;
+		} & DefaultSession["user"];
+	}
 
-  interface User extends DefaultUser {
-    id: string;
-    accessToken?: string;
-    role?: string;
-  }
+	interface User extends DefaultUser {
+		accessToken?: string;
+		id: string;
+		role?: string;
+	}
 }
 
 export const authOptions: NextAuthOptions = {
-  adapter: SupabaseAdapter({
-    url: process.env.SUPABASE_URL!,
-    secret: process.env.SUPABASE_ROLE_SERVICE_KEY!,
-  }),
-  providers: [
-    // GoogleProvider({
-    //   clientId: process.env.GOOGLE_CLIENT_ID!,
-    //   clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    // }),
+	adapter: SupabaseAdapter({
+		url: process.env.SUPABASE_URL || "",
+		secret: process.env.SUPABASE_SERVICE_ROLE_KEY || "",
+	}),
+	providers: [
+		CredentialsProvider({
+			name: "Credentials",
+			id: "credentials",
+			credentials: {
+				email: { label: "Email", type: "text" },
+				password: { label: "Password", type: "password" },
+			},
 
-    CredentialsProvider({
-      name: "Credentials",
-      id: "credentials",
-      credentials: {
-        email: { label: "Email", type: "text" },
-        password: { label: "Password", type: "password" },
-      },
+			async authorize(credentials) {
+				if (!(credentials?.email && credentials?.password)) {
+					throw new Error("Email and password are required");
+				}
 
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error("Email and password are required");
-        }
+				const user = await userDomain.usersApplication.getByEmail(
+					credentials.email
+				);
+				if (!user) {
+					throw new Error("Invalid email or password");
+				}
+				if (!user.verified) {
+					throw new Error(
+						"Email not verified. We’ve sent a verification email to your email address."
+					);
+				}
+				const isValid = await bcrypt.compare(
+					credentials.password,
+					user.password
+				);
+				if (!isValid) {
+					throw new Error("Invalid email or password");
+				}
 
-        await connectDB();
-        const user = await User.findOne({ email: credentials.email });
+				console.log("User authenticated:", user.email);
 
-        if (!user) {
-          throw new Error("Invalid email or password");
-        }
-        if (!user.verified) {
-          throw new Error(
-            "Email not verified. We’ve sent a verification email to your email address.",
-          );
-        }
-        const isValid = await bcrypt.compare(
-          credentials.password,
-          user.password,
-        );
-        if (!isValid) {
-          throw new Error("Invalid email or password");
-        }
-
-        // console.log("User authenticated:", user.email);
-        // const accessToken = jwt.sign(
-        //   {
-        //     id: user._id.toString(),
-        //     email: user.email,
-        //   },
-        //   process.env.NEXTAUTH_SECRET!,
-        //   { expiresIn: "7d" }
-        // );
-        return {
-          id: user._id.toString(),
-          name: user.username,
-          email: user.email,
-          role: user.role,
-        };
-      },
-    }),
-  ],
-  secret: process.env.NEXTAUTH_SECRET,
-  session: {
-    strategy: "jwt",
-    maxAge: 30 * 24 * 60 * 60, // 30 days
-    updateAge: 24 * 60 * 60, // rotate token only once every 24 hours
-  },
-  callbacks: {
-    async jwt({ token, account, user }) {
-      if (account) {
-        token.accessToken = account.access_token;
-        token.provider = account.provider;
-      }
-      if (user?.accessToken) {
-        token.accessToken = user.accessToken;
-      }
-      if (user) {
-        token.id = user.id;
-        token.name = user.name;
-        token.email = user.email;
-        token.role = user.role;
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      if (token) {
-        session.user = {
-          ...(session.user as Session["user"]),
-          id: token.id as string,
-          name: token.name,
-          email: token.email,
-          provider: token.provider as string | undefined,
-          role: token.role as string | undefined,
-        };
-        session.accessToken = token.accessToken as string;
-      }
-      return session;
-    },
-  },
-  pages: {
-    signIn: "/login",
-    signOut: "/logout",
-    error: "/not-found",
-  },
-  debug: process.env.NODE_ENV === "development",
+				return {
+					id: user.user_id,
+					name: user.username,
+					email: user.email,
+					role: user.role,
+				};
+			},
+		}),
+	],
+	secret: process.env.NEXTAUTH_SECRET,
+	session: {
+		strategy: "jwt",
+		maxAge: 30 * 24 * 60 * 60, // 30 days
+		updateAge: 24 * 60 * 60, // rotate token only once every 24 hours
+	},
+	callbacks: {
+		jwt({ token, account, user }) {
+			if (account) {
+				token.accessToken = account.access_token;
+				token.provider = account.provider;
+			}
+			if (user?.accessToken) {
+				token.accessToken = user.accessToken;
+			}
+			if (user) {
+				token.id = user.id;
+				token.name = user.name;
+				token.email = user.email;
+				token.role = user.role;
+			}
+			return token;
+		},
+		session({ session, token }) {
+			if (token) {
+				session.user = {
+					...(session.user as Session["user"]),
+					id: token.id as string,
+					name: token.name,
+					email: token.email,
+					provider: token.provider as string | undefined,
+					role: token.role as string | undefined,
+				};
+				session.accessToken = token.accessToken as string;
+			}
+			return session;
+		},
+	},
+	pages: {
+		signIn: "/login",
+		signOut: "/logout",
+		error: "/not-found",
+	},
+	debug: process.env.NODE_ENV === "development",
 };

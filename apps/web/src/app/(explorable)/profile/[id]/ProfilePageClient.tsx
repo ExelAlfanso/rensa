@@ -1,110 +1,113 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
-import Heading from "@/frontend/components/Heading";
-import AccentButton from "@/frontend/components/buttons/AccentButton";
-import ProfileRollFilterDropdown from "@/frontend/components/dropdowns/profile/ProfileRollFilterDropdown";
-import RollList, { Roll } from "@/frontend/components/lists/RollList";
-import { EditRollProvider } from "@/frontend/providers/EditRollProvider";
-import { useAuthStore } from "@/frontend/stores/useAuthStore";
-import { CreateRollProvider } from "@/frontend/providers/CreateRollProvider";
-import ShareButton from "@/frontend/components/buttons/ShareButton";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchRollsByUserId } from "@/services/RollServices";
+import Image from "next/image";
+import { useState } from "react";
+import AccentButton from "@/frontend/components/buttons/AccentButton";
+import ShareButton from "@/frontend/components/buttons/ShareButton";
+import ProfileRollFilterDropdown from "@/frontend/components/dropdowns/profile/ProfileRollFilterDropdown";
+import Heading from "@/frontend/components/Heading";
+import RollList, { type Roll } from "@/frontend/components/lists/RollList";
+import { CreateRollProvider } from "@/frontend/providers/CreateRollProvider";
+import { EditRollProvider } from "@/frontend/providers/EditRollProvider";
+import { fetchRollsByUserId } from "@/frontend/services/roll.service";
+import { useAuthStore } from "@/frontend/stores/useAuthStore";
 
 interface ProfilePageClientProps {
-  profileData: {
-    user: { id: string; username: string; avatar?: string };
-    rolls: Roll[];
-  };
+	profileData: {
+		user: { id: string; username: string; avatar?: string };
+		rolls: Roll[];
+	};
 }
 
 export default function ProfilePageClient({
-  profileData,
+	profileData,
 }: ProfilePageClientProps) {
-  const { user } = useAuthStore();
-  const queryClient = useQueryClient();
-  const [filter, setFilter] = useState("latest");
-  const isOwner = user?.name === profileData.user?.username;
+	const { user } = useAuthStore();
+	const queryClient = useQueryClient();
+	const [filter, setFilter] = useState("latest");
+	const isOwner = user?.name === profileData.user?.username;
 
-  const { data: rolls } = useQuery({
-    queryKey: ["profileRolls", profileData.user.id, filter],
-    queryFn: async () => {
-      const res = await fetchRollsByUserId(profileData.user.id, filter);
-      return res;
-    },
-    enabled: !!profileData.user?.username,
-  });
+	const { data: rolls } = useQuery({
+		queryKey: ["profileRolls", profileData.user.id, filter],
+		queryFn: () => fetchRollsByUserId(profileData.user.id, filter),
+		enabled: !!profileData.user?.username,
+	});
 
-  const handleRollUpdate = (roll: { rollId: string; name: string }) => {
-    queryClient.setQueryData<Roll[]>(
-      ["profileRolls", profileData.user.id, filter],
-      (oldRolls) => {
-        if (!oldRolls) return [];
-        return oldRolls.map((r) =>
-          r._id === roll.rollId ? { ...r, name: roll.name } : r,
-        );
-      },
-    );
-  };
-  const handleRollDelete = (rollId: string) => {
-    queryClient.setQueryData<Roll[]>(
-      ["profileRolls", profileData.user.id, filter],
-      (oldRolls) => {
-        if (!oldRolls) return [];
-        return oldRolls.filter((r) => r._id !== rollId);
-      },
-    );
-  };
+	const handleRollUpdate = (roll: { rollId: string; name: string }) => {
+		queryClient.setQueryData<Roll[]>(
+			["profileRolls", profileData.user.id, filter],
+			(oldRolls) => {
+				if (!oldRolls) {
+					return [];
+				}
+				return oldRolls.map((r) =>
+					r._id === roll.rollId ? { ...r, name: roll.name } : r
+				);
+			}
+		);
+	};
+	const handleRollDelete = (rollId: string) => {
+		queryClient.setQueryData<Roll[]>(
+			["profileRolls", profileData.user.id, filter],
+			(oldRolls) => {
+				if (!oldRolls) {
+					return [];
+				}
+				return oldRolls.filter((r) => r._id !== rollId);
+			}
+		);
+	};
 
-  const handleRollCreate = (roll: { _id: string; name: string }) => {
-    queryClient.setQueryData<Roll[]>(
-      ["profileRolls", profileData.user.id, filter],
-      (oldRolls) => {
-        if (!oldRolls) return [];
-        return [
-          {
-            _id: roll._id,
-            userId: user?.id || "",
-            name: roll.name,
-            previewPhotos: [],
-            createdAt: new Date().toISOString(),
-          },
-          ...oldRolls,
-        ];
-      },
-    );
-  };
-  return (
-    <CreateRollProvider onRollCreate={handleRollCreate}>
-      <EditRollProvider
-        onRollDelete={handleRollDelete}
-        onRollUpdate={handleRollUpdate}
-      >
-        <div className="flex flex-col items-center justify-center w-full min-h-screen bg-white">
-          <div className="w-[131px] h-[131px] relative rounded-full overflow-hidden">
-            <Image
-              src={profileData.user?.avatar || "/profile.jpg"}
-              alt={profileData.user?.username || "User Avatar"}
-              fill
-              className="object-cover w-full h-full"
-            />
-          </div>
-          <Heading size="l" className="mt-4 text-black">
-            @{profileData.user?.username || "User Name"}
-          </Heading>
-          <div className="flex flex-row items-center justify-center gap-4 mt-4">
-            <ShareButton userId={user?.id || ""}></ShareButton>
+	const handleRollCreate = (roll: { _id: string; name: string }) => {
+		queryClient.setQueryData<Roll[]>(
+			["profileRolls", profileData.user.id, filter],
+			(oldRolls) => {
+				if (!oldRolls) {
+					return [];
+				}
+				return [
+					{
+						_id: roll._id,
+						userId: user?.id || "",
+						name: roll.name,
+						previewPhotos: [],
+						createdAt: new Date().toISOString(),
+					},
+					...oldRolls,
+				];
+			}
+		);
+	};
+	return (
+		<CreateRollProvider onRollCreate={handleRollCreate}>
+			<EditRollProvider
+				onRollDelete={handleRollDelete}
+				onRollUpdate={handleRollUpdate}
+			>
+				<div className="flex min-h-screen w-full flex-col items-center justify-center bg-white">
+					<div className="relative h-[131px] w-[131px] overflow-hidden rounded-full">
+						<Image
+							alt={profileData.user?.username || "User Avatar"}
+							className="h-full w-full object-cover"
+							fill
+							src={profileData.user?.avatar || "/profile.jpg"}
+						/>
+					</div>
+					<Heading className="mt-4 text-black" size="l">
+						@{profileData.user?.username || "User Name"}
+					</Heading>
+					<div className="mt-4 flex flex-row items-center justify-center gap-4">
+						<ShareButton userId={user?.id || ""} />
 
-            {isOwner && <AccentButton>Edit Profile</AccentButton>}
-          </div>
-          <div className="flex flex-col items-start justify-center w-full gap-6 mt-10 xl:mt-0 px-30">
-            <ProfileRollFilterDropdown setFilter={setFilter} />
-            <RollList rolls={rolls} isOwner={isOwner} />
-          </div>
-        </div>
-      </EditRollProvider>
-    </CreateRollProvider>
-  );
+						{isOwner && <AccentButton>Edit Profile</AccentButton>}
+					</div>
+					<div className="mt-10 flex w-full flex-col items-start justify-center gap-6 px-30 xl:mt-0">
+						<ProfileRollFilterDropdown setFilter={setFilter} />
+						<RollList isOwner={isOwner} rolls={rolls} />
+					</div>
+				</div>
+			</EditRollProvider>
+		</CreateRollProvider>
+	);
 }

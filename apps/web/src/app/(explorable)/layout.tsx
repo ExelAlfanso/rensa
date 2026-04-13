@@ -1,18 +1,18 @@
 "use client";
-import ExploreNavBar from "@/frontend/components/navbar/ExploreNavBar";
+import ExploreNavbar from "@/frontend/components/navbar/ExploreNavbar";
 import { EditPhotoProvider } from "@/frontend/providers/EditPhotoProvider";
 
 export default function RootLayout({
-  children,
+	children,
 }: Readonly<{
-  children: React.ReactNode;
+	children: React.ReactNode;
 }>) {
-  return (
-    <EditPhotoProvider>
-      <div className="flex items-center justify-center">
-        <ExploreNavBar />
-        {children}
-      </div>
-    </EditPhotoProvider>
-  );
+	return (
+		<EditPhotoProvider>
+			<div className="flex items-center justify-center">
+				<ExploreNavbar />
+				{children}
+			</div>
+		</EditPhotoProvider>
+	);
 }

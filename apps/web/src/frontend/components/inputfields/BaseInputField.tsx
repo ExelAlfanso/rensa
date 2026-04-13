@@ -1,23 +1,23 @@
 // BaseInputField.tsx
-import React from "react";
+import type React from "react";
 
 interface BaseInputFieldProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
-  label?: string;
+	extends React.InputHTMLAttributes<HTMLInputElement> {
+	label?: string;
 }
 
 const BaseInputField: React.FC<BaseInputFieldProps> = ({ label, ...props }) => (
-  <div className="flex flex-col">
-    {label && (
-      <label className="text-[13px] text-black-200 font-figtree font-medium mb-1">
-        {label}
-      </label>
-    )}
-    <input
-      {...props}
-      className="w-full pl-6 pr-4 bg-gray-200 rounded-3xl px-4 py-3 text-[16px] focus:outline-gray-800 focus:bg-[#FAFAFA] h-12 md:h-16 md:py-4 text-black placeholder:text-black-300 font-figtree "
-    />
-  </div>
+	<div className="flex flex-col">
+		{label && (
+			<label className="mb-1 font-figtree font-medium text-[13px] text-black-200">
+				{label}
+			</label>
+		)}
+		<input
+			{...props}
+			className="h-12 w-full rounded-3xl bg-gray-200 px-4 py-3 pr-4 pl-6 font-figtree text-[16px] text-black placeholder:text-black-300 focus:bg-[#FAFAFA] focus:outline-gray-800 md:h-16 md:py-4"
+		/>
+	</div>
 );
 
 export default BaseInputField;

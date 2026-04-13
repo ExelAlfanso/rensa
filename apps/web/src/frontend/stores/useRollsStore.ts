@@ -3,59 +3,64 @@ import { api } from "@/lib/axios-client";
 import { useAuthStore } from "./useAuthStore";
 
 interface Roll {
-  _id: string;
-  name: string;
-  imageUrl: string;
+	_id: string;
+	imageUrl: string;
+	name: string;
 }
 
 interface RollsState {
-  rolls: Roll[];
-  isLoading: boolean;
-  fetchRolls: () => Promise<void>;
-  clearRolls: () => void;
-  createRoll: (newRoll: { name: string; imageUrl?: string }) => Promise<void>;
+	clearRolls: () => void;
+	createRoll: (newRoll: { name: string; imageUrl?: string }) => Promise<void>;
+	fetchRolls: () => Promise<void>;
+	isLoading: boolean;
+	rolls: Roll[];
 }
 
 export const useRollsStore = create<RollsState>((set, get) => ({
-  rolls: [],
-  isLoading: false,
+	rolls: [],
+	isLoading: false,
 
-  fetchRolls: async () => {
-    const user = useAuthStore.getState().user;
-    if (!user) return;
+	fetchRolls: async () => {
+		const user = useAuthStore.getState().user;
+		if (!user) {
+			return;
+		}
 
-    // Avoid refetching if already fetched
-    if (get().rolls.length > 0) return;
+		// Avoid refetching if already fetched
+		if (get().rolls.length > 0) {
+			return;
+		}
 
-    set({ isLoading: true });
-    try {
-      const res = await api.get(`/rolls?userId=${user.id}`);
-      set({ rolls: res.data.data.rolls || [] });
-    } catch (err) {
-      console.error("Error fetching rolls:", err);
-    } finally {
-      set({ isLoading: false });
-    }
-  },
-  createRoll: async (newRoll: { name: string; imageUrl?: string }) => {
-    const user = useAuthStore.getState().user;
-    if (!user) throw new Error("User not authenticated");
-    set({ isLoading: true });
-    try {
-      const res = await api.post(`/rolls/`, {
-        ...newRoll,
-        userId: user.id,
-      });
-      set((state) => ({
-        rolls: [...state.rolls, res.data.data],
-      }));
-    } catch (err) {
-      console.error("Error creating roll:", err);
-      throw err;
-    } finally {
-      set({ isLoading: false });
-    }
-  },
+		set({ isLoading: true });
+		try {
+			const res = await api.get(`/rolls?userId=${user.id}`);
+			set({ rolls: res.data.data.rolls || [] });
+		} catch {
+			set({ rolls: [] });
+		} finally {
+			set({ isLoading: false });
+		}
+	},
+	createRoll: async (newRoll: { name: string; imageUrl?: string }) => {
+		const user = useAuthStore.getState().user;
+		if (!user) {
+			throw new Error("User not authenticated");
+		}
+		set({ isLoading: true });
+		try {
+			const res = await api.post("/rolls/", {
+				...newRoll,
+				userId: user.id,
+			});
+			set((state) => ({
+				rolls: [...state.rolls, res.data.data],
+			}));
+		} catch (error) {
+			throw error instanceof Error ? error : new Error("Failed to create roll");
+		} finally {
+			set({ isLoading: false });
+		}
+	},
 
-  clearRolls: () => set({ rolls: [] }),
+	clearRolls: () => set({ rolls: [] }),
 }));

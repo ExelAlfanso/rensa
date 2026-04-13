@@ -21,6 +21,11 @@ export const updateBookmarkDto = bookmarkResponseDto.partial().omit({
 	updated_at: true,
 });
 
+export const bookmarkActionDto = z.object({
+	action: z.enum(["increment", "decrement"]),
+	userId: z.uuid(),
+});
+
 export type BookmarkResponseDto = z.infer<typeof bookmarkResponseDto>;
 export type CreateBookmarkDto = z.infer<typeof createBookmarkDto>;
 export type UpdateBookmarkDto = z.infer<typeof updateBookmarkDto>;

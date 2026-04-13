@@ -11,27 +11,39 @@ Applies to:
 - `src/lib/supabase.ts`
 - `supabase/migrations/**`
 
-## Current Backend Direction (As Of March 2026)
+## Current Backend Direction (As Of April 2026)
 
-The codebase currently uses a hybrid backend approach:
-- NextAuth with `@auth/supabase-adapter` for auth persistence (`next_auth` schema in Supabase).
-- Supabase for relational entities (`users`, `photos`, `rolls`, bookmarks, etc.).
-- Existing credential auth flow still references MongoDB (`connectDB`, `User` model) during `CredentialsProvider.authorize`.
+The backend direction is PostgreSQL-first and Supabase-backed:
+- NextAuth with `@auth/supabase-adapter` for auth persistence (`next_auth` schema in Supabase/PostgreSQL).
+- Supabase/PostgreSQL for all application entities (`users`, `photos`, `rolls`, `bookmarks`, `comments`, `contacts`, `bug_reports`).
 
-When adding or refactoring backend logic, keep this transition state explicit and avoid hidden coupling between MongoDB and Supabase.
+When adding or refactoring backend logic:
+- Do not introduce non-PostgreSQL persistence dependencies.
+- Treat PostgreSQL/Supabase as the single source of truth.
 
 ## Architecture Rules
+
+### -1) Domain-Wise Structure (Scalable Default)
+
+New backend logic should be organized by domain under:
+- `src/backend/domains/<domain>/application`
+- `src/backend/domains/<domain>/domain`
+- `src/backend/domains/<domain>/infrastructure`
+- `src/backend/domains/<domain>/module.ts`
+
+API routes in `src/app/api/**` remain thin HTTP adapters that delegate to domain
+use-cases.
 
 ### 0) Layer Rules (Clean Architecture)
 
 Mandatory dependency direction:
-- `route.ts` (controller) -> service -> repository
+- `route.ts` (controller) -> domain application -> service -> repository
 
 Reverse calls are forbidden. No exceptions.
 
 Controller layer (`src/app/api/**/route.ts`):
 - Role: delivery/HTTP adapter.
-- Allowed: read `Request`/params, validate with Zod DTO, call service methods, return `NextResponse`, map errors to HTTP status codes.
+- Allowed: read `Request`/params, validate with Zod DTO, call domain application methods, return `NextResponse`, map errors to HTTP status codes.
 - Forbidden: database queries, business logic, importing repositories.
 - Signs: uses `req.json()`, `NextResponse`, `zod.parse()`.
 
@@ -54,6 +66,7 @@ DTO layer (`*.dto.ts`):
 
 Hard anti-patterns:
 - Controller -> repository
+- Controller -> service (bypassing domain application)
 - Service -> HTTP
 - Repository -> service
 - Zod in service layer
@@ -63,10 +76,11 @@ Hard anti-patterns:
 
 Use this shape consistently:
 - API Route Handler (`src/app/api/**/route.ts`): request/response mapping only (controller layer).
+- Domain Application (`src/backend/domains/<domain>/application/*.application.ts`): use-case facade exposed to controllers.
 - Service: business rules, authorization checks, orchestration.
 - Repository: database access only.
 - DTO: input/output contracts and validation.
-- Module: dependency wiring and composition.
+- Domain Module: dependency wiring and composition (`src/backend/domains/<domain>/module.ts`).
 
 Do not place business logic in API route handlers or repositories.
 
@@ -91,7 +105,8 @@ Naming:
 
 Rules:
 - Interface methods should return domain/DTO-safe shapes.
-- Implementations in `src/backend/repository` must satisfy interfaces exactly.
+- Implementations in `src/backend/domains/<domain>/infrastructure/*.repository.ts`
+  must satisfy interfaces exactly.
 - No framework-specific response types in repositories.
 - No `any`; use strict return types and nullability (`Promise<T | null>` where needed).
 
@@ -118,12 +133,11 @@ Rules:
 - Keep session and JWT callbacks deterministic; do not append volatile fields without reason.
 - Normalize role source of truth (prefer DB-backed role, not client-provided values).
 
-### 2) Credentials Flow During Transition
+### 2) Credentials Flow
 
-Because credentials auth still reads MongoDB:
-- Any user identity field used in session (`id`, `email`, `role`) must remain consistent with Supabase adapter rows.
-- If a migration to fully Supabase auth is started, complete it end-to-end in one PR or behind a feature flag.
-- Avoid partial dual-write behavior without explicit reconciliation logic.
+Credentials auth must read/write PostgreSQL-backed user records only:
+- Any user identity field used in session (`id`, `email`, `role`) must be sourced from Supabase-backed application users.
+- Avoid dual-write behavior or mixed identity stores.
 
 ### 3) Trigger-Based Profile Creation
 
@@ -203,11 +217,13 @@ Minimum local checks before merge:
 ## File/Folder Conventions
 
 - `src/app/api/**/route.ts` (controller layer)
-- `src/backend/services/*.service.ts`
-- `src/backend/repository/*.repository.ts`
+- `src/backend/domains/<domain>/application/*.application.ts`
+- `src/backend/domains/<domain>/infrastructure/*`
+- `src/backend/domains/<domain>/module.ts`
+- `src/backend/domains/<domain>/application/*.service.ts`
+- `src/backend/domains/<domain>/infrastructure/*.repository.ts`
 - `src/backend/interfaces/*.interface.ts`
 - `src/backend/dtos/*.dto.ts`
-- `src/backend/modules/*.module.ts`
 
 Do not add new controller files under `src/backend/controllers`; use API route handlers instead.
 Each new feature should include all relevant layers (even if thin initially) to prevent logic drift.

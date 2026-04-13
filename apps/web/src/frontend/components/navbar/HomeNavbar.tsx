@@ -1,27 +1,27 @@
 "use client";
-import Logo from "../icons/Logo";
-import LinkTertiaryButton from "../buttons/LinkButtons/LinkTertiaryButton";
-import LinkPrimaryButton from "../buttons/LinkButtons/LinkPrimaryButton";
 import Link from "next/link";
+import LinkPrimaryButton from "../buttons/LinkButtons/LinkPrimaryButton";
+import LinkTertiaryButton from "../buttons/LinkButtons/LinkTertiaryButton";
+import Logo from "../icons/Logo";
 
 const HomeNavbar = () => {
-  return (
-    <nav className="z-30 left-1/2 top-5 -translate-x-1/2 fixed w-[90%] lg:w-[70%] xl:w-[80%] h-14 md:h-18 text-black rounded-[48px] flex items-center justify-between bg-white-200 shadow-lg">
-      <div className="flex flex-row items-center gap-1 lg:gap-4 ml-2 lg:ml-6">
-        <Logo size={"s"}></Logo>
-        <Link href="/home">
-          <h1 className=" text-[24px] font-forum hidden lg:flex">Rensa</h1>
-        </Link>
-      </div>
-      <div className="flex flex-row items-center justify-center gap-6 mr-6">
-        <span className="inline-flex items-center gap-2">
-          <LinkTertiaryButton href={"/explore"}>Discover</LinkTertiaryButton>
-          <LinkPrimaryButton href={"/register"}>Get Started</LinkPrimaryButton>
-          <span className="hidden lg:flex "></span>
-        </span>
-      </div>
-    </nav>
-  );
+	return (
+		<nav className="fixed top-5 left-1/2 z-30 flex h-14 w-[90%] -translate-x-1/2 items-center justify-between rounded-[48px] bg-white-200 text-black shadow-lg md:h-18 lg:w-[70%] xl:w-[80%]">
+			<div className="ml-2 flex flex-row items-center gap-1 lg:ml-6 lg:gap-4">
+				<Logo size={"s"} />
+				<Link href="/home">
+					<h1 className="hidden font-forum text-[24px] lg:flex">Rensa</h1>
+				</Link>
+			</div>
+			<div className="mr-6 flex flex-row items-center justify-center gap-6">
+				<span className="inline-flex items-center gap-2">
+					<LinkTertiaryButton href={"/explore"}>Discover</LinkTertiaryButton>
+					<LinkPrimaryButton href={"/register"}>Get Started</LinkPrimaryButton>
+					<span className="hidden lg:flex" />
+				</span>
+			</div>
+		</nav>
+	);
 };
 
 export default HomeNavbar;

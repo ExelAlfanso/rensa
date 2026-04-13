@@ -1,32 +1,34 @@
-import RollPageClient from "./RollPageClient";
-import { fetchProfileByRollId } from "@/services/ProfileServices";
-import { fetchRollById } from "@/services/RollServices";
 import { redirect } from "next/navigation";
+import { fetchProfileByRollId } from "@/frontend/services/profile.service";
+import { fetchRollById } from "@/frontend/services/roll.service";
+import RollPageClient from "./RollPageClient";
 
 export default async function RollPageWrapper({
-  params,
+	params,
 }: {
-  params: Promise<{ id: string }>;
+	params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
-  let rollData;
-  let ownerId;
-  try {
-    rollData = await fetchRollById(id);
-    ownerId = await fetchProfileByRollId(id);
-  } catch {
-    redirect("/404");
-  }
+	const { id } = await params;
+	let rollData: Awaited<ReturnType<typeof fetchRollById>> | null = null;
+	let ownerId: Awaited<ReturnType<typeof fetchProfileByRollId>> | null = null;
+	try {
+		[rollData, ownerId] = await Promise.all([
+			fetchRollById(id),
+			fetchProfileByRollId(id),
+		]);
+	} catch {
+		redirect("/404");
+	}
 
-  if (!rollData || !ownerId) {
-    redirect("/404");
-  }
+	if (!(rollData && ownerId)) {
+		redirect("/404");
+	}
 
-  return (
-    <RollPageClient
-      ownerId={ownerId}
-      name={rollData.name || "Unknown Roll"}
-      id={id}
-    ></RollPageClient>
-  );
+	return (
+		<RollPageClient
+			id={id}
+			name={rollData.name || "Unknown Roll"}
+			ownerId={ownerId}
+		/>
+	);
 }

@@ -1,17 +1,17 @@
 "use client";
 
 import { SessionProvider } from "next-auth/react";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { AuthSyncProvider } from "./AuthSyncProvider";
 
 export default function SessionProviderWrapper({
-  children,
+	children,
 }: {
-  children: ReactNode;
+	children: ReactNode;
 }) {
-  return (
-    <SessionProvider>
-      <AuthSyncProvider>{children}</AuthSyncProvider>
-    </SessionProvider>
-  );
+	return (
+		<SessionProvider>
+			<AuthSyncProvider>{children}</AuthSyncProvider>
+		</SessionProvider>
+	);
 }

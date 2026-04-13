@@ -1,92 +1,93 @@
 "use client";
 
-import { useOutsideClick } from "@/frontend/hooks/useOutsideClick";
-import React, { useState } from "react";
-import Text from "../Text";
 import { CaretDownIcon } from "@phosphor-icons/react";
+import type React from "react";
+import { useState } from "react";
+import { useOutsideClick } from "@/frontend/hooks/use-outside-click";
+import Text from "../Text";
 
 interface SearchDropdownProps {
-  cameraModels: string[];
-  value: string;
-  onSelect: (model: string) => void;
-  label?: string;
-  placeholder?: string;
+	cameraModels: string[];
+	label?: string;
+	onSelect: (model: string) => void;
+	placeholder?: string;
+	value: string;
 }
 
 export const SearchDropdown: React.FC<SearchDropdownProps> = ({
-  cameraModels,
-  value,
-  label,
-  placeholder,
-  onSelect,
+	cameraModels,
+	value,
+	label,
+	placeholder,
+	onSelect,
 }) => {
-  const [search, setSearch] = useState(value ?? "");
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useOutsideClick<HTMLDivElement>(() => setIsOpen(false));
+	const [search, setSearch] = useState(value ?? "");
+	const [isOpen, setIsOpen] = useState(false);
+	const dropdownRef = useOutsideClick<HTMLDivElement>(() => setIsOpen(false));
 
-  const filteredModels = cameraModels.filter((m) =>
-    m.toLowerCase().includes(String(search).toLowerCase()),
-  );
+	const filteredModels = cameraModels.filter((m) =>
+		m.toLowerCase().includes(String(search).toLowerCase())
+	);
 
-  return (
-    <div className="relative w-full mt-3" ref={dropdownRef}>
-      {label && (
-        <Text size="xs" className="text-gray-700">
-          {label}
-        </Text>
-      )}
-      <input
-        type="text"
-        value={search}
-        onChange={(e) => {
-          setSearch(e.target.value);
-          setIsOpen(true);
-        }}
-        onFocus={() => setIsOpen(true)}
-        placeholder={placeholder ?? "Search camera model..."}
-        className="w-full px-4 py-2 text-left bg-gray-200 cursor-pointer rounded-3xl hover:bg-gray-300 ring-0 outline-0"
-      />
+	return (
+		<div className="relative mt-3 w-full" ref={dropdownRef}>
+			{label && (
+				<Text className="text-gray-700" size="xs">
+					{label}
+				</Text>
+			)}
+			<input
+				className="w-full cursor-pointer rounded-3xl bg-gray-200 px-4 py-2 text-left outline-0 ring-0 hover:bg-gray-300"
+				onChange={(e) => {
+					setSearch(e.target.value);
+					setIsOpen(true);
+				}}
+				onFocus={() => setIsOpen(true)}
+				placeholder={placeholder ?? "Search camera model..."}
+				type="text"
+				value={search}
+			/>
 
-      {filteredModels.length > 0 && (
-        <div
-          className={`origin-top z-10 absolute top-15 bg-white-200 border border-gray-500 rounded-2xl transition-transform duration-300 ${
-            isOpen ? "scale-y-100" : "scale-y-0"
-          }`}
-        >
-          {/* Scrollable wrapper */}
-          <div
-            className={`${
-              (filteredModels?.length ?? 0) > 6
-                ? "grid grid-cols-2"
-                : "flex flex-col"
-            } max-h-60 overflow-y-auto`}
-          >
-            {filteredModels.map((model) => (
-              <button
-                key={model}
-                onClick={() => {
-                  onSelect(model);
-                  setSearch(model);
-                  setIsOpen(false);
-                }}
-                className="px-3 py-2 cursor-pointer hover:bg-gray-100 text-left"
-              >
-                {model}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-      <button
-        type="button"
-        className="absolute right-3 top-1/2 cursor-pointer"
-        onClick={(e) => {
-          e.stopPropagation();
-          setIsOpen((prev) => !prev);
-        }}
-      >
-        <CaretDownIcon size={20} />
-      </button>
-    </div>
-  );
+			{filteredModels.length > 0 && (
+				<div
+					className={`absolute top-15 z-10 origin-top rounded-2xl border border-gray-500 bg-white-200 transition-transform duration-300 ${
+						isOpen ? "scale-y-100" : "scale-y-0"
+					}`}
+				>
+					{/* Scrollable wrapper */}
+					<div
+						className={`${
+							(filteredModels?.length ?? 0) > 6
+								? "grid grid-cols-2"
+								: "flex flex-col"
+						} max-h-60 overflow-y-auto`}
+					>
+						{filteredModels.map((model) => (
+							<button
+								className="cursor-pointer px-3 py-2 text-left hover:bg-gray-100"
+								key={model}
+								onClick={() => {
+									onSelect(model);
+									setSearch(model);
+									setIsOpen(false);
+								}}
+							>
+								{model}
+							</button>
+						))}
+					</div>
+				</div>
+			)}
+			<button
+				className="absolute top-1/2 right-3 cursor-pointer"
+				onClick={(e) => {
+					e.stopPropagation();
+					setIsOpen((prev) => !prev);
+				}}
+				type="button"
+			>
+				<CaretDownIcon size={20} />
+			</button>
+		</div>
+	);
 };

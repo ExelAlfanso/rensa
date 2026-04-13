@@ -1,0 +1,81 @@
+import type { OpenApiFragment } from "@/backend/shared/openapi/types";
+
+export const rollsOpenApiFragment: OpenApiFragment = {
+	tags: [{ name: "rolls" }],
+	paths: {
+		"/api/rolls": {
+			get: {
+				tags: ["rolls"],
+				summary: "List user rolls",
+				parameters: [
+					{
+						in: "query",
+						name: "userId",
+						required: true,
+						schema: { type: "string", format: "uuid" },
+					},
+					{
+						in: "query",
+						name: "sort",
+						schema: { type: "string", enum: ["latest", "oldest"] },
+					},
+				],
+				responses: { 200: { description: "Rolls listed" } },
+			},
+			post: {
+				tags: ["rolls"],
+				summary: "Create roll",
+				requestBody: {
+					required: true,
+					content: {
+						"application/json": {
+							schema: { $ref: "#/components/schemas/CreateRollDto" },
+							example: {
+								user_id: "0f2d8f3e-1dd7-4a52-9dd7-8cbffa4fd89f",
+								name: "My Travel Roll",
+								description: "Trip photos",
+							},
+						},
+					},
+				},
+				responses: { 201: { description: "Roll created" } },
+			},
+		},
+		"/api/rolls/default": {
+			get: {
+				tags: ["rolls"],
+				summary: "Get default roll",
+				responses: { 200: { description: "Default roll found" } },
+			},
+		},
+		"/api/rolls/is-saved": {
+			get: {
+				tags: ["rolls"],
+				summary: "List rolls containing a photo",
+				parameters: [
+					{
+						in: "query",
+						name: "photoId",
+						required: true,
+						schema: { type: "string", format: "uuid" },
+					},
+				],
+				responses: { 200: { description: "Saved status listed" } },
+			},
+		},
+	},
+	components: {
+		schemas: {
+			CreateRollDto: {
+				type: "object",
+				required: ["user_id", "name"],
+				properties: {
+					user_id: { type: "string", format: "uuid" },
+					name: { type: "string", minLength: 1 },
+					description: { type: "string" },
+					imageUrl: { type: "string" },
+				},
+			},
+		},
+	},
+};

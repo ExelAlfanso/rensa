@@ -3,9 +3,9 @@ import { Suspense } from "react";
 import LoginForm from "@/frontend/components/forms/LoginForm";
 
 export default function LoginPage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <LoginForm />
-    </Suspense>
-  );
+	return (
+		<Suspense fallback={<div>Loading...</div>}>
+			<LoginForm />
+		</Suspense>
+	);
 }

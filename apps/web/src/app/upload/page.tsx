@@ -1,9 +1,9 @@
 import UploadSection from "@/frontend/sections/UploadSection";
 
 export default function UploadPage() {
-  return (
-    <div className="min-h-screen flex flex-col bg-white-500 items-center justify-center text-primary">
-      <UploadSection></UploadSection>
-    </div>
-  );
+	return (
+		<div className="flex min-h-screen flex-col items-center justify-center bg-white-500 text-primary">
+			<UploadSection />
+		</div>
+	);
 }

@@ -1,7 +1,7 @@
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS photos;
 DROP TABLE IF EXISTS photo_metadata;
-DROP TABLE IF EXISTS likes;
+DROP TABLE IF EXISTS bookmarks;
 DROP TABLE IF EXISTS comments;
 DROP TABLE IF EXISTS rolls;
 DROP TABLE IF EXISTS roll_photos;
@@ -58,8 +58,8 @@ create table photo_metadata (
   uploaded_at timestamptz
 );
 
-create table likes (
-  like_id uuid primary key default gen_random_uuid(),
+create table bookmarks (
+  bookmark_id uuid primary key default gen_random_uuid(),
   photo_id uuid references photos(photo_id) on delete cascade,
   user_id uuid references users(user_id) on delete cascade,
   created_at timestamptz default now(),
@@ -132,7 +132,7 @@ create index idx_comments_photo on comments(photo_id);
 
 create index idx_comments_user on comments(user_id);
 
-create index idx_likes_photo on likes(photo_id);
+create index idx_bookmarks_photo on bookmarks(photo_id);
 
 create index idx_rolls_user on rolls(user_id);
 

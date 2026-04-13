@@ -1,129 +1,89 @@
-import { connectDB } from "@/lib/mongodb";
-import Photo, { PhotoDocument } from "@/models/Photo";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { ZodError } from "zod";
+import {
+	BackendError,
+	UnauthorizedError,
+} from "@/backend/common/backend.error";
+import { photoDomain } from "@/backend/domains/photos/module";
+import { photoIdParamDto } from "@/backend/dtos/photo.dto";
 import { authOptions } from "@/lib/auth";
-import cloudinary, { validateCloudinaryUrl } from "@/lib/cloudinary";
 
 /*
   GET /api/photos/[id]
-  Fetch a specific photo by ID
 */
 export async function GET(
-  request: Request,
-  context: { params: Promise<{ id: string }> },
+	_request: Request,
+	context: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await context.params;
-  if (!/^[0-9a-fA-F]{24}$/.test(id)) {
-    return NextResponse.json(
-      { success: false, message: "Invalid photo ID format" },
-      { status: 400 },
-    );
-  }
-  try {
-    await connectDB();
-    const photo = await Photo.findById(id).lean<PhotoDocument>();
-    if (!photo) {
-      return NextResponse.json(
-        { success: false, message: "Photo not found" },
-        { status: 404 },
-      );
-    }
-
-    if (photo.url && !validateCloudinaryUrl(photo.url)) {
-      console.error(`⚠️ Suspicious URL detected for photo ${id}: ${photo.url}`);
-      return NextResponse.json(
-        {
-          success: false,
-          message:
-            "Photo URL integrity check failed. This photo may have been tampered with.",
-        },
-        { status: 403 },
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      message: "Successfully fetched photo.",
-      data: photo,
-    });
-  } catch (error) {
-    return NextResponse.json(
-      { success: false, message: "Failed to fetch photo " + error },
-      { status: 500 },
-    );
-  }
+	try {
+		const params = photoIdParamDto.parse(await context.params);
+		const photo = await photoDomain.photosApplication.getById(params.id);
+		return NextResponse.json({
+			success: true,
+			message: "Successfully fetched photo.",
+			data: photo,
+		});
+	} catch (error) {
+		return mapRouteError(error, "Failed to fetch photo");
+	}
 }
 
+/*
+  DELETE /api/photos/[id]
+*/
 export async function DELETE(
-  request: Request,
-  context: { params: Promise<{ id: string }> },
+	_request: Request,
+	context: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await context.params;
-  try {
-    await connectDB();
+	try {
+		const params = photoIdParamDto.parse(await context.params);
+		const session = await getServerSession(authOptions);
+		const actorId = session?.user?.id;
+		if (!actorId) {
+			throw new UnauthorizedError();
+		}
 
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { success: false, message: "Unauthorized" },
-        { status: 401 },
-      );
-    }
-    const photo = await Photo.findById(id).lean<PhotoDocument>();
-    if (!photo) {
-      return NextResponse.json(
-        { success: false, message: "Photo not found" },
-        { status: 404 },
-      );
-    }
-    if (photo.userId?.toString() !== session.user.id) {
-      return NextResponse.json(
-        { success: false, message: "Forbidden: You don't own this photo" },
-        { status: 403 },
-      );
-    }
+		await photoDomain.photosApplication.deleteById(params.id, actorId);
 
-    await Photo.findByIdAndDelete(id);
+		return NextResponse.json({
+			success: true,
+			message: "Photo deleted successfully.",
+		});
+	} catch (error) {
+		return mapRouteError(error, "Failed to delete photo");
+	}
+}
 
-    try {
-      const photoUrl = photo.url;
-      if (!photoUrl || !validateCloudinaryUrl(photoUrl)) {
-        console.warn(
-          "Skipping Cloudinary delete: invalid URL for photo",
-          photo._id,
-        );
-      } else {
-        const idx = photoUrl.indexOf("user_uploads/");
-        if (idx !== -1) {
-          let publicId = photoUrl.slice(idx); // includes folder prefix
-          const q = publicId.search(/[?#]/);
-          if (q !== -1) publicId = publicId.slice(0, q);
-          const lastDot = publicId.lastIndexOf(".");
-          if (lastDot !== -1) publicId = publicId.slice(0, lastDot);
-          publicId = decodeURIComponent(publicId);
-          if (/^[A-Za-z0-9_\\-\\/]+$/.test(publicId)) {
-            await cloudinary.uploader.destroy(publicId);
-            console.log(`Deleted from Cloudinary: ${publicId}`);
-          } else {
-            console.warn(
-              "Refused to delete Cloudinary id with unsafe characters",
-              publicId,
-            );
-          }
-        }
-      }
-    } catch (err) {
-      console.error("⚠️ Failed to delete from Cloudinary:", err);
-    }
-    return NextResponse.json({
-      success: true,
-      message: "Photo deleted successfully.",
-    });
-  } catch (error) {
-    return NextResponse.json(
-      { success: false, message: "Failed to delete photo " + error },
-      { status: 500 },
-    );
-  }
+function mapRouteError(error: unknown, fallbackMessage: string): NextResponse {
+	if (error instanceof ZodError) {
+		return NextResponse.json(
+			{
+				success: false,
+				message: "Invalid photo ID format",
+				details: error.flatten(),
+			},
+			{ status: 400 }
+		);
+	}
+
+	if (error instanceof BackendError) {
+		return NextResponse.json(
+			{
+				success: false,
+				message: error.message,
+				code: error.code,
+			},
+			{ status: error.statusCode }
+		);
+	}
+
+	return NextResponse.json(
+		{
+			success: false,
+			message: fallbackMessage,
+			details: error instanceof Error ? error.message : "Unknown error",
+		},
+		{ status: 500 }
+	);
 }

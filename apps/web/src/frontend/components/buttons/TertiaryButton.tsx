@@ -1,25 +1,25 @@
-import React from "react";
-import Button, { ButtonProps } from "./Button";
+import type React from "react";
+import Button, { type ButtonProps } from "./Button";
 
 const TertiaryButton: React.FC<ButtonProps> = ({
-  id,
-  className,
-  children,
-  href,
-  onClick,
-  type,
+	id,
+	className,
+	children,
+	href,
+	onClick,
+	type,
 }) => {
-  return (
-    <Button
-      type={type}
-      id={id}
-      href={href}
-      onClick={onClick}
-      className={`btn-ghost text-primary hover:bg-transparent hover:text-black-200 hover:border-white-600 border-1 border-primary ${className}`}
-    >
-      {children}
-    </Button>
-  );
+	return (
+		<Button
+			className={`btn-ghost border-1 border-primary text-primary hover:border-white-600 hover:bg-transparent hover:text-black-200 ${className}`}
+			href={href}
+			id={id}
+			onClick={onClick}
+			type={type}
+		>
+			{children}
+		</Button>
+	);
 };
 
 export default TertiaryButton;

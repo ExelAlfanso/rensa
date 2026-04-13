@@ -1,141 +1,45 @@
-import { connectDB } from "@/lib/mongodb";
-import Contact from "@/models/Contact";
 import { NextResponse } from "next/server";
-import { contactFormLimiter } from "@/lib/rateLimiter";
-import { validateContactData } from "@/lib/validation";
-import ContactAdminEmail from "@/frontend/components/emailTemplates/ContactAdminEmail";
-import getResend from "@/lib/resend";
-import ContactConfirmationEmail from "@/frontend/components/emailTemplates/ContactConfirmationEmail";
-import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
+import { ZodError } from "zod";
+import { BackendError } from "@/backend/common/backend.error";
+import { contactDomain } from "@/backend/domains/contacts/module";
+import {
+	createContactDto,
+	listContactsQueryDto,
+} from "@/backend/dtos/contact.dto";
+import { authOptions } from "@/lib/auth";
 
 /**
  * POST /api/contact
  * Submit a contact form inquiry
- *
- * Security measures:
- * - Input validation and sanitization
- * - Rate limiting (5 requests per hour per IP)
- * - MongoDB validation schemas
- * - Error messages don't leak sensitive info
  */
 export async function POST(req: Request) {
-  try {
-    // Rate limiting
-    const ip =
-      req.headers.get("x-forwarded-for") ||
-      req.headers.get("x-real-ip") ||
-      "unknown";
+	try {
+		const body = createContactDto.parse(await req.json());
+		const forwardedIp = req.headers.get("x-forwarded-for");
+		const fallbackIp = req.headers.get("x-real-ip");
+		const ipAddress =
+			forwardedIp?.split(",")[0]?.trim() || fallbackIp || "unknown";
+		const userAgent = req.headers.get("user-agent") || "";
+		const result = await contactDomain.contactsApplication.submit(body, {
+			ipAddress,
+			userAgent,
+		});
 
-    const { success } = await contactFormLimiter.limit(ip);
-    if (!success) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Too many requests. Please try again later.",
-        },
-        { status: 429 },
-      );
-    }
-
-    // Parse and validate request body
-    const { email, name, subject, message } = await req.json();
-    const body = { email, name, subject, message };
-
-    // Validate and sanitize input
-    const validation = validateContactData(body);
-    if (!validation.isValid) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Validation failed",
-          errors: validation.errors,
-        },
-        { status: 400 },
-      );
-    }
-
-    // Connect to database
-    await connectDB();
-
-    // Create contact document
-    const contact = new Contact({
-      ...validation.data,
-      ipAddress: ip,
-      userAgent: req.headers.get("user-agent") || "",
-    });
-
-    // Validate using Mongoose schema
-    const validationError = contact.validateSync();
-    if (validationError) {
-      const errors: Record<string, string> = {};
-      Object.entries(validationError.errors).forEach(([key, error]: any) => {
-        errors[key] = error.message;
-      });
-
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Validation failed",
-          errors,
-        },
-        { status: 400 },
-      );
-    }
-
-    // Save to database
-    await contact.save();
-
-    // Send email notifications (non-blocking on failure)
-
-    try {
-      const resend = await getResend();
-      await resend.emails.send({
-        from: process.env.CONTACT_NOTIFICATION_EMAIL || "",
-        to: process.env.ADMIN_EMAIL || "",
-        subject: contact.subject,
-        react: ContactAdminEmail({
-          senderEmail: contact.email,
-          senderName: contact.name,
-          subject: contact.subject,
-          message: contact.message,
-        }),
-      });
-
-      await resend.emails.send({
-        from: process.env.NO_REPLY_EMAIL || "",
-        to: contact.email,
-        subject: `New Contact Form Submission: ${contact.subject}`,
-        react: ContactConfirmationEmail({
-          name: contact.name,
-          subject: contact.subject,
-        }),
-      });
-    } catch (e) {
-      console.error("Failed to send contact form emails:", e);
-    }
-    return NextResponse.json(
-      {
-        success: true,
-        message: "Your message has been received. We'll get back to you soon!",
-        data: {
-          id: contact._id,
-        },
-      },
-      { status: 201 },
-    );
-  } catch (error) {
-    console.error("[Contact API Error]:", error);
-
-    // Don't expose internal errors to client
-    return NextResponse.json(
-      {
-        success: false,
-        message: "An error occurred while processing your request",
-      },
-      { status: 500 },
-    );
-  }
+		return NextResponse.json(
+			{
+				success: true,
+				message: "Your message has been received. We'll get back to you soon!",
+				data: result,
+			},
+			{ status: 201 }
+		);
+	} catch (error) {
+		return mapRouteError(
+			error,
+			"An error occurred while processing your request"
+		);
+	}
 }
 
 /**
@@ -143,53 +47,57 @@ export async function POST(req: Request) {
  * Retrieve contact messages (admin only)
  */
 export async function GET(req: Request) {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session || session.user.role !== "admin") {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Unauthorized",
-        },
-        { status: 401 },
-      );
-    }
+	try {
+		const session = await getServerSession(authOptions);
+		const { searchParams } = new URL(req.url);
+		const query = listContactsQueryDto.parse({
+			status: searchParams.get("status") ?? undefined,
+			page: searchParams.get("page") ?? undefined,
+			limit: searchParams.get("limit") ?? undefined,
+		});
+		const result = await contactDomain.contactsApplication.list(
+			query,
+			session?.user?.role
+		);
 
-    await connectDB();
+		return NextResponse.json({
+			success: true,
+			data: result.contacts,
+			pagination: result.pagination,
+		});
+	} catch (error) {
+		return mapRouteError(error, "Failed to retrieve contacts");
+	}
+}
 
-    const { searchParams } = new URL(req.url);
-    const status = searchParams.get("status") || "new";
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "10");
+function mapRouteError(error: unknown, fallbackMessage: string): NextResponse {
+	if (error instanceof ZodError) {
+		return NextResponse.json(
+			{
+				success: false,
+				message: "Validation failed",
+				errors: error.flatten(),
+			},
+			{ status: 400 }
+		);
+	}
 
-    const skip = (page - 1) * limit;
+	if (error instanceof BackendError) {
+		return NextResponse.json(
+			{
+				success: false,
+				message: error.message,
+				code: error.code,
+			},
+			{ status: error.statusCode }
+		);
+	}
 
-    const contacts = await Contact.find({ status })
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
-
-    const total = await Contact.countDocuments({ status });
-
-    return NextResponse.json({
-      success: true,
-      data: contacts,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit),
-      },
-    });
-  } catch (error) {
-    console.error("[Contact GET API Error]:", error);
-
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to retrieve contacts",
-      },
-      { status: 500 },
-    );
-  }
+	return NextResponse.json(
+		{
+			success: false,
+			message: fallbackMessage,
+		},
+		{ status: 500 }
+	);
 }

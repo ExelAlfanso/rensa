@@ -1,42 +1,43 @@
-import { authOptions } from "@/lib/auth";
-import { connectDB } from "@/lib/mongodb";
-import Roll from "@/models/Roll";
-import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { BackendError } from "@/backend/common/backend.error";
+import { rollDomain } from "@/backend/domains/rolls/module";
+import { authOptions } from "@/lib/auth";
 
 /*
     GET /api/rolls/default
-    Returns the default roll ("All Photos") for the authenticated user (current session for security)
 */
-
 export async function GET() {
-  await connectDB();
-  const session = await getServerSession(authOptions);
-
-  if (!session || !session.user) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-  }
-  try {
-    const defaultRoll = await Roll.findOne({
-      name: "All Photos",
-      userId: session.user.id,
-    }).lean();
-
-    return NextResponse.json(
-      {
-        success: true,
-        message: "Fetched default roll successfully",
-        data: defaultRoll,
-      },
-      { status: 200 }
-    );
-  } catch {
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to fetch default roll",
-      },
-      { status: 500 }
-    );
-  }
+	try {
+		const session = await getServerSession(authOptions);
+		const actorId = session?.user?.id;
+		const defaultRoll =
+			await rollDomain.rollsApplication.getDefaultByUserId(actorId);
+		return NextResponse.json(
+			{
+				success: true,
+				message: "Fetched default roll successfully",
+				data: defaultRoll,
+			},
+			{ status: 200 }
+		);
+	} catch (error) {
+		if (error instanceof BackendError) {
+			return NextResponse.json(
+				{
+					success: false,
+					message: error.message,
+					code: error.code,
+				},
+				{ status: error.statusCode }
+			);
+		}
+		return NextResponse.json(
+			{
+				success: false,
+				message: "Failed to fetch default roll",
+			},
+			{ status: 500 }
+		);
+	}
 }

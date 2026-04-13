@@ -2,44 +2,44 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React from "react";
+import type React from "react";
 
 interface LinkIconButtonProps {
-  href: string;
-  className?: string;
-  onClick?: () => void;
-  children?: React.ReactNode;
-  Icon: React.ElementType;
+	children?: React.ReactNode;
+	className?: string;
+	href: string;
+	Icon: React.ElementType;
+	onClick?: () => void;
 }
 
 const LinkIconButton: React.FC<LinkIconButtonProps> = ({
-  href,
-  className,
-  onClick,
-  children,
-  Icon,
+	href,
+	className,
+	onClick,
+	children,
+	Icon,
 }) => {
-  const router = useRouter();
+	const router = useRouter();
 
-  const handleClick = (e: React.MouseEvent) => {
-    if (href === "back") {
-      e.preventDefault();
-      router.back();
-    } else if (onClick) {
-      onClick();
-    }
-  };
+	const handleClick = (e: React.MouseEvent) => {
+		if (href === "back") {
+			e.preventDefault();
+			router.back();
+		} else if (onClick) {
+			onClick();
+		}
+	};
 
-  return (
-    <Link
-      href={href === "back" ? "#" : href}
-      onClick={handleClick}
-      className={className}
-    >
-      {Icon && <Icon size={32} className="text-primary hover:text-black-200" />}
-      {children}
-    </Link>
-  );
+	return (
+		<Link
+			className={className}
+			href={href === "back" ? "#" : href}
+			onClick={handleClick}
+		>
+			{Icon && <Icon className="text-primary hover:text-black-200" size={32} />}
+			{children}
+		</Link>
+	);
 };
 
 export default LinkIconButton;

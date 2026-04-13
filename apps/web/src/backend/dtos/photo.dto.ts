@@ -1,38 +1,71 @@
 import { z } from "zod";
+import { paginationQueryDto, uuidDto } from "./common.dto";
 
-const photoResponseDto = z.object({
-	photo_id: z.string(),
-	user_id: z.string(),
-	image_url: z.string(),
-	bookmarks: z.number(),
-	title: z.string(),
-	description: z.string(),
-	tags: z.array(z.string()),
-	metadata: z.object({
-		width: z.number(),
-		height: z.number(),
-		format: z.string(),
-		size: z.number(),
-		exif: z.record(z.string(), z.string()),
-		uploaded_at: z.string(),
-	}),
-	created_at: z.string(),
-	updated_at: z.string(),
+const populatedPhotoUserDto = z
+	.object({
+		user_id: uuidDto,
+		username: z.string().optional(),
+		avatar: z.string().optional(),
+	})
+	.passthrough();
+
+export const photoResponseDto = z
+	.object({
+		photo_id: uuidDto,
+		user_id: z.union([uuidDto, populatedPhotoUserDto]),
+		url: z.string().url(),
+		title: z.string(),
+		description: z.string().default(""),
+		category: z.string().default(""),
+		style: z.string().default(""),
+		color: z.string().default(""),
+		camera: z.string().default(""),
+		bookmarks: z.number().int().min(0).default(0),
+		created_at: z.string().optional(),
+		updated_at: z.string().optional(),
+	})
+	.passthrough();
+
+export const createPhotoDto = z.object({
+	user_id: uuidDto,
+	url: z.string().url(),
+	title: z.string().min(1),
+	description: z.string().optional(),
+	category: z.string().optional(),
+	style: z.string().optional(),
+	color: z.string().optional(),
+	camera: z.string().optional(),
 });
 
-const createPhotoDto = photoResponseDto.omit({
-	photo_id: true,
-	created_at: true,
-	updated_at: true,
+export const updatePhotoDto = createPhotoDto
+	.omit({
+		user_id: true,
+		url: true,
+	})
+	.partial();
+
+export const photoIdParamDto = z.object({
+	id: uuidDto,
 });
-const updatePhotoDto = photoResponseDto.partial().omit({
-	photo_id: true,
-	user_id: true,
-	metadata: true,
-	created_at: true,
-	updated_at: true,
+
+export const listPhotosQueryDto = paginationQueryDto.extend({
+	sort: z.enum(["recent", "popular"]).default("recent"),
+	filters: z
+		.string()
+		.transform((value) =>
+			value
+				.split(",")
+				.map((item) => item.trim())
+				.filter(Boolean)
+		)
+		.optional(),
+});
+
+export const photoBookmarkQueryDto = paginationQueryDto.extend({
+	userId: uuidDto,
 });
 
 export type PhotoResponseDto = z.infer<typeof photoResponseDto>;
 export type CreatePhotoDto = z.infer<typeof createPhotoDto>;
 export type UpdatePhotoDto = z.infer<typeof updatePhotoDto>;
+export type ListPhotosQueryDto = z.infer<typeof listPhotosQueryDto>;

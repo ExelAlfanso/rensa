@@ -1,25 +1,26 @@
-import React from "react";
-import Heading from "./Heading";
 import Image from "next/image";
+import type React from "react";
+import Heading from "./Heading";
+
 interface UploadPreviewProps {
-  photo: string;
+	photo: string;
 }
 
 const UploadPreview: React.FC<UploadPreviewProps> = ({ photo }) => {
-  return (
-    <div className="flex flex-col items-center justify-center lg:block">
-      <Heading size="l" alignment="left">
-        What it is about?
-      </Heading>
-      <Image
-        src={photo}
-        alt={"image"}
-        width={1200}
-        height={900}
-        className="max-w-3/4 h-auto rounded-3xl"
-      ></Image>
-    </div>
-  );
+	return (
+		<div className="flex flex-col items-center justify-center lg:block">
+			<Heading alignment="left" size="l">
+				What it is about?
+			</Heading>
+			<Image
+				alt={"image"}
+				className="h-auto max-w-3/4 rounded-3xl"
+				height={900}
+				src={photo}
+				width={1200}
+			/>
+		</div>
+	);
 };
 
 export default UploadPreview;

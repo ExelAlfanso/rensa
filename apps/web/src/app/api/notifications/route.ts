@@ -1,57 +1,72 @@
-import { elysiaApi } from "@/lib/axios-server";
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
+import { ZodError } from "zod";
+import { notificationDomain } from "@/backend/domains/notifications/module";
+import {
+	createNotificationDto,
+	listNotificationsQueryDto,
+} from "@/backend/dtos/notification.dto";
 
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const { recipientId, page, limit } = Object.fromEntries(
-    searchParams.entries()
-  );
+	try {
+		const { searchParams } = new URL(req.url);
+		const query = listNotificationsQueryDto.parse({
+			recipientId: searchParams.get("recipientId") ?? undefined,
+			page: searchParams.get("page") ?? undefined,
+			limit: searchParams.get("limit") ?? undefined,
+		});
+		const notifications =
+			await notificationDomain.notificationsApplication.list(query);
 
-  try {
-    const res = await elysiaApi.get(`/notifications`, {
-      params: { recipientId, page, limit },
-    });
-    return NextResponse.json(
-      {
-        success: true,
-        data: res.data.data.notifications,
-        message: "Notifications fetched successfully",
-      },
-      { status: 200 }
-    );
-  } catch (err) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to fetch notifications",
-        error: (err as Error).message,
-      },
-      { status: 500 }
-    );
-  }
+		return NextResponse.json(
+			{
+				success: true,
+				data: notifications,
+				message: "Notifications fetched successfully",
+			},
+			{ status: 200 }
+		);
+	} catch (error) {
+		return mapRouteError(error, "Failed to fetch notifications");
+	}
 }
 
 export async function POST(req: Request) {
-  const { actorId, recipientId, photoId, type } = await req.json();
-  try {
-    const res = await elysiaApi.post(`/notifications`, {
-      actorId,
-      recipientId,
-      photoId,
-      type,
-    });
-    return NextResponse.json(
-      {
-        success: true,
-        data: res.data,
-        message: "Notification created successfully",
-      },
-      { status: 201 }
-    );
-  } catch {
-    return NextResponse.json(
-      { success: false, message: "Failed to create notification" },
-      { status: 500 }
-    );
-  }
+	try {
+		const payload = createNotificationDto.parse(await req.json());
+		const response =
+			await notificationDomain.notificationsApplication.create(payload);
+
+		return NextResponse.json(
+			{
+				success: true,
+				data: response,
+				message: "Notification created successfully",
+			},
+			{ status: 201 }
+		);
+	} catch (error) {
+		return mapRouteError(error, "Failed to create notification");
+	}
+}
+
+function mapRouteError(error: unknown, fallbackMessage: string): NextResponse {
+	if (error instanceof ZodError) {
+		return NextResponse.json(
+			{
+				success: false,
+				message: "Validation failed",
+				errors: error.flatten(),
+			},
+			{ status: 400 }
+		);
+	}
+
+	return NextResponse.json(
+		{
+			success: false,
+			message: fallbackMessage,
+			error: error instanceof Error ? error.message : "Unknown error",
+		},
+		{ status: 500 }
+	);
 }

@@ -1,49 +1,48 @@
 "use client";
-import React from "react";
-import Logo from "../icons/Logo";
-import Heading from "../Heading";
-import ProfileButton from "@/frontend/components/buttons/ProfileIconButton";
-import BookmarkButton from "../buttons/BookmarkButton";
 import Link from "next/link";
-import NotificationDropdown from "../dropdowns/Notification/NotificationDropdown";
-import AccountDropdown from "../dropdowns/AccountDropdown";
+import ProfileButton from "@/frontend/components/buttons/ProfileIconButton";
 import { useAuthStore } from "@/frontend/stores/useAuthStore";
+import BookmarkButton from "../buttons/BookmarkButton";
 import PrimaryButton from "../buttons/PrimaryButton";
 import SecondaryButton from "../buttons/SecondaryButton";
 import TertiaryButton from "../buttons/TertiaryButton";
+import AccountDropdown from "../dropdowns/AccountDropdown";
+import NotificationDropdown from "../dropdowns/notification/NotificationDropdown";
+import Heading from "../Heading";
+import Logo from "../icons/Logo";
 
-const ExploreNavBar = () => {
-  const user = useAuthStore((state) => state.user);
-  return (
-    <nav className="z-20 left-1/2 top-5 -translate-x-1/2 fixed w-[90%] lg:w-[70%] h-14 md:h-18 text-black rounded-[48px] flex items-center justify-between bg-white-200 shadow-lg">
-      <div className="flex flex-row items-center gap-1 lg:gap-4 ml-2 lg:ml-6">
-        <Logo size={"s"}></Logo>
-        <Link className="hidden lg:block" href="/explore">
-          <Heading size="s">Rensa</Heading>
-        </Link>
-      </div>
-      <div className="flex flex-row items-center justify-center gap-6 mr-6">
-        <span className="inline-flex items-center gap-2">
-          {user ? (
-            <>
-              <SecondaryButton href="/upload">Create</SecondaryButton>
-              <span className="flex ">
-                <NotificationDropdown></NotificationDropdown>
-                <BookmarkButton></BookmarkButton>
-              </span>
-              <ProfileButton src={"/profile.jpg"} alt={""}></ProfileButton>
-              <AccountDropdown src="/profile.jpg" user={user}></AccountDropdown>
-            </>
-          ) : (
-            <>
-              <PrimaryButton href="/login">Login</PrimaryButton>
-              <TertiaryButton href="/register">Sign Up</TertiaryButton>
-            </>
-          )}
-        </span>
-      </div>
-    </nav>
-  );
+const ExploreNavbar = () => {
+	const user = useAuthStore((state) => state.user);
+	return (
+		<nav className="fixed top-5 left-1/2 z-20 flex h-14 w-[90%] -translate-x-1/2 items-center justify-between rounded-[48px] bg-white-200 text-black shadow-lg md:h-18 lg:w-[70%]">
+			<div className="ml-2 flex flex-row items-center gap-1 lg:ml-6 lg:gap-4">
+				<Logo size={"s"} />
+				<Link className="hidden lg:block" href="/explore">
+					<Heading size="s">Rensa</Heading>
+				</Link>
+			</div>
+			<div className="mr-6 flex flex-row items-center justify-center gap-6">
+				<span className="inline-flex items-center gap-2">
+					{user ? (
+						<>
+							<SecondaryButton href="/upload">Create</SecondaryButton>
+							<span className="flex">
+								<NotificationDropdown />
+								<BookmarkButton />
+							</span>
+							<ProfileButton alt={""} src={"/profile.jpg"} />
+							<AccountDropdown src="/profile.jpg" user={user} />
+						</>
+					) : (
+						<>
+							<PrimaryButton href="/login">Login</PrimaryButton>
+							<TertiaryButton href="/register">Sign Up</TertiaryButton>
+						</>
+					)}
+				</span>
+			</div>
+		</nav>
+	);
 };
 
-export default ExploreNavBar;
+export default ExploreNavbar;

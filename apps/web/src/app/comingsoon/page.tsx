@@ -1,3 +1,3 @@
 export default function ComingSoonPage() {
-  return <div></div>;
+	return <div />;
 }

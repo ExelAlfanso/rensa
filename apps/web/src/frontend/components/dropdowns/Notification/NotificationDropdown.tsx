@@ -1,107 +1,107 @@
 "use client";
 
 import { BellIcon } from "@phosphor-icons/react";
-import Heading from "../../Heading";
 import Image from "next/image";
-import Text from "@/frontend/components/Text";
-import IconDropdown from "../IconDropdown";
-import DropdownItem from "../DropdownItem";
-import { useNotificationContext } from "@/frontend/providers/NotificationProvider";
-import useReadOnVisible from "@/frontend/hooks/useReadOnVisible";
-import { NotificationData } from "@/models/Notification";
 import { useCallback } from "react";
+import Text from "@/frontend/components/Text";
+import useReadOnVisible from "@/frontend/hooks/use-read-on-visible";
+import { useNotificationContext } from "@/frontend/providers/NotificationProvider";
+import type { NotificationData } from "@/frontend/types/notification";
+import Heading from "../../Heading";
+import DropdownItem from "../DropdownItem";
+import IconDropdown from "../IconDropdown";
 
 interface NotificationItemProps {
-  notification: NotificationData;
-  isLast: boolean;
+	isLast: boolean;
+	notification: NotificationData;
 }
 
 const NotificationItem = ({ notification, isLast }: NotificationItemProps) => {
-  const { markNotificationAsRead } = useNotificationContext();
+	const { markNotificationAsRead } = useNotificationContext();
 
-  const handleVisible = useCallback(() => {
-    markNotificationAsRead(notification.id);
-  }, [markNotificationAsRead, notification.id]);
+	const handleVisible = useCallback(() => {
+		markNotificationAsRead(notification.id);
+	}, [markNotificationAsRead, notification.id]);
 
-  const ref = useReadOnVisible(
-    notification.id,
-    notification.read,
-    handleVisible,
-  );
+	const ref = useReadOnVisible(
+		notification.id,
+		notification.read,
+		handleVisible
+	);
 
-  return (
-    <DropdownItem
-      ref={ref}
-      key={notification.id}
-      href={"/photo/" + notification.photoId}
-      className={`w-full ${isLast ? "rounded-b-2xl" : ""}`}
-    >
-      <div className={`w-12 h-12 inline mr-3 relative`}>
-        <Image
-          src={notification.actorId.avatar || "/profile.jpg"}
-          alt="profile"
-          fill
-          className="object-cover rounded-2xl aspect-square"
-        />
-      </div>
-      <Text size="xs" className="inline">
-        <span className="inline font-bold">
-          {notification.actorId.username}
-        </span>{" "}
-        {notification.type === "photo-saved"
-          ? "saved your photo."
-          : notification.type === "photo-commented"
-            ? "commented on your photo."
-            : "bookmarked your photo."}
-      </Text>
-    </DropdownItem>
-  );
+	return (
+		<DropdownItem
+			className={`w-full ${isLast ? "rounded-b-2xl" : ""}`}
+			href={`/photo/${notification.photoId}`}
+			key={notification.id}
+			ref={ref}
+		>
+			<div className={"relative mr-3 inline h-12 w-12"}>
+				<Image
+					alt="profile"
+					className="aspect-square rounded-2xl object-cover"
+					fill
+					src={notification.actorId.avatar || "/profile.jpg"}
+				/>
+			</div>
+			<Text className="inline" size="xs">
+				<span className="inline font-bold">
+					{notification.actorId.username}
+				</span>{" "}
+				{notification.type === "photo-saved"
+					? "saved your photo."
+					: notification.type === "photo-commented"
+						? "commented on your photo."
+						: "bookmarked your photo."}
+			</Text>
+		</DropdownItem>
+	);
 };
 
 const NotificationDropdown = () => {
-  const { notifications, clearNotifications } = useNotificationContext();
-  const unreadCount = notifications.filter((n) => !n.read).length;
-  const handleClearAllNotifications = () => {
-    // console.log("Clearing all notifications");
-    clearNotifications();
-  };
-  return (
-    <div className="relative z-50 w-full">
-      {unreadCount > 0 && (
-        <div className="absolute z-20 right-0 top-0 rounded-full bg-red-500 w-4 h-4 text-white-500 text-[10px] flex items-center justify-center">
-          {unreadCount}
-        </div>
-      )}
-      <IconDropdown Tag={BellIcon} closeOnItemClick={false} className="h-100">
-        <Heading alignment="center" size="m" className="py-6 relative w-full">
-          Notifications
-          {notifications.length > 0 && (
-            <button
-              onClick={handleClearAllNotifications}
-              className="absolute right-5 top-18 text-gray-700 hover:text-gray-600 transition-colors duration-300 cursor-pointer"
-            >
-              <Text size="xs">Clear all</Text>
-            </button>
-          )}
-        </Heading>
-        <ul className="overflow-y-auto no-scrollbar w-full flex flex-col items-center">
-          {notifications?.length > 0 ? (
-            notifications.map((notification, idx) => (
-              <NotificationItem
-                key={notification.id}
-                notification={notification}
-                isLast={idx === notifications.length - 1}
-              />
-            ))
-          ) : (
-            <Text size="s" className="mb-10 text-gray-400">
-              No notifications
-            </Text>
-          )}
-        </ul>
-      </IconDropdown>
-    </div>
-  );
+	const { notifications, clearNotifications } = useNotificationContext();
+	const unreadCount = notifications.filter((n) => !n.read).length;
+	const handleClearAllNotifications = () => {
+		// console.log("Clearing all notifications");
+		clearNotifications();
+	};
+	return (
+		<div className="relative z-50 w-full">
+			{unreadCount > 0 && (
+				<div className="absolute top-0 right-0 z-20 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white-500">
+					{unreadCount}
+				</div>
+			)}
+			<IconDropdown className="h-100" closeOnItemClick={false} Tag={BellIcon}>
+				<Heading alignment="center" className="relative w-full py-6" size="m">
+					Notifications
+					{notifications.length > 0 && (
+						<button
+							className="absolute top-18 right-5 cursor-pointer text-gray-700 transition-colors duration-300 hover:text-gray-600"
+							onClick={handleClearAllNotifications}
+						>
+							<Text size="xs">Clear all</Text>
+						</button>
+					)}
+				</Heading>
+				<ul className="no-scrollbar flex w-full flex-col items-center overflow-y-auto">
+					{notifications?.length > 0 ? (
+						notifications.map((notification, idx) => (
+							<NotificationItem
+								isLast={idx === notifications.length - 1}
+								key={notification.id}
+								notification={notification}
+							/>
+						))
+					) : (
+						<Text className="mb-10 text-gray-400" size="s">
+							No notifications
+						</Text>
+					)}
+				</ul>
+			</IconDropdown>
+		</div>
+	);
 };
 
 export default NotificationDropdown;

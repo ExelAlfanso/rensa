@@ -1,59 +1,59 @@
-import { NextRequest, NextResponse } from "next/server";
-import { connectDB } from "@/lib/mongodb";
-import { getToken } from "next-auth/jwt";
-import Roll from "@/models/Roll";
+import { type NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { ZodError } from "zod";
+import { BackendError } from "@/backend/common/backend.error";
+import { rollDomain } from "@/backend/domains/rolls/module";
+import { isSavedQueryDto } from "@/backend/dtos/roll.dto";
+import { authOptions } from "@/lib/auth";
 
-const secret = process.env.NEXTAUTH_SECRET!;
-
-/**
+/*
  * GET /api/rolls/is-saved?photoId=<photoId>
- * Returns { isSaved: boolean, rollIds: string[], rolls: { _id, name }[] }
  */
 export async function GET(req: NextRequest) {
-  try {
-    await connectDB();
+	try {
+		const session = await getServerSession(authOptions);
+		const actorId = session?.user?.id;
+		const { searchParams } = new URL(req.url);
+		const query = isSavedQueryDto.parse({
+			photoId: searchParams.get("photoId") ?? undefined,
+		});
 
-    // Auth check
-    const token = await getToken({ req, secret });
-    if (!token?.id) {
-      return NextResponse.json(
-        { success: false, message: "Unauthorized" },
-        { status: 401 }
-      );
-    }
-
-    const { searchParams } = new URL(req.url);
-    const photoId = searchParams.get("photoId");
-
-    if (!photoId) {
-      return NextResponse.json(
-        { success: false, message: "Missing photoId" },
-        { status: 400 }
-      );
-    }
-
-    // Find rolls of the user that contain this photo
-    const rolls = await Roll.find({ userId: token.id, photos: photoId }).select(
-      "_id name"
-    );
-
-    return NextResponse.json(
-      {
-        success: true,
-        message: "Fetched saved rolls successfully",
-        data: {
-          isSaved: rolls.length > 0,
-          rollIds: rolls.map((r) => r._id),
-          rolls, // optional: return roll names
-        },
-      },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error("  Error checking saved rolls:", error);
-    return NextResponse.json(
-      { success: false, message: "Internal Server Error" },
-      { status: 500 }
-    );
-  }
+		const result = await rollDomain.rollsApplication.listContainingPhoto(
+			query.photoId,
+			actorId
+		);
+		return NextResponse.json(
+			{
+				success: true,
+				message: "Fetched saved rolls successfully",
+				data: result,
+			},
+			{ status: 200 }
+		);
+	} catch (error) {
+		if (error instanceof ZodError) {
+			return NextResponse.json(
+				{
+					success: false,
+					message: "Validation failed",
+					details: error.flatten(),
+				},
+				{ status: 400 }
+			);
+		}
+		if (error instanceof BackendError) {
+			return NextResponse.json(
+				{
+					success: false,
+					message: error.message,
+					code: error.code,
+				},
+				{ status: error.statusCode }
+			);
+		}
+		return NextResponse.json(
+			{ success: false, message: "Internal Server Error" },
+			{ status: 500 }
+		);
+	}
 }

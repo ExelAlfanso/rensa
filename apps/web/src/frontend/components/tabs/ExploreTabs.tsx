@@ -1,35 +1,37 @@
 "use client";
 
-import { tabDatas } from "@/frontend/datas/exploreDatas";
-import React from "react";
+import type React from "react";
+import { tabDatas } from "@/frontend/data/exploreDatas";
 import "./ExploreTabs.css";
 interface ExploreTabsProps {
-  setActiveTab?: (tab: string) => void;
-  className?: string;
+	className?: string;
+	setActiveTab?: (tab: string) => void;
 }
 
 const ExploreTabs: React.FC<ExploreTabsProps> = ({
-  className,
-  setActiveTab,
+	className,
+	setActiveTab,
 }) => {
-  return (
-    <div className={`tabs gap-5 tabs-border ${className}`}>
-      {tabDatas.map((tab, idx) => (
-        <input
-          key={idx}
-          type="radio"
-          name="my_tabs_2"
-          className={`tab transition-all duration-300 hover:text-black-300 text-primary text-[14px] md:text-[20px] `}
-          onClick={() => {
-            setActiveTab?.(tab.id);
-            tab.isActive = !tab.isActive;
-          }}
-          defaultChecked={tab.id === "tab1"}
-          aria-label={tab.label}
-        />
-      ))}
-    </div>
-  );
+	return (
+		<div className={`tabs tabs-border gap-5 ${className}`}>
+			{tabDatas.map((tab, idx) => (
+				<input
+					aria-label={tab.label}
+					className={
+						"tab text-[14px] text-primary transition-all duration-300 hover:text-black-300 md:text-[20px]"
+					}
+					defaultChecked={tab.id === "tab1"}
+					key={idx}
+					name="my_tabs_2"
+					onClick={() => {
+						setActiveTab?.(tab.id);
+						tab.isActive = !tab.isActive;
+					}}
+					type="radio"
+				/>
+			))}
+		</div>
+	);
 };
 
 export default ExploreTabs;

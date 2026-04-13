@@ -1,25 +1,26 @@
 import { XIcon } from "@phosphor-icons/react";
-import React from "react";
+import type React from "react";
 import Text from "../Text";
+
 interface TagChipProps {
-  tag: string;
-  onClick: React.MouseEventHandler<HTMLButtonElement>;
-  disabled?: boolean;
+	disabled?: boolean;
+	onClick: React.MouseEventHandler<HTMLButtonElement>;
+	tag: string;
 }
 
 const TagChip: React.FC<TagChipProps> = ({
-  tag,
-  onClick,
-  disabled = false,
+	tag,
+	onClick,
+	disabled = false,
 }) => {
-  return (
-    <span className="flex justify-between gap-2 w-20 sm:w-25 p-2 pl-4 pr-6 bg-black border rounded-full text-white-200">
-      <Text size="xs">{tag}</Text>
-      <button onClick={onClick} type="button" disabled={disabled}>
-        <XIcon size={10} color={"white"}></XIcon>
-      </button>
-    </span>
-  );
+	return (
+		<span className="flex w-20 justify-between gap-2 rounded-full border bg-black p-2 pr-6 pl-4 text-white-200 sm:w-25">
+			<Text size="xs">{tag}</Text>
+			<button disabled={disabled} onClick={onClick} type="button">
+				<XIcon color={"white"} size={10} />
+			</button>
+		</span>
+	);
 };
 
 export default TagChip;

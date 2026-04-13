@@ -1,81 +1,84 @@
 "use client";
 
-import { useOutsideClick } from "@/frontend/hooks/useOutsideClick";
-import React, { useState } from "react";
+import type React from "react";
+import { useState } from "react";
+import { useOutsideClick } from "@/frontend/hooks/use-outside-click";
 
 interface IconDropdownProps {
-  id?: string;
-  children?: React.ReactNode;
-  Tag?: React.ElementType;
-  iconSize?: number;
-  position?: "left" | "right" | "center";
-  closeOnItemClick?: boolean;
-  weight?:
-    | "bold"
-    | "duotone"
-    | "fill"
-    | "light"
-    | "regular"
-    | "thin"
-    | undefined;
+	children?: React.ReactNode;
 
-  className?: string;
+	className?: string;
+	closeOnItemClick?: boolean;
+	iconSize?: number;
+	id?: string;
+	position?: "left" | "right" | "center";
+	Tag?: React.ElementType;
+	weight?:
+		| "bold"
+		| "duotone"
+		| "fill"
+		| "light"
+		| "regular"
+		| "thin"
+		| undefined;
 }
 
 const IconDropdown: React.FC<IconDropdownProps> = ({
-  children,
-  iconSize = 32,
-  Tag = undefined,
-  position = "center",
-  closeOnItemClick = true,
-  weight = "fill",
-  className = "",
+	children,
+	iconSize = 32,
+	Tag = undefined,
+	position = "center",
+	closeOnItemClick = true,
+	weight = "fill",
+	className = "",
 }) => {
-  const positionClasses = {
-    left: "-right-0",
-    right: "left-0",
-    center: "-left-23",
-  };
-  const [open, setOpen] = useState(false);
-  const dropdownRef = useOutsideClick<HTMLDivElement>(() => setOpen(false));
+	const positionClasses = {
+		left: "-right-0",
+		right: "left-0",
+		center: "-left-23",
+	};
+	const [open, setOpen] = useState(false);
+	const dropdownRef = useOutsideClick<HTMLDivElement>(() => setOpen(false));
 
-  const handleItemClick = (event: React.SyntheticEvent) => {
-    if (closeOnItemClick) {
-      setOpen(false);
-      return;
-    }
+	const handleItemClick = (event: React.SyntheticEvent) => {
+		if (closeOnItemClick) {
+			setOpen(false);
+			return;
+		}
 
-    const target = event.target as HTMLElement | null;
-    const shouldClose = target?.closest('[data-close-dropdown="true"]');
-    if (shouldClose) setOpen(false);
-  };
+		const target = event.target as HTMLElement | null;
+		const shouldClose = target?.closest('[data-close-dropdown="true"]');
+		if (shouldClose) {
+			setOpen(false);
+		}
+	};
 
-  return (
-    <div className={`relative text-black`} ref={dropdownRef}>
-      {Tag && (
-        <Tag
-          weight={weight}
-          size={iconSize}
-          className="hover:text-black-200 text-black transition-colors duration-200 cursor-pointer"
-          onClick={() => setOpen((prev) => !prev)}
-        />
-      )}
-      {open && (
-        <ul
-          className={`absolute -right-20 md:-left-40 top-10 md:top-13 mt-2 w-90 flex flex-col items-center rounded-2xl bg-white-200 p-0 shadow-lg transform transition-all duration-200 ease-out origin-top ${className}
+	return (
+		<div className={"relative text-black"} ref={dropdownRef}>
+			{Tag && (
+				<Tag
+					className="cursor-pointer text-black transition-colors duration-200 hover:text-black-200"
+					onClick={() => setOpen((prev) => !prev)}
+					size={iconSize}
+					weight={weight}
+				/>
+			)}
+			{open && (
+				<ul
+					className={`absolute top-10 mt-2 flex w-90 origin-top transform flex-col items-center rounded-2xl bg-white-200 p-0 shadow-lg transition-all duration-200 ease-out md:top-13 ${positionClasses[position]} ${className}
           ${
-            open
-              ? "opacity-100 scale-100 translate-y-0"
-              : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
-          }
+						open
+							? "translate-y-0 scale-100 opacity-100"
+							: "pointer-events-none -translate-y-2 scale-95 opacity-0"
+					}
         `}
-          onClickCapture={handleItemClick}
-        >
-          {children}
-        </ul>
-      )}
-    </div>
-  );
+					onClickCapture={handleItemClick}
+				>
+					{children}
+				</ul>
+			)}
+		</div>
+	);
 };
 
 export default IconDropdown;

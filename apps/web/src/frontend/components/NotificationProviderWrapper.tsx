@@ -2,9 +2,9 @@
 import { NotificationProvider } from "@/frontend/providers/NotificationProvider";
 
 export default function NotificationProviderWrapper({
-  children,
+	children,
 }: {
-  children: React.ReactNode;
+	children: React.ReactNode;
 }) {
-  return <NotificationProvider>{children}</NotificationProvider>;
+	return <NotificationProvider>{children}</NotificationProvider>;
 }

@@ -1,20 +1,20 @@
 import PrimaryButton from "../PrimaryButton";
 
 export interface LinkButtonProps {
-  href: string;
-  className?: string;
-  children?: React.ReactNode;
+	children?: React.ReactNode;
+	className?: string;
+	href: string;
 }
 const LinkPrimaryButton: React.FC<LinkButtonProps> = ({
-  href,
-  className,
-  children,
+	href,
+	className,
+	children,
 }) => {
-  return (
-    <PrimaryButton href={href} className={className}>
-      {children}
-    </PrimaryButton>
-  );
+	return (
+		<PrimaryButton className={className} href={href}>
+			{children}
+		</PrimaryButton>
+	);
 };
 
 export default LinkPrimaryButton;
