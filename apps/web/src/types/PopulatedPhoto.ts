@@ -21,5 +21,5 @@ export interface PopulatedPhoto {
 	title: string;
 	updatedAt?: string;
 	url: string;
-	userId: PopulatedPhotoUser | string;
+	userId: PopulatedPhotoUser;
 }

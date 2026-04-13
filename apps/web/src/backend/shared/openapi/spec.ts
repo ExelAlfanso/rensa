@@ -1,5 +1,7 @@
-import { authOpenApiFragment } from "@/app/api/auth/schema";
-import { docsRouteFragment } from "@/app/api/docs/schema";
+import { authOpenApiDocFragment } from "@/app/api/auth/doc";
+import { authOpenApiSchemaFragment } from "@/app/api/auth/schema";
+import { docsRouteFragment } from "@/app/api/docs/doc";
+import { docsOpenApiSchemaFragment } from "@/app/api/docs/schema";
 import { emailOpenApiFragment } from "@/app/api/email/schema";
 import { notificationsReadOpenApiFragment } from "@/app/api/notifications/[id]/read/schema";
 import { notificationsOpenApiFragment } from "@/app/api/notifications/schema";
@@ -9,17 +11,20 @@ import { photoBookmarkOpenApiFragment } from "@/app/api/photos/bookmark/schema";
 import { photosOpenApiFragment } from "@/app/api/photos/schema";
 import { profileByIdOpenApiFragment } from "@/app/api/profile/[id]/schema";
 import { rollByIdOpenApiFragment } from "@/app/api/rolls/[rollId]/schema";
-import { rollsOpenApiFragment } from "@/app/api/rolls/schema";
+import { rollsOpenApiDocFragment } from "@/app/api/rolls/doc";
+import { rollsOpenApiSchemaFragment } from "@/app/api/rolls/schema";
 import { usersByIdOpenApiFragment } from "@/app/api/users/[id]/schema";
 import type { OpenApiFragment } from "./types";
 
 const fragments: OpenApiFragment[] = [
-	authOpenApiFragment,
+	authOpenApiDocFragment,
+	authOpenApiSchemaFragment,
 	emailOpenApiFragment,
 	photosOpenApiFragment,
 	photoByIdOpenApiFragment,
 	photoBookmarkOpenApiFragment,
-	rollsOpenApiFragment,
+	rollsOpenApiDocFragment,
+	rollsOpenApiSchemaFragment,
 	rollByIdOpenApiFragment,
 	usersByIdOpenApiFragment,
 	profileByIdOpenApiFragment,
@@ -27,6 +32,7 @@ const fragments: OpenApiFragment[] = [
 	notificationsReadOpenApiFragment,
 	openApiRouteFragment,
 	docsRouteFragment,
+	docsOpenApiSchemaFragment,
 ];
 
 const collectTags = (items: OpenApiFragment[]): Array<{ name: string }> => {
@@ -73,7 +79,7 @@ export const openApiSpec = {
 		title: "Rensa API",
 		version: "1.1.0",
 		description:
-			"Canonical API contract for Rensa. Each route group owns docs in local schema.ts files with DTO and mock examples.",
+			"Canonical API contract for Rensa. Each route group owns reusable schemas in schema.ts and route-level docs in doc.ts.",
 	},
 	servers: [
 		{

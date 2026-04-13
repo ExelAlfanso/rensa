@@ -65,6 +65,20 @@
 	--gray-800: #727a72;
 	--gray-900: #575a58;
 
+	/* Typography scale tokens */
+	--text-xs-mobile: 10px;
+	--text-xs-desktop: 13px;
+	--text-s-mobile: 13px;
+	--text-s-desktop: 18px;
+	--text-m-mobile: 16px;
+	--text-m-desktop: 18px;
+	--text-l-mobile: 18px;
+	--text-l-desktop: 20px;
+	--text-xl-mobile: 20px;
+	--text-xl-desktop: 24px;
+	--text-xxl-mobile: 24px;
+	--text-xxl-desktop: 30px;
+
 	--font-figtree: "Figtree", serif;
 	--font-forum: "Forum", sans-serif;
 }
@@ -157,6 +171,56 @@ select:-webkit-autofill:focus {
 }
 
 @layer utilities {
+	.type-xs {
+		font-size: var(--text-xs-mobile);
+	}
+
+	.type-s {
+		font-size: var(--text-s-mobile);
+	}
+
+	.type-m {
+		font-size: var(--text-m-mobile);
+	}
+
+	.type-l {
+		font-size: var(--text-l-mobile);
+	}
+
+	.type-xl {
+		font-size: var(--text-xl-mobile);
+	}
+
+	.type-xxl {
+		font-size: var(--text-xxl-mobile);
+	}
+
+	@media (min-width: 768px) {
+		.type-xs {
+			font-size: var(--text-xs-desktop);
+		}
+
+		.type-s {
+			font-size: var(--text-s-desktop);
+		}
+
+		.type-m {
+			font-size: var(--text-m-desktop);
+		}
+
+		.type-l {
+			font-size: var(--text-l-desktop);
+		}
+
+		.type-xl {
+			font-size: var(--text-xl-desktop);
+		}
+
+		.type-xxl {
+			font-size: var(--text-xxl-desktop);
+		}
+	}
+
 	.no-scrollbar {
 		/* Firefox */
 		-ms-overflow-style: none;
