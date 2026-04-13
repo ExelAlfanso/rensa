@@ -1,6 +1,6 @@
 pre-commit:
   jobs:
-    - run: PATH="$PWD/node_modules/.bin:$PATH" ./node_modules/.bin/ultracite fix
+    - run: npx ultracite fix
       glob:
         - "**/*.js"
         - "**/*.jsx"

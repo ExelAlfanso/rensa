@@ -63,7 +63,7 @@ const MasonryGallerySection: React.FC<MasonryGallerySectionProps> = ({
 			if (userId) {
 				return fetchBookmarkedPhotosFromDB(userId, page);
 			}
-			return null as unknown as FetchPhotosResponse;
+			return Promise.reject(new Error("Invalid query parameters"));
 		},
 		getNextPageParam: (lastPage) => lastPage.nextPage,
 		initialPageParam: 1,

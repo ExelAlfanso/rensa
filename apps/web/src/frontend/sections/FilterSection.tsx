@@ -11,7 +11,7 @@ const FilterSection = () => {
 		setFilters([]);
 	};
 	return (
-		<div className="flex w-full flex-col justify-center px-[25px] md:px-[30px] lg:px-[70px] xl:px-[90px] 2xl:px-[260px]">
+		<div className="flex w-full flex-col justify-center px-6.25 md:px-7.5 lg:px-17.5 xl:px-22.5 2xl:px-65">
 			<FilterList
 				filters={filters}
 				handleClearFilters={handleClearFilters}
