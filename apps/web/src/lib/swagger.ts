@@ -10,5 +10,5 @@ export const getApiDocs = async () => {
 		apiFolder: "app/api",
 		definition,
 	});
-	return spec;
+	return await spec;
 };
