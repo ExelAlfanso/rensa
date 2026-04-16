@@ -70,7 +70,7 @@ Whether you're shooting with Fujifilm, Ricoh, or other custom-profile capable ca
 ### Backend Services
 
 - **APIs**: Elysia.js (TypeScript), FastAPI (Python)
-- **Database**: PostgreSQL (Supabase)
+- **Database**: PostgreSQL + Drizzle ORM
 - **Real-time**: Socket.io
 - **File Storage**: Cloudinary
 - **Caching**: Redis
@@ -98,7 +98,7 @@ Whether you're shooting with Fujifilm, Ricoh, or other custom-profile capable ca
 - **Node.js**: v18.0.0 or higher ([Download](https://nodejs.org/))
 - **npm**: v9.0.0 or higher (comes with Node.js)
 - **git**: Latest version
-- **PostgreSQL / Supabase**: Project database and auth schemas
+- **PostgreSQL**: Project database
 - **Cloudinary Account**: For image hosting ([Sign up](https://cloudinary.com/))
 
 ### Installation
@@ -126,10 +126,7 @@ Then edit `.env.local` and add your configuration:
 
 ```env
 # Database
-SUPABASE_URL=...
-SUPABASE_SERVICE_ROLE_KEY=...
-SUPABASE_PUBLISHABLE_KEY=...
-NEXT_PUBLIC_SUPABASE_URL=...
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/rensa
 
 # Authentication
 NEXTAUTH_URL=http://localhost:3000
@@ -331,7 +328,7 @@ MIT License © 2026 Rensa Contributors
 - [Next.js](https://nextjs.org/) - React framework
 - [Tailwind CSS](https://tailwindcss.com/) - Styling
 - [Framer Motion](https://www.framer.com/motion/) - Animations
-- [Supabase](https://supabase.com/) - PostgreSQL platform and auth adapter backend
+- [Drizzle ORM](https://orm.drizzle.team/) - Type-safe PostgreSQL ORM
 - [Cloudinary](https://cloudinary.com/) - Image hosting
 
 ### Community

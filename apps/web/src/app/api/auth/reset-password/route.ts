@@ -1,8 +1,10 @@
 import bcrypt from "bcryptjs";
+import { and, eq } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 import { type NextRequest, NextResponse } from "next/server";
+import { users } from "@/backend/db/schema";
+import db from "@/lib/drizzle";
 import { resetPasswordLimiter } from "@/lib/rateLimiter";
-import { supabaseAdmin } from "@/lib/supabase";
 
 /*
   POST /api/auth/reset-password
@@ -85,28 +87,20 @@ export async function POST(req: NextRequest) {
 		}
 
 		const hashedPassword = await bcrypt.hash(password, 10);
-		const { data, error: updateError } = await supabaseAdmin
-			.from("users")
-			.update({
+		const [updated] = await db
+			.update(users)
+			.set({
 				password: hashedPassword,
-				password_changed_at: new Date().toISOString(),
-				updated_at: new Date().toISOString(),
+				passwordChangedAt: new Date(),
+				updatedAt: new Date(),
 			})
-			.eq("email", payload.email)
-			.select("user_id")
-			.single();
+			.where(and(eq(users.email, payload.email), eq(users.userId, payload.id)))
+			.returning({ id: users.userId });
 
-		if (updateError || !data) {
-			if (updateError?.code === "PGRST116") {
-				return NextResponse.json(
-					{ success: false, message: "User not found" },
-					{ status: 404 }
-				);
-			}
-			console.error("Database error during password reset:", updateError);
+		if (!updated) {
 			return NextResponse.json(
-				{ success: false, message: "Failed to update password" },
-				{ status: 500 }
+				{ success: false, message: "User not found" },
+				{ status: 404 }
 			);
 		}
 

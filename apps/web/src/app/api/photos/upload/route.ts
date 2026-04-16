@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import sharp from "sharp";
+import { photoMetadata, photos } from "@/backend/db/schema";
 import { authOptions } from "@/lib/auth";
 import { fastApi } from "@/lib/axios-server";
 import cloudinary, { validateCloudinaryUrl } from "@/lib/cloudinary";
+import db from "@/lib/drizzle";
 import { photoUploadLimiter } from "@/lib/rateLimiter";
-import { supabaseAdmin } from "@/lib/supabase";
 import { sanitizeInput } from "@/lib/validation";
 
 export async function compressImageUnder10MB(buffer: Buffer): Promise<Buffer> {
@@ -255,10 +256,10 @@ export async function POST(req: Request) {
 			);
 		}
 
-		const { data: photo, error: photoError } = await supabaseAdmin
-			.from("photos")
-			.insert({
-				user_id: userId,
+		const [photo] = await db
+			.insert(photos)
+			.values({
+				userId,
 				url: secure_url,
 				title,
 				description,
@@ -267,38 +268,56 @@ export async function POST(req: Request) {
 				color,
 				camera,
 			})
-			.select(
-				"photo_id,user_id,url,title,description,category,style,color,camera,created_at,updated_at"
-			)
-			.single();
-		if (photoError || !photo) {
+			.returning();
+		if (!photo) {
 			return NextResponse.json(
 				{
 					success: false,
-					error: `Failed to persist photo: ${photoError?.message ?? "No data"}`,
+					error: "Failed to persist photo",
 				},
 				{ status: 500 }
 			);
 		}
 
-		const { error: metadataError } = await supabaseAdmin
-			.from("photo_metadata")
-			.upsert({
-				photo_metadata_id: photo.photo_id,
-				width,
-				height,
-				format,
-				size: bytes,
-				uploaded_at: created_at,
-			});
-		if (metadataError) {
+		try {
+			await db
+				.insert(photoMetadata)
+				.values({
+					photoMetadataId: photo.photoId,
+					width,
+					height,
+					format,
+					size: bytes,
+					uploadedAt: new Date(created_at),
+				})
+				.onConflictDoUpdate({
+					target: photoMetadata.photoMetadataId,
+					set: {
+						width,
+						height,
+						format,
+						size: bytes,
+						uploadedAt: new Date(created_at),
+					},
+				});
+		} catch (metadataError) {
 			console.error("Failed to persist photo metadata:", metadataError);
 		}
 
 		return NextResponse.json({
 			success: true,
 			photo: {
-				...photo,
+				photo_id: photo.photoId,
+				user_id: photo.userId,
+				url: photo.url,
+				title: photo.title,
+				description: photo.description,
+				category: photo.category,
+				style: photo.style,
+				color: photo.color,
+				camera: photo.camera,
+				created_at: photo.createdAt?.toISOString(),
+				updated_at: photo.updatedAt?.toISOString(),
 				tags,
 				metadata: {
 					width,

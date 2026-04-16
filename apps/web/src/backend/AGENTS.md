@@ -8,18 +8,18 @@ Applies to:
 - `src/backend/**`
 - `src/app/api/**`
 - `src/lib/auth.ts`
-- `src/lib/supabase.ts`
-- `supabase/migrations/**`
+- `src/lib/drizzle.ts`
+- `src/backend/db/**`
 
 ## Current Backend Direction (As Of April 2026)
 
-The backend direction is PostgreSQL-first and Supabase-backed:
-- NextAuth with `@auth/supabase-adapter` for auth persistence (`next_auth` schema in Supabase/PostgreSQL).
-- Supabase/PostgreSQL for all application entities (`users`, `photos`, `rolls`, `bookmarks`, `comments`, `contacts`, `bug_reports`).
+The backend direction is PostgreSQL-first and Drizzle-backed:
+- NextAuth with `@auth/drizzle-adapter` for auth persistence.
+- PostgreSQL + Drizzle for all application entities (`users`, `photos`, `rolls`, `bookmarks`, `comments`, `contacts`, `bug_reports`).
 
 When adding or refactoring backend logic:
 - Do not introduce non-PostgreSQL persistence dependencies.
-- Treat PostgreSQL/Supabase as the single source of truth.
+- Treat PostgreSQL as the single source of truth.
 
 ## Architecture Rules
 
@@ -57,7 +57,7 @@ Repository layer (`*.repository.ts`):
 - Role: data access only.
 - Allowed: database queries, persistence mapping.
 - Forbidden: business logic, validation, calling other repositories, HTTP/Zod awareness.
-- Signs: SQL/ORM/Supabase queries, no business-rule branching.
+- Signs: SQL/ORM queries, no business-rule branching.
 
 DTO layer (`*.dto.ts`):
 - Role: input/output validation with Zod.
@@ -118,25 +118,22 @@ Service layer must:
 - Translate repository errors to stable app errors.
 - Keep cross-entity operations transactional when required.
 
-If Supabase multi-step writes must be atomic, use Postgres functions/RPC or explicit transaction-capable pathways.
+If multi-step writes must be atomic, use PostgreSQL transactions.
 
 ## Auth Best Practices
 
-### 1) NextAuth + Supabase Adapter
+### 1) NextAuth + Drizzle Adapter
 
-`src/lib/auth.ts` currently configures Supabase adapter with:
-- `SUPABASE_URL`
-- `SUPABASE_ROLE_SERVICE_KEY`
+`src/lib/auth.ts` currently configures Drizzle adapter with `src/lib/drizzle.ts`.
 
 Rules:
-- Service role key is server-only. Never expose via `NEXT_PUBLIC_*`.
 - Keep session and JWT callbacks deterministic; do not append volatile fields without reason.
 - Normalize role source of truth (prefer DB-backed role, not client-provided values).
 
 ### 2) Credentials Flow
 
 Credentials auth must read/write PostgreSQL-backed user records only:
-- Any user identity field used in session (`id`, `email`, `role`) must be sourced from Supabase-backed application users.
+- Any user identity field used in session (`id`, `email`, `role`) must be sourced from PostgreSQL-backed application users.
 - Avoid dual-write behavior or mixed identity stores.
 
 ### 3) Trigger-Based Profile Creation
@@ -148,7 +145,7 @@ Rules:
 - Avoid assumptions that `raw_user_meta_data->>'full_name'` always exists.
 - Add fallback username logic in SQL or service layer.
 
-## Supabase and SQL Migration Rules
+## SQL Migration Rules
 
 ### 1) Migration Safety
 
@@ -180,12 +177,11 @@ For trigger/function updates:
 
 ## Data Access Standards
 
-For Supabase access (`src/lib/supabase.ts` and repositories):
-- Use server-only clients for privileged operations.
-- Always check `{ error }` and surface typed failures.
-- Prefer `.single()` for unique row queries.
-- Avoid returning `data[0]` without null/error handling.
+For Drizzle data access (`src/lib/drizzle.ts` and repositories):
+- Use typed schema imports from `src/backend/db/schema.ts`.
+- Handle null/empty result sets explicitly.
 - Select only required columns in read queries.
+- Prefer transactions for multi-step writes.
 
 ## TypeScript Standards
 
@@ -234,6 +230,6 @@ Each new feature should include all relevant layers (even if thin initially) to 
 - Service enforces authorization and invariants.
 - Repository uses safe query patterns and typed returns.
 - Auth/session fields remain backward compatible.
-- Supabase migration is additive and reviewed for production safety.
+- Migration is additive and reviewed for production safety.
 - Tests and lint pass.
 - Docs updated if endpoint or data contract changed.

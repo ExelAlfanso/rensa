@@ -1,7 +1,9 @@
+import { eq } from "drizzle-orm";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { type NextRequest, NextResponse } from "next/server";
+import { users } from "@/backend/db/schema";
 import { userDomain } from "@/backend/domains/users/module";
-import { supabaseAdmin } from "@/lib/supabase";
+import db from "@/lib/drizzle";
 
 interface VerifyTokenPayload extends JwtPayload {
 	email: string;
@@ -55,11 +57,15 @@ export async function POST(req: NextRequest) {
 			);
 		}
 
-		const { error: updateError } = await supabaseAdmin
-			.from("users")
-			.update({ verified: true, updated_at: new Date().toISOString() })
-			.eq("email", email);
-		if (updateError) {
+		const [updated] = await db
+			.update(users)
+			.set({
+				updatedAt: new Date(),
+				verified: true,
+			})
+			.where(eq(users.email, email))
+			.returning({ id: users.userId });
+		if (!updated) {
 			return NextResponse.json(
 				{ success: false, message: "Failed to verify email" },
 				{ status: 500 }

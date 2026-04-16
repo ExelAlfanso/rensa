@@ -3,11 +3,11 @@
 Updated: 2026-04-13
 
 ## Scope
-This ERD reflects the PostgreSQL/Supabase model as the canonical and only
+This ERD reflects the PostgreSQL + Drizzle model as the canonical and only
 supported persistence architecture.
 
 Primary sources:
-- `supabase/migrations/20260309112035_init.sql`
+- `src/backend/db/schema.ts`
 - `src/backend/domains/*/infrastructure/*.repository.ts`
 - `src/backend/dtos/*.ts`
 
@@ -42,7 +42,7 @@ erDiagram
     }
 
     PHOTO_METADATA {
-      uuid photo_metadata_id PK_FK
+      uuid photo_metadata_id PK,FK
       integer width
       integer height
       text format
@@ -78,8 +78,8 @@ erDiagram
     }
 
     ROLL_PHOTOS {
-      uuid roll_id PK_FK
-      uuid photo_id PK_FK
+      uuid roll_id PK,FK
+      uuid photo_id PK,FK
     }
 
     CONTACTS {
@@ -157,7 +157,7 @@ erDiagram
 ```
 
 ## Data Policy
-- PostgreSQL/Supabase is the only supported data persistence layer.
+- PostgreSQL is the only supported data persistence layer.
 - Any non-PostgreSQL persistence layer is out of scope and should not be
   introduced in new work.
 - Terminology is standardized as `bookmarks` only.

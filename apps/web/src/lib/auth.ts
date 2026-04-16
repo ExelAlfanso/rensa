@@ -1,4 +1,4 @@
-import { SupabaseAdapter } from "@auth/supabase-adapter";
+import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import bcrypt from "bcryptjs";
 import type {
 	DefaultSession,
@@ -7,7 +7,14 @@ import type {
 	Session,
 } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import {
+	authAccounts,
+	authSessions,
+	authUsers,
+	authVerificationTokens,
+} from "@/backend/db/schema";
 import { userDomain } from "../backend/domains/users/module";
+import db from "./drizzle";
 
 declare module "next-auth" {
 	interface Session {
@@ -27,9 +34,11 @@ declare module "next-auth" {
 }
 
 export const authOptions: NextAuthOptions = {
-	adapter: SupabaseAdapter({
-		url: process.env.SUPABASE_URL || "",
-		secret: process.env.SUPABASE_SERVICE_ROLE_KEY || "",
+	adapter: DrizzleAdapter(db, {
+		accountsTable: authAccounts,
+		sessionsTable: authSessions,
+		usersTable: authUsers,
+		verificationTokensTable: authVerificationTokens,
 	}),
 	providers: [
 		CredentialsProvider({
@@ -63,8 +72,6 @@ export const authOptions: NextAuthOptions = {
 				if (!isValid) {
 					throw new Error("Invalid email or password");
 				}
-
-				console.log("User authenticated:", user.email);
 
 				return {
 					id: user.user_id,

@@ -1,36 +1,14 @@
+import { asc, count, eq } from "drizzle-orm";
+import { comments, users } from "@/backend/db/schema";
 import type { CommentResponseDto } from "@/backend/dtos/comment.dto";
 import type {
 	CommentRepositoryInterface,
 	ListCommentsResult,
 } from "@/backend/interfaces/comment-repository.interface";
-import { supabaseAdmin } from "@/lib/supabase";
+import db from "@/lib/drizzle";
 
-interface CommentInsertRow {
-	photo_id: string;
-	text: string;
-	user_id: string;
-}
-
-interface CommentListRow {
-	comment_id: string;
-	created_at: string | null;
-	photo_id: string;
-	text: string;
-	updated_at: string | null;
-	user_id: string;
-	users:
-		| {
-				avatar: string | null;
-				user_id: string;
-				username: string;
-		  }
-		| {
-				avatar: string | null;
-				user_id: string;
-				username: string;
-		  }[]
-		| null;
-}
+const toIso = (value: Date | null): string | undefined =>
+	value ? value.toISOString() : undefined;
 
 export class CommentRepository implements CommentRepositoryInterface {
 	async create(params: {
@@ -38,29 +16,25 @@ export class CommentRepository implements CommentRepositoryInterface {
 		userId: string;
 		text: string;
 	}): Promise<CommentResponseDto> {
-		const payload: CommentInsertRow = {
-			photo_id: params.photoId,
-			user_id: params.userId,
-			text: params.text,
-		};
-		const { data, error } = await supabaseAdmin
-			.from("comments")
-			.insert(payload)
-			.select("comment_id,photo_id,user_id,text,created_at,updated_at")
-			.single();
-		if (error || !data) {
-			throw new Error(
-				`Failed to create comment: ${error?.message ?? "No data"}`
-			);
+		const [row] = await db
+			.insert(comments)
+			.values({
+				photoId: params.photoId,
+				text: params.text,
+				userId: params.userId,
+			})
+			.returning();
+		if (!row) {
+			throw new Error("Failed to create comment");
 		}
 
 		return {
-			_id: data.comment_id,
-			photoId: data.photo_id,
-			userId: data.user_id,
-			text: data.text,
-			createdAt: data.created_at ?? undefined,
-			updatedAt: data.updated_at ?? undefined,
+			_id: row.commentId,
+			photoId: row.photoId ?? "",
+			userId: row.userId ?? "",
+			text: row.text,
+			createdAt: toIso(row.createdAt),
+			updatedAt: toIso(row.updatedAt),
 		};
 	}
 
@@ -69,52 +43,52 @@ export class CommentRepository implements CommentRepositoryInterface {
 		offset: number;
 		limit: number;
 	}): Promise<ListCommentsResult> {
-		const from = params.offset;
-		const to = from + params.limit - 1;
-		const { data, error } = await supabaseAdmin
-			.from("comments")
-			.select(
-				"comment_id,photo_id,user_id,text,created_at,updated_at,users:user_id(user_id,username,avatar)"
-			)
-			.eq("photo_id", params.photoId)
-			.order("created_at", { ascending: true })
-			.range(from, to);
-		if (error) {
-			throw new Error(`Failed to list comments: ${error.message}`);
-		}
+		const rows = await db
+			.select({
+				avatar: users.avatar,
+				commentId: comments.commentId,
+				createdAt: comments.createdAt,
+				photoId: comments.photoId,
+				text: comments.text,
+				updatedAt: comments.updatedAt,
+				userId: comments.userId,
+				username: users.username,
+			})
+			.from(comments)
+			.leftJoin(users, eq(comments.userId, users.userId))
+			.where(eq(comments.photoId, params.photoId))
+			.orderBy(asc(comments.createdAt))
+			.limit(params.limit)
+			.offset(params.offset);
 
-		const { count, error: countError } = await supabaseAdmin
-			.from("comments")
-			.select("comment_id", { count: "exact", head: true })
-			.eq("photo_id", params.photoId);
-		if (countError) {
-			throw new Error(`Failed to count comments: ${countError.message}`);
-		}
+		const [countRow] = await db
+			.select({ total: count() })
+			.from(comments)
+			.where(eq(comments.photoId, params.photoId));
 
-		const comments = ((data ?? []) as CommentListRow[]).map((row) => {
-			const rawUser = Array.isArray(row.users) ? row.users[0] : row.users;
+		const mapped = rows.map((row) => {
 			const user =
-				rawUser && rawUser.user_id
+				row.userId && row.username
 					? {
-							_id: rawUser.user_id,
-							username: rawUser.username,
-							avatarUrl: rawUser.avatar ?? undefined,
+							_id: row.userId,
+							username: row.username,
+							avatarUrl: row.avatar ?? undefined,
 						}
-					: row.user_id;
+					: (row.userId ?? "");
 
 			return {
-				_id: row.comment_id,
-				photoId: row.photo_id,
+				_id: row.commentId,
+				photoId: row.photoId ?? "",
 				userId: user,
 				text: row.text,
-				createdAt: row.created_at ?? undefined,
-				updatedAt: row.updated_at ?? undefined,
+				createdAt: toIso(row.createdAt),
+				updatedAt: toIso(row.updatedAt),
 			};
 		});
 
 		return {
-			comments: comments as CommentResponseDto[],
-			total: count ?? 0,
+			comments: mapped as CommentResponseDto[],
+			total: Number(countRow?.total ?? 0),
 		};
 	}
 }

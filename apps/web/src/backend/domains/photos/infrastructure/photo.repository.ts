@@ -1,3 +1,5 @@
+import { count, desc, eq, ilike, inArray, or } from "drizzle-orm";
+import { bookmarks, photos } from "@/backend/db/schema";
 import type {
 	ListPhotosQueryDto,
 	PhotoResponseDto,
@@ -6,30 +8,12 @@ import type {
 	ListPhotosResult,
 	PhotoRepositoryInterface,
 } from "@/backend/interfaces/photo-repository.interface";
-import { supabaseAdmin } from "@/lib/supabase";
+import db from "@/lib/drizzle";
 
-interface PhotoRow {
-	camera: string | null;
-	category: string | null;
-	color: string | null;
-	created_at: string | null;
-	description: string | null;
-	photo_id: string;
-	style: string | null;
-	title: string;
-	updated_at: string | null;
-	url: string;
-	user_id: string;
-}
+type PhotoRow = typeof photos.$inferSelect;
 
-interface BookmarkRow {
-	photo_id: string;
-}
-
-const NO_ROWS_CODE = "PGRST116";
-
-const isNoRowsError = (error: { code?: string } | null): boolean =>
-	error?.code === NO_ROWS_CODE;
+const toIso = (value: Date | null): string | undefined =>
+	value ? value.toISOString() : undefined;
 
 export class PhotoRepository implements PhotoRepositoryInterface {
 	private async countBookmarksByPhotoIds(
@@ -43,17 +27,20 @@ export class PhotoRepository implements PhotoRepositoryInterface {
 			return bookmarkCountByPhotoId;
 		}
 
-		const { data, error } = await supabaseAdmin
-			.from("bookmarks")
-			.select("photo_id")
-			.in("photo_id", photoIds);
-		if (error) {
-			throw new Error(`Failed to count photo bookmarks: ${error.message}`);
-		}
+		const rows = await db
+			.select({
+				count: count(bookmarks.photoId),
+				photoId: bookmarks.photoId,
+			})
+			.from(bookmarks)
+			.where(inArray(bookmarks.photoId, photoIds))
+			.groupBy(bookmarks.photoId);
 
-		for (const row of (data ?? []) as BookmarkRow[]) {
-			const currentCount = bookmarkCountByPhotoId.get(row.photo_id) ?? 0;
-			bookmarkCountByPhotoId.set(row.photo_id, currentCount + 1);
+		for (const row of rows) {
+			if (!row.photoId) {
+				continue;
+			}
+			bookmarkCountByPhotoId.set(row.photoId, Number(row.count));
 		}
 
 		return bookmarkCountByPhotoId;
@@ -61,11 +48,11 @@ export class PhotoRepository implements PhotoRepositoryInterface {
 
 	private mapToPhotoResponseDto(
 		photo: PhotoRow,
-		bookmarks: number
+		bookmarksCount: number
 	): PhotoResponseDto {
 		return {
-			photo_id: photo.photo_id,
-			user_id: photo.user_id,
+			photo_id: photo.photoId,
+			user_id: photo.userId ?? "",
 			url: photo.url,
 			title: photo.title,
 			description: photo.description ?? "",
@@ -73,127 +60,99 @@ export class PhotoRepository implements PhotoRepositoryInterface {
 			style: photo.style ?? "",
 			color: photo.color ?? "",
 			camera: photo.camera ?? "",
-			bookmarks,
-			created_at: photo.created_at ?? undefined,
-			updated_at: photo.updated_at ?? undefined,
+			bookmarks: bookmarksCount,
+			created_at: toIso(photo.createdAt),
+			updated_at: toIso(photo.updatedAt),
 		};
 	}
 
 	private async mapPhotosToResponseDtos(
-		photos: PhotoRow[]
+		photoRows: PhotoRow[]
 	): Promise<PhotoResponseDto[]> {
-		const photoIds = photos.map((photo) => photo.photo_id);
+		const photoIds = photoRows.map((photo) => photo.photoId);
 		const bookmarkCountByPhotoId =
 			await this.countBookmarksByPhotoIds(photoIds);
-		return photos.map((photo) =>
+		return photoRows.map((photo) =>
 			this.mapToPhotoResponseDto(
 				photo,
-				bookmarkCountByPhotoId.get(photo.photo_id) ?? 0
+				bookmarkCountByPhotoId.get(photo.photoId) ?? 0
 			)
 		);
 	}
 
+	private buildFilterWhere(filters?: string[]) {
+		if (!(filters && filters.length > 0)) {
+			return undefined;
+		}
+		const conditions = filters.flatMap((filter) => {
+			const needle = `%${filter}%`;
+			return [
+				ilike(photos.category, needle),
+				ilike(photos.style, needle),
+				ilike(photos.color, needle),
+			];
+		});
+		return or(...conditions);
+	}
+
 	async list(query: ListPhotosQueryDto): Promise<ListPhotosResult> {
-		let baseQuery = supabaseAdmin
-			.from("photos")
-			.select(
-				"photo_id,user_id,url,title,description,category,style,color,camera,created_at,updated_at",
-				{ count: "exact" }
-			);
-
-		if (query.filters && query.filters.length > 0) {
-			baseQuery = baseQuery.or(
-				query.filters
-					.map((filter) => `category.ilike.%${filter}%`)
-					.concat(query.filters.map((filter) => `style.ilike.%${filter}%`))
-					.concat(query.filters.map((filter) => `color.ilike.%${filter}%`))
-					.join(",")
-			);
-		}
-
 		const from = (query.page - 1) * query.limit;
-		const to = from + query.limit - 1;
-		const { data, error, count } = await baseQuery
-			.order("created_at", { ascending: false })
-			.range(from, to);
-		if (error) {
-			throw new Error(`Failed to list photos: ${error.message}`);
-		}
+		const whereClause = this.buildFilterWhere(query.filters);
 
-		const photoRows = (data ?? []) as PhotoRow[];
-		const photos = await this.mapPhotosToResponseDtos(photoRows);
+		const photoRows = await db
+			.select()
+			.from(photos)
+			.where(whereClause)
+			.orderBy(desc(photos.createdAt))
+			.limit(query.limit)
+			.offset(from);
+
+		const [countRow] = await db
+			.select({ total: count() })
+			.from(photos)
+			.where(whereClause);
+
+		const photosResult = await this.mapPhotosToResponseDtos(photoRows);
 		return {
-			photos,
-			total: count ?? 0,
+			photos: photosResult,
+			total: Number(countRow?.total ?? 0),
 		};
 	}
 
 	async getById(id: string): Promise<PhotoResponseDto | null> {
-		const { data, error } = await supabaseAdmin
-			.from("photos")
-			.select(
-				"photo_id,user_id,url,title,description,category,style,color,camera,created_at,updated_at"
-			)
-			.eq("photo_id", id)
-			.single();
-		if (isNoRowsError(error)) {
+		const [row] = await db
+			.select()
+			.from(photos)
+			.where(eq(photos.photoId, id))
+			.limit(1);
+		if (!row) {
 			return null;
-		}
-		if (error || !data) {
-			throw new Error(
-				`Failed to fetch photo by id: ${error?.message ?? "No data"}`
-			);
 		}
 
 		const bookmarkCountByPhotoId = await this.countBookmarksByPhotoIds([id]);
-		return this.mapToPhotoResponseDto(
-			data as PhotoRow,
-			bookmarkCountByPhotoId.get(id) ?? 0
-		);
+		return this.mapToPhotoResponseDto(row, bookmarkCountByPhotoId.get(id) ?? 0);
 	}
 
 	async getOwnerId(id: string): Promise<string | null> {
-		const { data, error } = await supabaseAdmin
-			.from("photos")
-			.select("user_id")
-			.eq("photo_id", id)
-			.single();
-		if (isNoRowsError(error)) {
-			return null;
-		}
-		if (error || !data) {
-			throw new Error(
-				`Failed to fetch photo owner id: ${error?.message ?? "No data"}`
-			);
-		}
-
-		return (data as { user_id: string }).user_id;
+		const [row] = await db
+			.select({ userId: photos.userId })
+			.from(photos)
+			.where(eq(photos.photoId, id))
+			.limit(1);
+		return row?.userId ?? null;
 	}
 
 	async deleteById(id: string): Promise<void> {
-		const { error } = await supabaseAdmin
-			.from("photos")
-			.delete()
-			.eq("photo_id", id);
-		if (error) {
-			throw new Error(`Failed to delete photo: ${error.message}`);
-		}
+		await db.delete(photos).where(eq(photos.photoId, id));
 	}
 
 	async exists(id: string): Promise<boolean> {
-		const { data, error } = await supabaseAdmin
-			.from("photos")
-			.select("photo_id")
-			.eq("photo_id", id)
-			.single();
-		if (isNoRowsError(error)) {
-			return false;
-		}
-		if (error) {
-			throw new Error(`Failed to verify photo existence: ${error.message}`);
-		}
-
-		return !!data;
+		const [row] = await db
+			.select({ id: photos.photoId })
+			.from(photos)
+			.where(eq(photos.photoId, id))
+			.limit(1);
+		return Boolean(row);
 	}
 
 	async listByIds(
@@ -209,25 +168,24 @@ export class PhotoRepository implements PhotoRepositoryInterface {
 		}
 
 		const from = (page - 1) * limit;
-		const to = from + limit - 1;
-		const { data, error, count } = await supabaseAdmin
-			.from("photos")
-			.select(
-				"photo_id,user_id,url,title,description,category,style,color,camera,created_at,updated_at",
-				{ count: "exact" }
-			)
-			.in("photo_id", ids)
-			.order("created_at", { ascending: false })
-			.range(from, to);
-		if (error) {
-			throw new Error(`Failed to list photos by ids: ${error.message}`);
-		}
+		const whereClause = inArray(photos.photoId, ids);
 
-		const photoRows = (data ?? []) as PhotoRow[];
-		const photos = await this.mapPhotosToResponseDtos(photoRows);
+		const photoRows = await db
+			.select()
+			.from(photos)
+			.where(whereClause)
+			.orderBy(desc(photos.createdAt))
+			.limit(limit)
+			.offset(from);
+		const [countRow] = await db
+			.select({ total: count() })
+			.from(photos)
+			.where(whereClause);
+
+		const photosResult = await this.mapPhotosToResponseDtos(photoRows);
 		return {
-			photos,
-			total: count ?? 0,
+			photos: photosResult,
+			total: Number(countRow?.total ?? 0),
 		};
 	}
 
@@ -237,58 +195,45 @@ export class PhotoRepository implements PhotoRepositoryInterface {
 		limit: number
 	): Promise<ListPhotosResult> {
 		const from = (page - 1) * limit;
-		const to = from + limit - 1;
 
-		const {
-			data: bookmarksData,
-			error: bookmarksError,
-			count,
-		} = await supabaseAdmin
-			.from("bookmarks")
-			.select("photo_id", { count: "exact" })
-			.eq("user_id", userId)
-			.order("created_at", { ascending: false })
-			.range(from, to);
-		if (bookmarksError) {
-			throw new Error(
-				`Failed to fetch bookmarked photo ids: ${bookmarksError.message}`
-			);
-		}
+		const bookmarkRows = await db
+			.select({ photoId: bookmarks.photoId })
+			.from(bookmarks)
+			.where(eq(bookmarks.userId, userId))
+			.orderBy(desc(bookmarks.createdAt))
+			.limit(limit)
+			.offset(from);
+		const [countRow] = await db
+			.select({ total: count() })
+			.from(bookmarks)
+			.where(eq(bookmarks.userId, userId));
 
-		const photoIds = ((bookmarksData ?? []) as BookmarkRow[]).map(
-			(row) => row.photo_id
-		);
+		const photoIds = bookmarkRows
+			.map((row) => row.photoId)
+			.filter((value): value is string => Boolean(value));
 		if (photoIds.length === 0) {
 			return {
 				photos: [],
-				total: count ?? 0,
+				total: Number(countRow?.total ?? 0),
 			};
 		}
 
-		const { data: photosData, error: photosError } = await supabaseAdmin
-			.from("photos")
-			.select(
-				"photo_id,user_id,url,title,description,category,style,color,camera,created_at,updated_at"
-			)
-			.in("photo_id", photoIds);
-		if (photosError) {
-			throw new Error(
-				`Failed to fetch bookmarked photos: ${photosError.message}`
-			);
-		}
+		const photoRows = await db
+			.select()
+			.from(photos)
+			.where(inArray(photos.photoId, photoIds));
 
-		const photoRows = (photosData ?? []) as PhotoRow[];
 		const orderByPhotoId = new Map(photoIds.map((id, index) => [id, index]));
 		photoRows.sort(
 			(a, b) =>
-				(orderByPhotoId.get(a.photo_id) ?? Number.MAX_SAFE_INTEGER) -
-				(orderByPhotoId.get(b.photo_id) ?? Number.MAX_SAFE_INTEGER)
+				(orderByPhotoId.get(a.photoId) ?? Number.MAX_SAFE_INTEGER) -
+				(orderByPhotoId.get(b.photoId) ?? Number.MAX_SAFE_INTEGER)
 		);
 
-		const photos = await this.mapPhotosToResponseDtos(photoRows);
+		const photosResult = await this.mapPhotosToResponseDtos(photoRows);
 		return {
-			photos,
-			total: count ?? photoRows.length,
+			photos: photosResult,
+			total: Number(countRow?.total ?? photosResult.length),
 		};
 	}
 }

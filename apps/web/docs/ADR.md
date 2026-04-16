@@ -27,14 +27,13 @@ Keep `route -> service -> repository` as the canonical shape.
 Improved testability and clearer ownership.
 Some legacy routes still bypass this pattern and should be migrated.
 
-## ADR-003: Supabase/Postgres as Target Source of Truth for Core Domain
+## ADR-003: PostgreSQL + Drizzle as Source of Truth for Core Domain
 - Status: Accepted (Target), In Progress
 - Date: 2026-04-13
 - Context:
-Repositories for users/photos/rolls use `supabaseAdmin`, and migration files
-define relational tables.
+Repositories use Drizzle ORM and migration files define relational tables.
 - Decision:
-Converge core domain persistence on Supabase/Postgres.
+Converge core domain persistence on PostgreSQL + Drizzle.
 - Consequences:
 Relational consistency and easier cross-entity queries.
 Requires strict enforcement so new features do not introduce non-PostgreSQL persistence.
@@ -45,18 +44,18 @@ Requires strict enforcement so new features do not introduce non-PostgreSQL pers
 - Context:
 The project requires one canonical persistence model for scalability and consistency.
 - Decision:
-Use PostgreSQL/Supabase only for application persistence.
+Use PostgreSQL only for application persistence.
 - Consequences:
 Eliminates cross-store drift and split-brain identity risks.
 Any remaining legacy non-PostgreSQL paths should be refactored or removed.
 
-## ADR-005: NextAuth with Supabase Adapter for Session/Auth Infrastructure
+## ADR-005: NextAuth with Drizzle Adapter for Session/Auth Infrastructure
 - Status: Accepted
 - Date: 2026-04-13
 - Context:
 Authentication is managed with NextAuth and `next_auth` schema tables.
 - Decision:
-Continue using NextAuth + Supabase adapter, with JWT/session callbacks enriching
+Continue using NextAuth + Drizzle adapter, with JWT/session callbacks enriching
 `user.id` and `user.role`.
 - Consequences:
 Reliable auth/session abstraction.

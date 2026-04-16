@@ -1,8 +1,10 @@
+import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { users } from "@/backend/db/schema";
 import { authOptions } from "@/lib/auth";
 import cloudinary from "@/lib/cloudinary";
-import { supabaseAdmin } from "@/lib/supabase";
+import db from "@/lib/drizzle";
 import { compressImageUnder10MB } from "../../photos/upload/route";
 
 /*
@@ -15,15 +17,16 @@ export async function GET(
 ) {
 	const { id } = await context.params;
 	try {
-		const { data: user, error } = await supabaseAdmin
-			.from("users")
-			.select("user_id,username,email,avatar")
-			.eq("user_id", id)
-			.single();
-
-		if (error) {
-			throw new Error(`Failed to fetch user profile: ${error.message}`);
-		}
+		const [user] = await db
+			.select({
+				avatar: users.avatar,
+				email: users.email,
+				userId: users.userId,
+				username: users.username,
+			})
+			.from(users)
+			.where(eq(users.userId, id))
+			.limit(1);
 
 		if (!user) {
 			return NextResponse.json(
@@ -38,7 +41,7 @@ export async function GET(
 				message: "Successfully fetched user profile!",
 				data: {
 					user: {
-						id: user.user_id,
+						id: user.userId,
 						username: user.username,
 						email: user.email,
 						avatar: user.avatar ?? undefined,
@@ -89,15 +92,14 @@ export async function POST(req: Request) {
 			email = String(body.email ?? "");
 		}
 
-		const { data: user, error: userError } = await supabaseAdmin
-			.from("users")
-			.select("user_id,avatar")
-			.eq("user_id", id)
-			.single();
-
-		if (userError) {
-			throw new Error(`Failed to fetch user: ${userError.message}`);
-		}
+		const [user] = await db
+			.select({
+				avatar: users.avatar,
+				userId: users.userId,
+			})
+			.from(users)
+			.where(eq(users.userId, id))
+			.limit(1);
 
 		if (!user) {
 			return NextResponse.json(
@@ -106,7 +108,7 @@ export async function POST(req: Request) {
 			);
 		}
 
-		if (user.user_id !== session.user.id) {
+		if (user.userId !== session.user.id) {
 			return NextResponse.json(
 				{ success: false, message: "Unauthorized to update this profile" },
 				{ status: 403 }
@@ -169,19 +171,23 @@ export async function POST(req: Request) {
 			}
 		}
 
-		const { data: updatedUser, error: updateError } = await supabaseAdmin
-			.from("users")
-			.update({
+		const [updatedUser] = await db
+			.update(users)
+			.set({
 				username,
 				email,
 				avatar: avatarUrl,
-				updated_at: new Date().toISOString(),
+				updatedAt: new Date(),
 			})
-			.eq("user_id", id)
-			.select("user_id,username,email,avatar")
-			.single();
+			.where(eq(users.userId, id))
+			.returning({
+				avatar: users.avatar,
+				email: users.email,
+				userId: users.userId,
+				username: users.username,
+			});
 
-		if (updateError || !updatedUser) {
+		if (!updatedUser) {
 			return NextResponse.json(
 				{ success: false, message: "Failed to update profile." },
 				{ status: 500 }
@@ -194,7 +200,7 @@ export async function POST(req: Request) {
 				message: "Successfully updated user profile!",
 				data: {
 					user: {
-						id: updatedUser.user_id,
+						id: updatedUser.userId,
 						username: updatedUser.username,
 						email: updatedUser.email,
 						avatar: updatedUser.avatar ?? undefined,

@@ -5,7 +5,6 @@ import { docsOpenApiSchemaFragment } from "@/app/api/docs/schema";
 import { emailOpenApiFragment } from "@/app/api/email/schema";
 import { notificationsReadOpenApiFragment } from "@/app/api/notifications/[id]/read/schema";
 import { notificationsOpenApiFragment } from "@/app/api/notifications/schema";
-import { openApiRouteFragment } from "@/app/api/openapi/schema";
 import { photoByIdOpenApiFragment } from "@/app/api/photos/[id]/schema";
 import { photoBookmarkOpenApiFragment } from "@/app/api/photos/bookmark/schema";
 import { photosOpenApiFragment } from "@/app/api/photos/schema";
@@ -30,7 +29,6 @@ const fragments: OpenApiFragment[] = [
 	profileByIdOpenApiFragment,
 	notificationsOpenApiFragment,
 	notificationsReadOpenApiFragment,
-	openApiRouteFragment,
 	docsRouteFragment,
 	docsOpenApiSchemaFragment,
 ];

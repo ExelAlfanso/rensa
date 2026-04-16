@@ -1,106 +1,101 @@
+import { and, eq } from "drizzle-orm";
+import { bookmarks, users } from "@/backend/db/schema";
 import type {
 	UserRegisterDto,
 	UserResponseDto,
 	UserWithPasswordResponseDto,
 } from "@/backend/dtos/user.dto";
 import type { UserRepositoryInterface } from "@/backend/interfaces/user-repository.interface";
-import { supabaseAdmin } from "@/lib/supabase";
+import db from "@/lib/drizzle";
 
-// interface UserRow {
-// 	avatar: string | null;
-// 	created_at: string | null;
-// 	email: string;
-// 	role: "admin" | "user" | null;
-// 	updated_at: string | null;
-// 	user_id: string;
-// 	username: string;
-// 	verified: boolean | null;
-// }
-
-// interface BookmarkRow {
-// 	photo_id: string;
-// }
-
-const NO_ROWS_CODE = "PGRST116";
-
-const isNoRowsError = (error: { code?: string } | null): boolean =>
-	error?.code === NO_ROWS_CODE;
+const toIso = (value: Date | null): string | undefined =>
+	value ? value.toISOString() : undefined;
 
 export class UserRepository implements UserRepositoryInterface {
 	private async getBookmarkPhotoIds(userId: string): Promise<string[]> {
-		const { data: result, error } = await supabaseAdmin
-			.from("bookmarks")
-			.select("photo_id")
-			.eq("user_id", userId);
-		if (error) {
-			throw new Error(`Failed to fetch user bookmarks: ${error.message}`);
-		}
+		const rows = await db
+			.select({ photoId: bookmarks.photoId })
+			.from(bookmarks)
+			.where(eq(bookmarks.userId, userId));
 
-		return result.map((row) => row.photo_id);
+		return rows
+			.map((row) => row.photoId)
+			.filter((value): value is string => Boolean(value));
 	}
 
 	async create(user: UserRegisterDto): Promise<UserResponseDto> {
-		const { data, error } = await supabaseAdmin
-			.from("users")
-			.insert({
+		const [created] = await db
+			.insert(users)
+			.values({
 				email: user.email,
 				password: user.password,
 				role: "user",
 				username: user.username,
 				verified: false,
 			})
-			.select(
-				"user_id,email,username,avatar,role,verified,created_at,updated_at"
-			)
-			.single();
-		if (error || !data) {
-			throw new Error(`Failed to create user: ${error?.message ?? "No data"}`);
+			.returning();
+		if (!created) {
+			throw new Error("Failed to create user");
 		}
 
 		return {
-			...data,
-			bookmarks: await this.getBookmarkPhotoIds(data.user_id),
-		} as UserResponseDto;
+			user_id: created.userId,
+			email: created.email,
+			username: created.username,
+			avatar: created.avatar ?? "",
+			role: created.role ?? "user",
+			verified: created.verified ?? false,
+			bookmarks: await this.getBookmarkPhotoIds(created.userId),
+			createdAt: toIso(created.createdAt),
+			updatedAt: toIso(created.updatedAt),
+		};
 	}
 
 	async getById(id: string): Promise<UserResponseDto | null> {
-		const { data, error } = await supabaseAdmin
-			.from("users")
-			.select(
-				"user_id,email,username,avatar,role,verified,created_at,updated_at"
-			)
-			.eq("user_id", id)
-			.single();
-		if (error) {
-			throw new Error(`Failed to fetch user by ID: ${error.message}`);
+		const [row] = await db
+			.select()
+			.from(users)
+			.where(eq(users.userId, id))
+			.limit(1);
+		if (!row) {
+			return null;
 		}
+
 		return {
-			...data,
+			user_id: row.userId,
+			email: row.email,
+			username: row.username,
+			avatar: row.avatar ?? "",
+			role: row.role ?? "user",
+			verified: row.verified ?? false,
 			bookmarks: await this.getBookmarkPhotoIds(id),
-		} as UserResponseDto | null;
+			createdAt: toIso(row.createdAt),
+			updatedAt: toIso(row.updatedAt),
+		};
 	}
 
 	async getByEmail(email: string): Promise<UserWithPasswordResponseDto | null> {
-		const { data, error } = await supabaseAdmin
-			.from("users")
-			.select(
-				"user_id,email,username,avatar,role,verified,created_at,updated_at,password"
-			)
-			.eq("email", email)
-			.single();
-		if (isNoRowsError(error)) {
+		const [row] = await db
+			.select()
+			.from(users)
+			.where(eq(users.email, email))
+			.limit(1);
+		if (!row) {
 			return null;
-		}
-		if (error || !data) {
-			throw new Error(
-				`Failed to fetch user by email: ${error?.message ?? "No data"}`
-			);
 		}
 
 		return {
-			...data,
-			bookmarks: await this.getBookmarkPhotoIds(data.user_id),
-		} as UserWithPasswordResponseDto | null;
+			user_id: row.userId,
+			email: row.email,
+			username: row.username,
+			avatar: row.avatar ?? "",
+			role: row.role ?? "user",
+			verified: row.verified ?? false,
+			bookmarks: await this.getBookmarkPhotoIds(row.userId),
+			createdAt: toIso(row.createdAt),
+			updatedAt: toIso(row.updatedAt),
+			password: row.password,
+		};
 	}
 
 	async updateBookmarks(
@@ -109,28 +104,21 @@ export class UserRepository implements UserRepositoryInterface {
 		action: "increment" | "decrement"
 	): Promise<UserResponseDto | null> {
 		if (action === "increment") {
-			const { error } = await supabaseAdmin.from("bookmarks").upsert(
-				{
-					photo_id: photoId,
-					user_id: userId,
-				},
-				{
-					ignoreDuplicates: true,
-					onConflict: "photo_id,user_id",
-				}
-			);
-			if (error) {
-				throw new Error(`Failed to add bookmark: ${error.message}`);
-			}
+			await db
+				.insert(bookmarks)
+				.values({
+					photoId,
+					userId,
+				})
+				.onConflictDoNothing({
+					target: [bookmarks.photoId, bookmarks.userId],
+				});
 		} else {
-			const { error } = await supabaseAdmin
-				.from("bookmarks")
-				.delete()
-				.eq("photo_id", photoId)
-				.eq("user_id", userId);
-			if (error) {
-				throw new Error(`Failed to remove bookmark: ${error.message}`);
-			}
+			await db
+				.delete(bookmarks)
+				.where(
+					and(eq(bookmarks.photoId, photoId), eq(bookmarks.userId, userId))
+				);
 		}
 
 		return this.getById(userId);

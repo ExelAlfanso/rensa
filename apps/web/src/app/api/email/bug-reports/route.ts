@@ -1,11 +1,13 @@
+import { and, count, desc, eq, type SQL } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
+import { bugReports } from "@/backend/db/schema";
 import { BugReportConfirmationEmail } from "@/frontend/components/emailTemplates/BugReportConfirmationEmail";
 import { BugReportTeamEmail } from "@/frontend/components/emailTemplates/BugReportTeamEmail";
 import { authOptions } from "@/lib/auth";
+import db from "@/lib/drizzle";
 import { bugReportLimiter } from "@/lib/rateLimiter";
 import getResend from "@/lib/resend";
-import { supabaseAdmin } from "@/lib/supabase";
 import { validateBugReportData } from "@/lib/validation";
 
 /**
@@ -59,10 +61,16 @@ export async function POST(req: Request) {
 	}
 
 	let severity: "low" | "medium" | "high" | "critical" = "medium";
+	const validatedTitle = validation.data.title;
+	const validatedEmail = validation.data.email;
+	const validatedDescription = validation.data.description;
+	const validatedSteps = validation.data.stepsToReproduce;
+	const validatedActual = validation.data.actualBehavior;
+	const validatedExpected = validation.data.expectedBehavior;
 	const reportText = (
-		validation.data.title +
+		validatedTitle +
 		" " +
-		validation.data.description
+		validatedDescription
 	).toLowerCase();
 
 	const criticalKeywords = [
@@ -81,36 +89,40 @@ export async function POST(req: Request) {
 		severity = "high";
 	}
 
-	const { data: bugReport, error } = await supabaseAdmin
-		.from("bug_reports")
-		.insert({
-			title: validation.data.title,
-			email: validation.data.email,
-			description: validation.data.description,
-			steps: validation.data.stepsToReproduce,
-			expected_behavior: validation.data.expectedBehavior,
-			actual_behavior: validation.data.actualBehavior,
+	const [bugReport] = await db
+		.insert(bugReports)
+		.values({
+			title: validatedTitle,
+			email: validatedEmail,
+			description: validatedDescription,
+			steps: validatedSteps ?? null,
+			expectedBehavior: validatedExpected ?? null,
+			actualBehavior: validatedActual ?? null,
 			severity,
-			ip_address: ip,
-			user_agent: req.headers.get("user-agent") || "",
+			ipAddress: ip,
+			userAgent: req.headers.get("user-agent") || "",
 		})
-		.select("bug_report_id,title,email,created_at")
-		.single();
+		.returning({
+			bugReportId: bugReports.bugReportId,
+			createdAt: bugReports.createdAt,
+			email: bugReports.email,
+			title: bugReports.title,
+		});
 
-	if (error || !bugReport) {
+	if (!bugReport) {
 		return NextResponse.json(
 			{
 				success: false,
 				message: "Validation failed",
 				errors: {
-					database: error?.message ?? "Failed to save bug report",
+					database: "Failed to save bug report",
 				},
 			},
 			{ status: 400 }
 		);
 	}
 
-	const reportId = bugReport.bug_report_id;
+	const reportId = bugReport.bugReportId;
 
 	try {
 		const resend = await getResend();
@@ -119,15 +131,16 @@ export async function POST(req: Request) {
 			to: process.env.DEV_TEAM_EMAIL || process.env.ADMIN_EMAIL || "",
 			subject: `New Bug Report: ${bugReport.title}`,
 			react: BugReportTeamEmail({
-				title,
-				email,
-				description,
-				stepsToReproduce,
-				actualBehavior,
-				expectedBehavior,
+				title: validatedTitle,
+				email: validatedEmail,
+				description: validatedDescription,
+				stepsToReproduce: validatedSteps,
+				actualBehavior: validatedActual,
+				expectedBehavior: validatedExpected,
 				severity,
 				reportId,
-				submittedAt: bugReport.created_at,
+				submittedAt:
+					bugReport.createdAt?.toISOString() ?? new Date().toISOString(),
 			}),
 		});
 		await resend.emails.send({
@@ -189,32 +202,57 @@ export async function GET(req: Request) {
 
 		const descending = sortBy.startsWith("-");
 		const sortField = descending ? sortBy.slice(1) : sortBy;
-		const column =
-			sortField === "createdAt"
-				? "created_at"
-				: sortField === "updatedAt"
-					? "updated_at"
-					: "created_at";
 		const from = (page - 1) * limit;
-		const to = from + limit - 1;
-
-		let query = supabaseAdmin
-			.from("bug_reports")
-			.select("*", { count: "exact" });
+		type BugStatus = NonNullable<typeof bugReports.$inferInsert.status>;
+		type BugSeverity = NonNullable<typeof bugReports.$inferInsert.severity>;
+		const validStatuses: BugStatus[] = [
+			"new",
+			"investigating",
+			"acknowledged",
+			"resolved",
+			"closed",
+		];
+		const validSeverities: BugSeverity[] = [
+			"low",
+			"medium",
+			"high",
+			"critical",
+		];
+		let whereClause: SQL<unknown> | undefined;
 		if (status) {
-			query = query.eq("status", status);
+			if (validStatuses.includes(status as BugStatus)) {
+				whereClause = eq(bugReports.status, status as BugStatus);
+			}
 		}
 		if (severity) {
-			query = query.eq("severity", severity);
+			if (validSeverities.includes(severity as BugSeverity)) {
+				const severityWhere = eq(bugReports.severity, severity as BugSeverity);
+				whereClause = whereClause
+					? and(whereClause, severityWhere)
+					: severityWhere;
+			}
 		}
+		const orderByClause =
+			sortField === "updatedAt"
+				? descending
+					? desc(bugReports.updatedAt)
+					: bugReports.updatedAt
+				: descending
+					? desc(bugReports.createdAt)
+					: bugReports.createdAt;
 
-		const { data, error, count } = await query
-			.order(column, { ascending: !descending })
-			.range(from, to);
-
-		if (error) {
-			throw error;
-		}
+		const data = await db
+			.select()
+			.from(bugReports)
+			.where(whereClause)
+			.orderBy(orderByClause)
+			.limit(limit)
+			.offset(from);
+		const [countRow] = await db
+			.select({ total: count() })
+			.from(bugReports)
+			.where(whereClause);
+		const total = Number(countRow?.total ?? 0);
 
 		return NextResponse.json({
 			success: true,
@@ -222,8 +260,8 @@ export async function GET(req: Request) {
 			pagination: {
 				page,
 				limit,
-				total: count ?? 0,
-				pages: Math.ceil((count ?? 0) / limit),
+				total,
+				pages: Math.ceil(total / limit),
 			},
 		});
 	} catch (error) {

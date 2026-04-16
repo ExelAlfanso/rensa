@@ -1,30 +1,18 @@
+import { and, asc, desc, eq, inArray } from "drizzle-orm";
+import { rollPhotos, rolls } from "@/backend/db/schema";
 import type {
 	RollCreateDto,
 	RollResponseDto,
 	RollUpdateDto,
 } from "@/backend/dtos/roll.dto";
 import type { RollRepositoryInterface } from "@/backend/interfaces/roll-repository.interface";
-import { supabaseAdmin } from "@/lib/supabase";
+import db from "@/lib/drizzle";
 
-interface RollRow {
-	created_at: string | null;
-	description: string | null;
-	image_url: string | null;
-	name: string;
-	roll_id: string;
-	updated_at: string | null;
-	user_id: string;
-}
+type RollRow = typeof rolls.$inferSelect;
+const DEFAULT_ROLL_IMAGE = "/images/image6.JPG";
 
-interface RollPhotoRow {
-	photo_id: string;
-	roll_id: string;
-}
-
-const NO_ROWS_CODE = "PGRST116";
-
-const isNoRowsError = (error: { code?: string } | null): boolean =>
-	error?.code === NO_ROWS_CODE;
+const toIso = (value: Date | null): string | undefined =>
+	value ? value.toISOString() : undefined;
 
 export class RollRepository implements RollRepositoryInterface {
 	private async getPhotoIdsByRollIds(
@@ -38,18 +26,21 @@ export class RollRepository implements RollRepositoryInterface {
 			return photoIdsByRollId;
 		}
 
-		const { data, error } = await supabaseAdmin
-			.from("roll_photos")
-			.select("roll_id,photo_id")
-			.in("roll_id", rollIds);
-		if (error) {
-			throw new Error(`Failed to fetch roll photos: ${error.message}`);
-		}
+		const rows = await db
+			.select({
+				photoId: rollPhotos.photoId,
+				rollId: rollPhotos.rollId,
+			})
+			.from(rollPhotos)
+			.where(inArray(rollPhotos.rollId, rollIds));
 
-		for (const row of (data ?? []) as RollPhotoRow[]) {
-			const existing = photoIdsByRollId.get(row.roll_id) ?? [];
-			existing.push(row.photo_id);
-			photoIdsByRollId.set(row.roll_id, existing);
+		for (const row of rows) {
+			if (!(row.rollId && row.photoId)) {
+				continue;
+			}
+			const existing = photoIdsByRollId.get(row.rollId) ?? [];
+			existing.push(row.photoId);
+			photoIdsByRollId.set(row.rollId, existing);
 		}
 
 		return photoIdsByRollId;
@@ -60,84 +51,62 @@ export class RollRepository implements RollRepositoryInterface {
 		photoIds: string[]
 	): RollResponseDto {
 		return {
-			roll_id: roll.roll_id,
-			user_id: roll.user_id,
+			roll_id: roll.rollId,
+			user_id: roll.userId ?? "",
 			name: roll.name,
 			description: roll.description ?? "",
-			imageUrl: roll.image_url ?? "/images/image6.JPG",
+			imageUrl: roll.imageUrl ?? DEFAULT_ROLL_IMAGE,
 			photos: photoIds,
-			createdAt: roll.created_at ?? undefined,
-			updatedAt: roll.updated_at ?? undefined,
+			createdAt: toIso(roll.createdAt),
+			updatedAt: toIso(roll.updatedAt),
 		};
 	}
 
 	async create(payload: RollCreateDto): Promise<RollResponseDto> {
-		const { data, error } = await supabaseAdmin
-			.from("rolls")
-			.insert({
+		const [created] = await db
+			.insert(rolls)
+			.values({
 				description: payload.description ?? "",
-				image_url: payload.imageUrl ?? "/images/image6.JPG",
+				imageUrl: payload.imageUrl ?? DEFAULT_ROLL_IMAGE,
 				name: payload.name,
-				user_id: payload.user_id,
+				userId: payload.user_id,
 			})
-			.select(
-				"roll_id,user_id,name,description,image_url,created_at,updated_at"
-			)
-			.single();
-		if (error || !data) {
-			throw new Error(`Failed to create roll: ${error?.message ?? "No data"}`);
+			.returning();
+		if (!created) {
+			throw new Error("Failed to create roll");
 		}
 
-		return this.mapToRollResponseDto(data as RollRow, []);
+		return this.mapToRollResponseDto(created, []);
 	}
 
 	async getById(rollId: string): Promise<RollResponseDto | null> {
-		const { data, error } = await supabaseAdmin
-			.from("rolls")
-			.select(
-				"roll_id,user_id,name,description,image_url,created_at,updated_at"
-			)
-			.eq("roll_id", rollId)
-			.single();
-		if (isNoRowsError(error)) {
+		const [row] = await db
+			.select()
+			.from(rolls)
+			.where(eq(rolls.rollId, rollId))
+			.limit(1);
+		if (!row) {
 			return null;
-		}
-		if (error || !data) {
-			throw new Error(
-				`Failed to fetch roll by id: ${error?.message ?? "No data"}`
-			);
 		}
 
 		const photoIdsByRollId = await this.getPhotoIdsByRollIds([rollId]);
-		return this.mapToRollResponseDto(
-			data as RollRow,
-			photoIdsByRollId.get(rollId) ?? []
-		);
+		return this.mapToRollResponseDto(row, photoIdsByRollId.get(rollId) ?? []);
 	}
 
 	async getDefaultByUserId(userId: string): Promise<RollResponseDto | null> {
-		const { data, error } = await supabaseAdmin
-			.from("rolls")
-			.select(
-				"roll_id,user_id,name,description,image_url,created_at,updated_at"
-			)
-			.eq("user_id", userId)
-			.eq("name", "All Photos")
-			.single();
-		if (isNoRowsError(error)) {
+		const [row] = await db
+			.select()
+			.from(rolls)
+			.where(and(eq(rolls.userId, userId), eq(rolls.name, "All Photos")))
+			.limit(1);
+		if (!row) {
 			return null;
 		}
-		if (error || !data) {
-			throw new Error(
-				`Failed to fetch default roll: ${error?.message ?? "No data"}`
-			);
-		}
 
-		const roll = data as RollRow;
-		const photoIdsByRollId = await this.getPhotoIdsByRollIds([roll.roll_id]);
+		const photoIdsByRollId = await this.getPhotoIdsByRollIds([row.rollId]);
 		return this.mapToRollResponseDto(
-			roll,
-			photoIdsByRollId.get(roll.roll_id) ?? []
+			row,
+			photoIdsByRollId.get(row.rollId) ?? []
 		);
 	}
 
@@ -145,130 +114,124 @@ export class RollRepository implements RollRepositoryInterface {
 		userId: string,
 		photoId: string
 	): Promise<Array<{ roll_id: string; name: string }>> {
-		const { data: rollsData, error: rollsError } = await supabaseAdmin
-			.from("rolls")
-			.select("roll_id,name")
-			.eq("user_id", userId);
-		if (rollsError) {
-			throw new Error(`Failed to list user rolls: ${rollsError.message}`);
-		}
-
-		const userRolls = (rollsData ?? []) as Array<{
-			name: string;
-			roll_id: string;
-		}>;
+		const userRolls = await db
+			.select({
+				name: rolls.name,
+				rollId: rolls.rollId,
+			})
+			.from(rolls)
+			.where(eq(rolls.userId, userId));
 		if (userRolls.length === 0) {
 			return [];
 		}
 
-		const rollIds = userRolls.map((roll) => roll.roll_id);
-		const { data: linksData, error: linksError } = await supabaseAdmin
-			.from("roll_photos")
-			.select("roll_id")
-			.eq("photo_id", photoId)
-			.in("roll_id", rollIds);
-		if (linksError) {
-			throw new Error(`Failed to list saved rolls: ${linksError.message}`);
-		}
+		const rollIds = userRolls.map((roll) => roll.rollId);
+		const links = await db
+			.select({
+				rollId: rollPhotos.rollId,
+			})
+			.from(rollPhotos)
+			.where(
+				and(
+					eq(rollPhotos.photoId, photoId),
+					inArray(rollPhotos.rollId, rollIds)
+				)
+			);
 
 		const linkedRollIds = new Set(
-			((linksData ?? []) as Array<{ roll_id: string }>).map(
-				(row) => row.roll_id
-			)
+			links
+				.map((link) => link.rollId)
+				.filter((value): value is string => Boolean(value))
 		);
-		return userRolls.filter((roll) => linkedRollIds.has(roll.roll_id));
+		return userRolls
+			.filter((roll) => linkedRollIds.has(roll.rollId))
+			.map((roll) => ({
+				roll_id: roll.rollId,
+				name: roll.name,
+			}));
 	}
 
 	async listByUserId(
 		userId: string,
 		sort: "latest" | "oldest"
 	): Promise<RollResponseDto[]> {
-		const { data, error } = await supabaseAdmin
-			.from("rolls")
-			.select(
-				"roll_id,user_id,name,description,image_url,created_at,updated_at"
-			)
-			.eq("user_id", userId)
-			.order("created_at", { ascending: sort === "oldest" });
-		if (error) {
-			throw new Error(`Failed to list rolls: ${error.message}`);
-		}
+		const rollRows = await db
+			.select()
+			.from(rolls)
+			.where(eq(rolls.userId, userId))
+			.orderBy(
+				sort === "oldest" ? asc(rolls.createdAt) : desc(rolls.createdAt)
+			);
 
-		const rolls = (data ?? []) as RollRow[];
-		const rollIds = rolls.map((roll) => roll.roll_id);
+		const rollIds = rollRows.map((roll) => roll.rollId);
 		const photoIdsByRollId = await this.getPhotoIdsByRollIds(rollIds);
-		return rolls.map((roll) =>
-			this.mapToRollResponseDto(roll, photoIdsByRollId.get(roll.roll_id) ?? [])
+		return rollRows.map((roll) =>
+			this.mapToRollResponseDto(roll, photoIdsByRollId.get(roll.rollId) ?? [])
 		);
 	}
 
 	async addPhotoToRoll(rollId: string, photoId: string): Promise<number> {
-		const { data: roll, error: rollError } = await supabaseAdmin
-			.from("rolls")
-			.select("roll_id")
-			.eq("roll_id", rollId)
-			.single();
-		if (isNoRowsError(rollError) || !roll) {
+		const [roll] = await db
+			.select({ id: rolls.rollId })
+			.from(rolls)
+			.where(eq(rolls.rollId, rollId))
+			.limit(1);
+		if (!roll) {
 			return 0;
 		}
-		if (rollError) {
-			throw new Error(`Failed to verify roll: ${rollError}`);
-		}
 
-		const { error } = await supabaseAdmin.from("roll_photos").upsert(
-			{
-				photo_id: photoId,
-				roll_id: rollId,
-			},
-			{
-				ignoreDuplicates: true,
-				onConflict: "roll_id,photo_id",
-			}
-		);
-		if (error) {
-			throw new Error(`Failed to add photo to roll: ${error.message}`);
-		}
+		await db
+			.insert(rollPhotos)
+			.values({
+				photoId,
+				rollId,
+			})
+			.onConflictDoNothing({
+				target: [rollPhotos.rollId, rollPhotos.photoId],
+			});
 
 		return 1;
 	}
 
 	async removePhotoFromRoll(rollId: string, photoId: string): Promise<void> {
-		const { error } = await supabaseAdmin
-			.from("roll_photos")
-			.delete()
-			.eq("roll_id", rollId)
-			.eq("photo_id", photoId);
-		if (error) {
-			throw new Error(`Failed to remove photo from roll: ${error.message}`);
-		}
+		await db
+			.delete(rollPhotos)
+			.where(
+				and(eq(rollPhotos.rollId, rollId), eq(rollPhotos.photoId, photoId))
+			);
 	}
 
 	async update(
 		rollId: string,
 		payload: RollUpdateDto
 	): Promise<RollResponseDto | null> {
-		const { data, error } = await supabaseAdmin
-			.from("rolls")
-			.update({
-				description: payload.description,
-				image_url: payload.imageUrl,
-				name: payload.name,
-			})
-			.eq("roll_id", rollId)
-			.select(
-				"roll_id,user_id,name,description,image_url,created_at,updated_at"
-			)
-			.single();
-		if (isNoRowsError(error)) {
-			return null;
+		const updateData: {
+			description?: string;
+			imageUrl?: string;
+			name?: string;
+		} = {};
+		if (payload.description !== undefined) {
+			updateData.description = payload.description;
 		}
-		if (error || !data) {
-			throw new Error(`Failed to update roll: ${error?.message ?? "No data"}`);
+		if (payload.imageUrl !== undefined) {
+			updateData.imageUrl = payload.imageUrl;
+		}
+		if (payload.name !== undefined) {
+			updateData.name = payload.name;
+		}
+
+		const [updated] = await db
+			.update(rolls)
+			.set(updateData)
+			.where(eq(rolls.rollId, rollId))
+			.returning();
+		if (!updated) {
+			return null;
 		}
 
 		const photoIdsByRollId = await this.getPhotoIdsByRollIds([rollId]);
 		return this.mapToRollResponseDto(
-			data as RollRow,
+			updated,
 			photoIdsByRollId.get(rollId) ?? []
 		);
 	}
@@ -279,14 +242,7 @@ export class RollRepository implements RollRepositoryInterface {
 			return null;
 		}
 
-		const { error } = await supabaseAdmin
-			.from("rolls")
-			.delete()
-			.eq("roll_id", rollId);
-		if (error) {
-			throw new Error(`Failed to delete roll: ${error.message}`);
-		}
-
+		await db.delete(rolls).where(eq(rolls.rollId, rollId));
 		return existing;
 	}
 }

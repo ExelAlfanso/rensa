@@ -14,26 +14,26 @@ const rollsApplication = rollDomain.rollsApplication;
 */
 export async function POST(req: Request) {
 	try {
-		const ip =
-			req.headers.get("x-forwarded-for") ||
-			req.headers.get("x-real-ip") ||
-			"unknown";
+		// const ip =
+		// 	req.headers.get("x-forwarded-for") ||
+		// 	req.headers.get("x-real-ip") ||
+		// 	"unknown";
 
-		const { success, remaining, limit, reset } =
-			await registerLimiter.limit(ip);
-		if (!success) {
-			return NextResponse.json(
-				{ message: "Too many registration attempts. Please try again later." },
-				{
-					status: 429,
-					headers: {
-						"X-RateLimit-Limit": limit.toString(),
-						"X-RateLimit-Remaining": remaining.toString(),
-						"X-RateLimit-Reset": reset.toString(),
-					},
-				}
-			);
-		}
+		// const { success, remaining, limit, reset } =
+		// 	await registerLimiter.limit(ip);
+		// if (!success) {
+		// 	return NextResponse.json(
+		// 		{ message: "Too many registration attempts. Please try again later." },
+		// 		{
+		// 			status: 429,
+		// 			headers: {
+		// 				"X-RateLimit-Limit": limit.toString(),
+		// 				"X-RateLimit-Remaining": remaining.toString(),
+		// 				"X-RateLimit-Reset": reset.toString(),
+		// 			},
+		// 		}
+		// 	);
+		// }
 		const { username, email, password, confirmPassword } = await req.json();
 		if (password !== confirmPassword) {
 			return NextResponse.json(
