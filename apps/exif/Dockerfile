@@ -9,6 +9,7 @@ RUN npm install --include=dev
 
 # ===== Development =====
 FROM deps AS dev
+RUN apk add --no-cache perl
 ENV NODE_ENV=development
 COPY . .
 EXPOSE 3003
