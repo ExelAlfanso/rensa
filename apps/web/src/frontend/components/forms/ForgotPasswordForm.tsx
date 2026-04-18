@@ -3,7 +3,7 @@ import Link from "next/link";
 import { type FormEvent, useState } from "react";
 import PrimaryButton from "@/frontend/components/buttons/PrimaryButton";
 import TextInputField from "@/frontend/components/inputfields/TextInputField";
-import { useLoading } from "@/frontend/hooks/use-loading";
+import { useLoading } from "@/frontend/features/common/hooks/use-loading";
 import { api } from "@/lib/axios-client";
 import AuthFormLayout from "./AuthFormLayout";
 

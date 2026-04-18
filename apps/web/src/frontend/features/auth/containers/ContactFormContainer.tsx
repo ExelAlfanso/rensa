@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useLoading } from "@/frontend/hooks/use-loading";
+import { useLoading } from "@/frontend/features/common/hooks/use-loading";
 import { useToast } from "@/frontend/providers/ToastProvider";
 import ContactFormView, {
 	type ContactFormState,

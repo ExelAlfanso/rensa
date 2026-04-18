@@ -1,5 +1,5 @@
 import type React from "react";
-import usePhotoRoll from "@/frontend/hooks/use-photo-roll";
+import usePhotoRoll from "@/frontend/features/photos/hooks/use-photo-roll";
 import { useAuthStore } from "@/frontend/stores/useAuthStore";
 import type { PopulatedPhoto } from "@/types/PopulatedPhoto";
 import PhotoCardView from "../components/PhotoCardView";

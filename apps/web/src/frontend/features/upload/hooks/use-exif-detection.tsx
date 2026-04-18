@@ -2,9 +2,9 @@ import { useState } from "react";
 import {
 	type CameraSettings,
 	defaultCameraSettings,
-} from "@/frontend/data/cameraDatas";
-import { cameraFieldOptions } from "@/frontend/data/cameraFieldDatas";
-import { brandModels } from "@/frontend/data/cameraModelDatas";
+} from "@/frontend/features/upload/configs/cameraDatas";
+import { cameraFieldOptions } from "@/frontend/features/upload/configs/cameraFieldDatas";
+import { brandModels } from "@/frontend/features/upload/configs/cameraModelDatas";
 import { api } from "@/lib/axios-client";
 import {
 	detectValueinString,

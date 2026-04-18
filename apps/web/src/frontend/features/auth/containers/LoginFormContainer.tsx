@@ -3,7 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
-import { useLoading } from "@/frontend/hooks/use-loading";
+import { useLoading } from "@/frontend/features/common/hooks/use-loading";
 import { sanitizeInput } from "@/lib/validation";
 import LoginFormView, {
 	type LoginFormState,

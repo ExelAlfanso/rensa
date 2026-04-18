@@ -4,11 +4,16 @@ export function useOutsideClick<T extends HTMLElement>(
 	onOutsideClick: (event: MouseEvent) => void
 ) {
 	const ref = useRef<T>(null);
+	const latestOnOutsideClickRef = useRef(onOutsideClick);
+
+	useEffect(() => {
+		latestOnOutsideClickRef.current = onOutsideClick;
+	}, [onOutsideClick]);
 
 	useEffect(() => {
 		function handleClick(event: MouseEvent) {
 			if (ref.current && !ref.current.contains(event.target as Node)) {
-				onOutsideClick(event);
+				latestOnOutsideClickRef.current(event);
 			}
 		}
 
@@ -16,7 +21,7 @@ export function useOutsideClick<T extends HTMLElement>(
 		return () => {
 			document.removeEventListener("mousedown", handleClick);
 		};
-	}, [onOutsideClick]);
+	}, []);
 
 	return ref;
 }

@@ -2,7 +2,7 @@
 
 import type React from "react";
 import { useState } from "react";
-import { useOutsideClick } from "@/frontend/hooks/use-outside-click";
+import { useOutsideClick } from "@/frontend/features/common/hooks/use-outside-click";
 import { cn } from "@/utils/cn";
 
 interface IconDropdownProps {

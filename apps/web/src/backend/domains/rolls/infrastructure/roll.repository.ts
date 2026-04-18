@@ -1,5 +1,6 @@
 import { and, asc, desc, eq, inArray } from "drizzle-orm";
 import { rollPhotos, rolls } from "@/backend/db/schema";
+import { DEFAULT_ROLL_IMAGE } from "@/backend/domains/rolls/configs/roll.config";
 import type {
 	RollCreateDto,
 	RollResponseDto,
@@ -9,7 +10,6 @@ import type { RollRepositoryInterface } from "@/backend/interfaces/roll-reposito
 import db from "@/lib/drizzle";
 
 type RollRow = typeof rolls.$inferSelect;
-const DEFAULT_ROLL_IMAGE = "/images/image6.JPG";
 
 const toIso = (value: Date | null): string | undefined =>
 	value ? value.toISOString() : undefined;

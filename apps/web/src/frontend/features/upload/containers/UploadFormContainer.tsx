@@ -1,15 +1,12 @@
-import { useEffect } from "react";
+import { FilterLists } from "@/frontend/data/filterDatas";
 import {
 	type CameraSettings,
 	defaultCameraSettings,
-} from "@/frontend/data/cameraDatas";
-import { brandModels } from "@/frontend/data/cameraModelDatas";
-import { FilterLists } from "@/frontend/data/filterDatas";
+} from "@/frontend/features/upload/configs/cameraDatas";
+import { brandModels } from "@/frontend/features/upload/configs/cameraModelDatas";
 import UploadFormView from "../components/UploadFormView";
 
 export interface UploadFormContainerProps {
-	detectAndApplyExif: () => Promise<CameraSettings | null>;
-	file: File | null;
 	handleExifChange: (
 		field: string,
 		value: number | object | string | CameraSettings
@@ -17,7 +14,6 @@ export interface UploadFormContainerProps {
 	handleTags: (value: string | string[]) => void;
 	isDetecting: boolean;
 	onChange: (field: string, value: string | string[]) => void;
-	photo: string;
 	selectedCamera: CameraSettings["Brand"];
 	setSelectedCamera: (brand: CameraSettings["Brand"]) => void;
 	setSettings: (settings: CameraSettings) => void;
@@ -27,26 +23,15 @@ export interface UploadFormContainerProps {
 
 const UploadFormContainer: React.FC<UploadFormContainerProps> = ({
 	onChange,
-	photo,
 	tags,
 	handleExifChange,
 	handleTags,
 	isDetecting,
-	detectAndApplyExif,
 	settings,
 	selectedCamera,
 	setSelectedCamera,
 	setSettings,
 }) => {
-	useEffect(() => {
-		if (photo) {
-			const detectExif = async () => {
-				await detectAndApplyExif();
-			};
-			detectExif();
-		}
-	}, [photo, detectAndApplyExif]);
-
 	const handleBrandChange = (brand: CameraSettings["Brand"]) => {
 		setSelectedCamera(brand);
 		setSettings(defaultCameraSettings[brand]);

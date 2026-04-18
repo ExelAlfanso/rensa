@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import FilterListView from "../components/FilterListView";
 
 export interface FilterListContainerProps {
@@ -14,22 +14,20 @@ const FilterListContainer: React.FC<FilterListContainerProps> = ({
 }) => {
 	const [activeFilters, setActiveFilters] = useState<string[]>(filters);
 
-	useEffect(() => {
-		onFilterChange(activeFilters);
-	}, [activeFilters, onFilterChange]);
-
 	const handleToggleFilter = (label: string) => {
 		const normalizedLabel = label.toLowerCase();
-
-		setActiveFilters((previousFilters) =>
-			previousFilters.includes(normalizedLabel)
+		setActiveFilters((previousFilters) => {
+			const nextFilters = previousFilters.includes(normalizedLabel)
 				? previousFilters.filter((filter) => filter !== normalizedLabel)
-				: [...previousFilters, normalizedLabel]
-		);
+				: [...previousFilters, normalizedLabel];
+			onFilterChange(nextFilters);
+			return nextFilters;
+		});
 	};
 
 	const handleClearFiltersClick = () => {
 		setActiveFilters([]);
+		onFilterChange([]);
 		handleClearFilters();
 	};
 

@@ -1,4 +1,4 @@
-import type { CameraSettings } from "@/frontend/data/cameraDatas";
+import type { CameraSettings } from "@/frontend/features/upload/configs/cameraDatas";
 import CameraSettingsFormView from "../components/CameraSettingsFormView";
 
 export interface CameraSettingsFormContainerProps {

@@ -1,5 +1,10 @@
 "use client";
 import { useCallback, useRef, useState } from "react";
+import {
+	isAcceptedPhotoUploadFile,
+	PHOTO_UPLOAD_MAX_INPUT_SIZE_BYTES,
+	PHOTO_UPLOAD_MAX_INPUT_SIZE_MB,
+} from "@/shared/configs/photo-upload.config";
 
 export function useFileUpload() {
 	const [photo, setPhoto] = useState("");
@@ -21,18 +26,16 @@ export function useFileUpload() {
 	const handleBrowseClick = () => {
 		fileInputRef.current?.click();
 	};
-	const handleFileSelect = useCallback((file: File, sizeLimit: number) => {
-		const isJPG =
-			file.type === "image/jpeg" ||
-			file.type === "image/jpg" ||
-			file.name.toLowerCase().endsWith(".jpg") ||
-			file.name.toLowerCase().endsWith(".jpeg");
-		const isLtSize = file.size / 1024 / 1024 < sizeLimit; // size in MB
-		if (!isLtSize) {
-			setMessage(`Image must be smaller than ${sizeLimit}MB!`);
+	const handleFileSelect = useCallback((file: File) => {
+		const isWithinAllowedSize = file.size <= PHOTO_UPLOAD_MAX_INPUT_SIZE_BYTES;
+		if (!isWithinAllowedSize) {
+			setMessage(
+				`Image must be ${PHOTO_UPLOAD_MAX_INPUT_SIZE_MB}MB or smaller.`
+			);
 			return;
 		}
-		if (!isJPG) {
+
+		if (!isAcceptedPhotoUploadFile(file)) {
 			setMessage("Only JPG/JPEG files are allowed.");
 			return;
 		}
@@ -51,25 +54,22 @@ export function useFileUpload() {
 		// console.log("Selected file:", uploadedFile);
 	}, []);
 	const handleDrop = useCallback(
-		(e: React.DragEvent, sizeLimit: number) => {
+		(e: React.DragEvent) => {
 			e.preventDefault();
 			setIsDragOver(false);
 			const files = e.dataTransfer.files;
 
 			if (files && files.length > 0) {
-				handleFileSelect(files[0], sizeLimit);
+				handleFileSelect(files[0]);
 			}
 		},
 		[handleFileSelect]
 	);
 	//TODO: handle file change from input type file, can be photo, profile, document, etc.
-	const handleFileChange = (
-		e: React.ChangeEvent<HTMLInputElement>,
-		size: number
-	) => {
+	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (file) {
-			handleFileSelect(file, size);
+			handleFileSelect(file);
 		}
 	};
 

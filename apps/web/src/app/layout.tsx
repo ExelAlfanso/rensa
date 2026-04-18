@@ -3,7 +3,7 @@ import { Figtree, Forum } from "next/font/google";
 import "./globals.css";
 import SchemaMarkup from "@/frontend/components/SchemaMarkup";
 import Toast from "@/frontend/components/toast/Toast";
-import { LoadingProvider } from "@/frontend/hooks/use-loading";
+import { LoadingProvider } from "@/frontend/features/common/hooks/use-loading";
 import { NotificationProvider } from "@/frontend/providers/NotificationProvider";
 import QueryProvider from "@/frontend/providers/QueryProvider";
 import SessionProviderWrapper from "@/frontend/providers/SessionProviderWrapper";

@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type React from "react";
 import { useState } from "react";
-import usePhotoRoll from "@/frontend/hooks/use-photo-roll";
+import usePhotoRoll from "@/frontend/features/photos/hooks/use-photo-roll";
 import { fetchProfile } from "@/frontend/services/profile.service";
 import { useAuthStore } from "@/frontend/stores/useAuthStore";
 import type { PhotoMetadata } from "@/frontend/types/photo";
@@ -32,7 +32,7 @@ const PhotoInfoCardContainer: React.FC<PhotoInfoCardContainerProps> = ({
 }) => {
 	const { user } = useAuthStore();
 	const { data: profile } = useQuery({
-		queryKey: ["ownerId", ownerId],
+		queryKey: ["profile", ownerId],
 		queryFn: () => fetchProfile(ownerId),
 		staleTime: 5 * 60 * 1000,
 		enabled: !!ownerId,

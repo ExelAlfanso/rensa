@@ -2,29 +2,43 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import sharp from "sharp";
 import { photoMetadata, photos } from "@/backend/db/schema";
+import {
+	PHOTO_UPLOAD_COMPRESSION_MIN_QUALITY,
+	PHOTO_UPLOAD_COMPRESSION_QUALITY_STEP,
+	PHOTO_UPLOAD_COMPRESSION_START_QUALITY,
+	PHOTO_UPLOAD_MAX_DIMENSION_PX,
+} from "@/backend/domains/photos/configs/photo-upload.config";
 import { authOptions } from "@/lib/auth";
 import { fastApi } from "@/lib/axios-server";
 import cloudinary, { validateCloudinaryUrl } from "@/lib/cloudinary";
 import db from "@/lib/drizzle";
 import { photoUploadLimiter } from "@/lib/rateLimiter";
 import { sanitizeInput } from "@/lib/validation";
+import {
+	isAcceptedPhotoUploadFile,
+	PHOTO_UPLOAD_MAX_INPUT_SIZE_BYTES,
+	PHOTO_UPLOAD_MAX_INPUT_SIZE_MB,
+	PHOTO_UPLOAD_TARGET_OUTPUT_SIZE_BYTES,
+} from "@/shared/configs/photo-upload.config";
 
 export async function compressImageUnder10MB(buffer: Buffer): Promise<Buffer> {
-	let quality = 90; // start high
+	let quality = PHOTO_UPLOAD_COMPRESSION_START_QUALITY;
 	let output = await sharp(buffer)
 		.withMetadata()
 		.rotate(0)
-		.resize({ width: 2000 }) // limit dimensions
+		.resize({ width: PHOTO_UPLOAD_MAX_DIMENSION_PX })
 		.jpeg({ quality })
 		.toBuffer();
 
-	// Decrease quality until under 10MB
-	while (output.length > 10 * 1024 * 1024 && quality > 10) {
-		quality -= 10;
+	while (
+		output.length > PHOTO_UPLOAD_TARGET_OUTPUT_SIZE_BYTES &&
+		quality > PHOTO_UPLOAD_COMPRESSION_MIN_QUALITY
+	) {
+		quality -= PHOTO_UPLOAD_COMPRESSION_QUALITY_STEP;
 		output = await sharp(buffer)
 			.withMetadata()
 			.rotate(0)
-			.resize({ width: 2000 })
+			.resize({ width: PHOTO_UPLOAD_MAX_DIMENSION_PX })
 			.jpeg({ quality })
 			.toBuffer();
 	}
@@ -199,6 +213,21 @@ export async function POST(req: Request) {
 		if (!file) {
 			return NextResponse.json(
 				{ success: false, error: "No file provided" },
+				{ status: 400 }
+			);
+		}
+		if (file.size > PHOTO_UPLOAD_MAX_INPUT_SIZE_BYTES) {
+			return NextResponse.json(
+				{
+					success: false,
+					error: `Image must be ${PHOTO_UPLOAD_MAX_INPUT_SIZE_MB}MB or smaller.`,
+				},
+				{ status: 400 }
+			);
+		}
+		if (!isAcceptedPhotoUploadFile(file)) {
+			return NextResponse.json(
+				{ success: false, error: "Only JPG/JPEG files are allowed." },
 				{ status: 400 }
 			);
 		}

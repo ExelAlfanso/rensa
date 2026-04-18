@@ -2,8 +2,8 @@ import type React from "react";
 import { SearchDropdown } from "@/frontend/components/dropdowns/SearchDropdown";
 import InputDropdown from "@/frontend/components/inputfields/InputDropdown";
 import NumberInputField from "@/frontend/components/inputfields/NumberInputField";
-import type { CameraSettings } from "@/frontend/data/cameraDatas";
-import { cameraFieldOptions } from "@/frontend/data/cameraFieldDatas";
+import type { CameraSettings } from "@/frontend/features/upload/configs/cameraDatas";
+import { cameraFieldOptions } from "@/frontend/features/upload/configs/cameraFieldDatas";
 
 export interface CameraSettingsFormViewProps {
 	cameraModels: string[];

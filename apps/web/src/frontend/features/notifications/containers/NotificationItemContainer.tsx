@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
-import useReadOnVisible from "@/frontend/hooks/use-read-on-visible";
+import useReadOnVisible from "@/frontend/features/notifications/hooks/use-read-on-visible";
 import { useNotificationContext } from "@/frontend/providers/NotificationProvider";
 import type { NotificationData } from "@/frontend/types/notification";
 import NotificationItemView from "../components/NotificationItemView";

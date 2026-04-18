@@ -4,7 +4,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
-import { useLoading } from "@/frontend/hooks/use-loading";
+import { useLoading } from "@/frontend/features/common/hooks/use-loading";
 import { api } from "@/lib/axios-client";
 import RegisterFormView, {
 	type RegisterFormState,

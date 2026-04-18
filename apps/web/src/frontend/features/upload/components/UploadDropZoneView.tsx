@@ -1,5 +1,6 @@
 import { PanoramaIcon } from "@phosphor-icons/react";
 import type React from "react";
+import { UPLOAD_DROP_ZONE_ACCEPT } from "@/frontend/features/upload/configs/upload.config";
 import { cn } from "@/utils/cn";
 
 export interface UploadDropZoneViewProps {
@@ -39,7 +40,7 @@ const UploadDropZoneView: React.FC<UploadDropZoneViewProps> = ({
 			onDrop={onDrop}
 		>
 			<input
-				accept="image/jpeg,.jpg,.jpeg"
+				accept={UPLOAD_DROP_ZONE_ACCEPT}
 				className="hidden"
 				id="upload-image-input"
 				onChange={onFileChange}
