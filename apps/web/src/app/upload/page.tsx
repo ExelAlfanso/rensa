@@ -1,4 +1,17 @@
+import type { Metadata } from "next";
 import UploadPageContainer from "@/frontend/features/upload/containers/UploadPageContainer";
+
+export const metadata: Metadata = {
+	title: "Upload Photo",
+	description: "Upload your photo recipe to share it with the Rensa community.",
+	alternates: {
+		canonical: "/upload",
+	},
+	robots: {
+		index: false,
+		follow: false,
+	},
+};
 
 export default function UploadPage() {
 	return (

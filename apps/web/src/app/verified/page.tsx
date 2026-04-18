@@ -1,6 +1,16 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { api } from "@/lib/axios-client";
 import VerifiedClient from "./VerifiedClient";
+
+export const metadata: Metadata = {
+	title: "Email Verification",
+	description: "Verify your email address for your Rensa account.",
+	robots: {
+		index: false,
+		follow: false,
+	},
+};
 
 async function checkTokenValidity(token?: string) {
 	try {

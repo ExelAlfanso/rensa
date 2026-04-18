@@ -40,6 +40,9 @@ export const homeMetadata: Metadata = {
 		creator: "@rensaphoto",
 		images: ["https://rensa.site/og-image.jpg"],
 	},
+	alternates: {
+		canonical: "/",
+	},
 	robots: {
 		index: true,
 		follow: true,

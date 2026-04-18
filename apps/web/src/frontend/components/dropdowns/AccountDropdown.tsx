@@ -41,7 +41,7 @@ const AccountDropdown = ({ src, user }: AccountDropdownProps) => {
 								src={src}
 							/>
 						</div>
-						<div>
+						<div className="flex flex-col items-start justify-center">
 							<Text size="s">{user?.name}</Text>
 							<Text className="font-light text-gray-600" size="s">
 								Free Plan

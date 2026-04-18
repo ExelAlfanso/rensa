@@ -1,9 +1,60 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import PhotoInfoCard from "@/frontend/components/cards/PhotoInfoCard";
 import Heading from "@/frontend/components/Heading";
 import ImagePreview from "@/frontend/components/ImagePreview";
 import MasonryGalleryPage from "@/frontend/sections/MasonryGallerySection/MasonryGallerySection";
 import { fetchPhotoById } from "@/frontend/services/photo.service";
+
+export async function generateMetadata({
+	params,
+}: {
+	params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+	const { id } = await params;
+	try {
+		const photo = await fetchPhotoById(id);
+		const title = photo?.title || "Photo";
+		const description =
+			photo?.description || "Discover photography inspiration on Rensa.";
+
+		return {
+			title: `${title}`,
+			description,
+			alternates: {
+				canonical: `/photo/${id}`,
+			},
+			openGraph: {
+				title,
+				description,
+				url: `/photo/${id}`,
+				type: "article",
+				images: photo?.url
+					? [
+							{
+								url: photo.url,
+								alt: title,
+							},
+						]
+					: undefined,
+			},
+			twitter: {
+				card: "summary_large_image",
+				title,
+				description,
+				images: photo?.url ? [photo.url] : undefined,
+			},
+		};
+	} catch {
+		return {
+			title: "Photo Not Found",
+			robots: {
+				index: false,
+				follow: false,
+			},
+		};
+	}
+}
 
 export default async function PhotoPage({
 	params,

@@ -72,9 +72,6 @@ export const metadata: Metadata = {
 		card: "summary_large_image",
 		creator: "@rensaphoto",
 	},
-	alternates: {
-		canonical: "https://rensa.site",
-	},
 };
 
 export const viewport = {

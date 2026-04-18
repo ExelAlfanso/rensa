@@ -1,4 +1,17 @@
+import type { Metadata } from "next";
 import ResetPasswordForm from "@/frontend/components/forms/ResetPasswordForm";
+
+export const metadata: Metadata = {
+	title: "Reset Password",
+	description: "Set a new password for your Rensa account.",
+	alternates: {
+		canonical: "/reset-password",
+	},
+	robots: {
+		index: false,
+		follow: false,
+	},
+};
 
 export default async function ResetPasswordPage({
 	searchParams,
