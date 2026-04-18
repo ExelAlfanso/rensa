@@ -34,8 +34,11 @@ interface BackendPhotosResponse {
 export interface FetchPhotosResponse {
 	data: PopulatedPhoto[];
 	nextPage: number | undefined;
+	source?: ExplorePhotoSource;
 	urls: string[];
 }
+
+export type ExplorePhotoSource = "db" | "picsum";
 
 export const fetchPhotosFromDB = async (
 	page: number,
@@ -98,6 +101,51 @@ export const fetchPhotosFromRoll = async (
 		data: res.data.data.photos,
 		urls: res.data.data.photos.map((photo: PopulatedPhoto) => photo.url),
 		nextPage: res.data.data.hasMore ? page + 1 : undefined,
+	};
+};
+
+interface PicsumPhotosResponse {
+	hasMore: boolean;
+	photos: PopulatedPhoto[];
+}
+
+const getExplorePhotoSource = (): ExplorePhotoSource => {
+	const requestedSource = process.env.NEXT_PUBLIC_EXPLORE_SOURCE;
+	if (process.env.NODE_ENV === "production") {
+		return "db";
+	}
+	if (requestedSource === "picsum") {
+		return "picsum";
+	}
+	return "db";
+};
+
+export const fetchExplorePhotos = async (
+	page: number,
+	filters: string[] | undefined,
+	sort: "popular" | "recent" = "recent"
+): Promise<FetchPhotosResponse> => {
+	const source = getExplorePhotoSource();
+	if (source === "db") {
+		const response = await fetchPhotosFromDB(page, filters, sort);
+		return { ...response, source };
+	}
+
+	const params: Record<string, number | string | undefined> = {
+		page,
+		limit: 10,
+		sort,
+		filters: filters?.join(" "),
+	};
+
+	const response = await api.get<PicsumPhotosResponse>("/photos/debug/picsum", {
+		params,
+	});
+	return {
+		data: response.data.photos,
+		urls: response.data.photos.map((photo) => photo.url),
+		nextPage: response.data.hasMore ? page + 1 : undefined,
+		source,
 	};
 };
 

@@ -1,8 +1,5 @@
-import FilterSection from "@/frontend/sections/FilterSection";
+import ExplorePageContainer from "@/frontend/features/explore/containers/ExplorePageContainer";
+
 export default function ExplorePage() {
-	return (
-		<div className="flex min-h-screen w-full flex-col items-center bg-white-500">
-			<FilterSection />
-		</div>
-	);
+	return <ExplorePageContainer />;
 }

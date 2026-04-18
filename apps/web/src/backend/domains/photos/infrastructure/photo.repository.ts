@@ -80,6 +80,26 @@ export class PhotoRepository implements PhotoRepositoryInterface {
 		);
 	}
 
+	private async getPhotosByIdsInOrder(photoIds: string[]): Promise<PhotoRow[]> {
+		if (photoIds.length === 0) {
+			return [];
+		}
+
+		const photoRows = await db
+			.select()
+			.from(photos)
+			.where(inArray(photos.photoId, photoIds));
+
+		const orderByPhotoId = new Map(photoIds.map((id, index) => [id, index]));
+		photoRows.sort(
+			(a, b) =>
+				(orderByPhotoId.get(a.photoId) ?? Number.MAX_SAFE_INTEGER) -
+				(orderByPhotoId.get(b.photoId) ?? Number.MAX_SAFE_INTEGER)
+		);
+
+		return photoRows;
+	}
+
 	private buildFilterWhere(filters?: string[]) {
 		if (!(filters && filters.length > 0)) {
 			return undefined;
@@ -98,14 +118,32 @@ export class PhotoRepository implements PhotoRepositoryInterface {
 	async list(query: ListPhotosQueryDto): Promise<ListPhotosResult> {
 		const from = (query.page - 1) * query.limit;
 		const whereClause = this.buildFilterWhere(query.filters);
+		let photoRows: PhotoRow[] = [];
 
-		const photoRows = await db
-			.select()
-			.from(photos)
-			.where(whereClause)
-			.orderBy(desc(photos.createdAt))
-			.limit(query.limit)
-			.offset(from);
+		if (query.sort === "popular") {
+			const popularRows = await db
+				.select({
+					photoId: photos.photoId,
+				})
+				.from(photos)
+				.leftJoin(bookmarks, eq(bookmarks.photoId, photos.photoId))
+				.where(whereClause)
+				.groupBy(photos.photoId)
+				.orderBy(desc(count(bookmarks.bookmarkId)), desc(photos.createdAt))
+				.limit(query.limit)
+				.offset(from);
+
+			const orderedPhotoIds = popularRows.map((row) => row.photoId);
+			photoRows = await this.getPhotosByIdsInOrder(orderedPhotoIds);
+		} else {
+			photoRows = await db
+				.select()
+				.from(photos)
+				.where(whereClause)
+				.orderBy(desc(photos.createdAt))
+				.limit(query.limit)
+				.offset(from);
+		}
 
 		const [countRow] = await db
 			.select({ total: count() })
@@ -218,17 +256,7 @@ export class PhotoRepository implements PhotoRepositoryInterface {
 			};
 		}
 
-		const photoRows = await db
-			.select()
-			.from(photos)
-			.where(inArray(photos.photoId, photoIds));
-
-		const orderByPhotoId = new Map(photoIds.map((id, index) => [id, index]));
-		photoRows.sort(
-			(a, b) =>
-				(orderByPhotoId.get(a.photoId) ?? Number.MAX_SAFE_INTEGER) -
-				(orderByPhotoId.get(b.photoId) ?? Number.MAX_SAFE_INTEGER)
-		);
+		const photoRows = await this.getPhotosByIdsInOrder(photoIds);
 
 		const photosResult = await this.mapPhotosToResponseDtos(photoRows);
 		return {
