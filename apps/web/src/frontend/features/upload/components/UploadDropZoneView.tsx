@@ -8,7 +8,6 @@ export interface UploadDropZoneViewProps {
 	fileInputRef: React.RefObject<HTMLInputElement | null>;
 	isDragOver: boolean;
 	isUploading: boolean;
-	onBrowseClick: () => void;
 	onDragLeave: (event: React.DragEvent<HTMLElement>) => void;
 	onDragOver: (event: React.DragEvent<HTMLElement>) => void;
 	onDrop: (event: React.DragEvent<HTMLElement>) => void;
@@ -16,7 +15,6 @@ export interface UploadDropZoneViewProps {
 }
 
 const UploadDropZoneView: React.FC<UploadDropZoneViewProps> = ({
-	onBrowseClick,
 	onDrop,
 	onDragOver,
 	onDragLeave,
@@ -34,7 +32,6 @@ const UploadDropZoneView: React.FC<UploadDropZoneViewProps> = ({
 				isDragOver ? "bg-white-600" : "hover:bg-white-600"
 			)}
 			htmlFor="upload-image-input"
-			onClick={onBrowseClick}
 			onDragLeave={onDragLeave}
 			onDragOver={onDragOver}
 			onDrop={onDrop}

@@ -17,7 +17,11 @@ export async function POST(req: Request) {
 	formData.append("file", file, file.name);
 
 	try {
-		const res = await expressApi.post("/exifread", formData);
+		const res = await expressApi.post("/exifread", formData, {
+			headers: {
+				"Content-Type": "multipart/form-data",
+			},
+		});
 		return NextResponse.json(
 			{
 				success: true,

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLoading } from "@/frontend/features/common/hooks/use-loading";
 import {
 	type CameraSettings,
@@ -41,24 +41,45 @@ export function useUploadPageController() {
 	const { setLoading } = useLoading();
 	const [error, setError] = useState("");
 	const [form, setForm] = useState<UploadFormState>(createInitialFormState());
+	const lastDetectedFileKeyRef = useRef<string | null>(null);
 
-	const handleExifChange = (
-		field: string,
-		value: number | object | string | CameraSettings["Brand"]
-	) => {
-		if (field === "Brand") {
-			const nextExif = defaultCameraSettings[value as CameraSettings["Brand"]];
-			setForm((prev) => ({ ...prev, exif: nextExif }));
-			return;
-		}
+	const handleExifChange = useCallback(
+		(
+			field: string,
+			value: number | object | string | CameraSettings["Brand"]
+		) => {
+			if (field === "Brand") {
+				const nextExif =
+					defaultCameraSettings[value as CameraSettings["Brand"]];
+				setForm((prev) => ({ ...prev, exif: nextExif }));
+				return;
+			}
 
-		setForm((prev) => ({ ...prev, exif: { ...prev.exif, [field]: value } }));
-	};
+			setForm((prev) => ({ ...prev, exif: { ...prev.exif, [field]: value } }));
+		},
+		[]
+	);
 
 	const exifDetection = useExifDetection(
 		fileUpload.uploadedFile,
 		handleExifChange
 	);
+	const { detectAndApplyExif } = exifDetection;
+
+	useEffect(() => {
+		if (!fileUpload.uploadedFile) {
+			lastDetectedFileKeyRef.current = null;
+			return;
+		}
+
+		const nextFileKey = `${fileUpload.uploadedFile.name}-${fileUpload.uploadedFile.size}-${fileUpload.uploadedFile.lastModified}`;
+		if (lastDetectedFileKeyRef.current === nextFileKey) {
+			return;
+		}
+
+		lastDetectedFileKeyRef.current = nextFileKey;
+		detectAndApplyExif().catch(() => undefined);
+	}, [detectAndApplyExif, fileUpload.uploadedFile]);
 
 	const handleChange = (field: string, value: string | string[]) => {
 		setForm((prev) => ({ ...prev, [field]: value }));

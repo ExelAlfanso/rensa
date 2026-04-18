@@ -27,7 +27,6 @@ const UploadPageContainer: React.FC = () => {
 			}}
 			dropZoneProps={{
 				fileInputRef: fileUpload.fileInputRef,
-				handleBrowseClick: fileUpload.handleBrowseClick,
 				handleDragLeave: fileUpload.handleDragLeave,
 				handleDragOver: fileUpload.handleDragOver,
 				handleDrop: fileUpload.handleDrop,

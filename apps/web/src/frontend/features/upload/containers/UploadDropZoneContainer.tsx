@@ -4,7 +4,6 @@ import UploadDropZoneView from "../components/UploadDropZoneView";
 export interface UploadDropZoneContainerProps {
 	content?: React.ReactNode;
 	fileInputRef: React.RefObject<HTMLInputElement | null>;
-	handleBrowseClick: () => void;
 	handleDragLeave: (event: React.DragEvent<HTMLElement>) => void;
 	handleDragOver: (event: React.DragEvent<HTMLElement>) => void;
 	handleDrop: (event: React.DragEvent<HTMLElement>) => void;
@@ -14,7 +13,6 @@ export interface UploadDropZoneContainerProps {
 }
 
 const UploadDropZoneContainer: React.FC<UploadDropZoneContainerProps> = ({
-	handleBrowseClick,
 	handleDrop,
 	handleDragOver,
 	handleDragLeave,
@@ -30,7 +28,6 @@ const UploadDropZoneContainer: React.FC<UploadDropZoneContainerProps> = ({
 			fileInputRef={fileInputRef}
 			isDragOver={isDragOver}
 			isUploading={isUploading}
-			onBrowseClick={handleBrowseClick}
 			onDragLeave={handleDragLeave}
 			onDragOver={handleDragOver}
 			onDrop={handleDrop}

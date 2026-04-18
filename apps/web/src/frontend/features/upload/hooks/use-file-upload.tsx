@@ -23,9 +23,6 @@ export function useFileUpload() {
 		e.preventDefault();
 		setIsDragOver(false);
 	}, []);
-	const handleBrowseClick = () => {
-		fileInputRef.current?.click();
-	};
 	const handleFileSelect = useCallback((file: File) => {
 		const isWithinAllowedSize = file.size <= PHOTO_UPLOAD_MAX_INPUT_SIZE_BYTES;
 		if (!isWithinAllowedSize) {
@@ -91,7 +88,6 @@ export function useFileUpload() {
 		fileInputRef,
 		handleDragOver,
 		handleDragLeave,
-		handleBrowseClick,
 		handleDrop,
 		handleFileChange,
 		handleCancel,
