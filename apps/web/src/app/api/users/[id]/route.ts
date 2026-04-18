@@ -1,51 +1,64 @@
 import { NextResponse } from "next/server";
-import User from "@/models/User";
-import { connectDB } from "@/lib/mongodb";
 import { getServerSession } from "next-auth";
+import { ZodError } from "zod";
+import {
+	BackendError,
+	UnauthorizedError,
+} from "@/backend/common/backend.error";
+import { userDomain } from "@/backend/domains/users/module";
+import { userIdParamDto } from "@/backend/dtos/user.dto";
 import { authOptions } from "@/lib/auth";
 
 /*
   GET /api/users/[id]
-  Fetch user by ID
-  Returns { success: boolean, message: string, data: { user } }
 */
-
 export async function GET(
-  request: Request,
-  context: { params: Promise<{ id: string }> }
+	_request: Request,
+	context: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await context.params;
+	try {
+		const params = userIdParamDto.parse(await context.params);
+		const session = await getServerSession(authOptions);
+		const actorId = session?.user?.id;
+		if (!actorId) {
+			throw new UnauthorizedError();
+		}
 
-  try {
-    const session = await getServerSession({ req: request, ...authOptions });
-    if (!session) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
+		const user = await userDomain.usersApplication.getById(params.id, actorId);
+		return NextResponse.json(
+			{
+				success: true,
+				message: "Successfully fetched user",
+				data: { user },
+			},
+			{ status: 200 }
+		);
+	} catch (error) {
+		if (error instanceof ZodError) {
+			return NextResponse.json(
+				{
+					success: false,
+					message: "Validation failed",
+					details: error.flatten(),
+				},
+				{ status: 400 }
+			);
+		}
 
-    if (session.user.id !== id) {
-      return NextResponse.json({ message: "Forbidden" }, { status: 403 });
-    }
+		if (error instanceof BackendError) {
+			return NextResponse.json(
+				{
+					success: false,
+					message: error.message,
+					code: error.code,
+				},
+				{ status: error.statusCode }
+			);
+		}
 
-    await connectDB();
-
-    const user = await User.findById(id).lean();
-    if (!user) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
-    }
-
-    return NextResponse.json(
-      {
-        success: true,
-        message: "Sucessfully fetched user",
-        data: { user },
-      },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error("Error fetching user:", error);
-    return NextResponse.json(
-      { message: "Internal Server Error" },
-      { status: 500 }
-    );
-  }
+		return NextResponse.json(
+			{ success: false, message: "Internal Server Error" },
+			{ status: 500 }
+		);
+	}
 }

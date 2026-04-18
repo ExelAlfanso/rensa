@@ -1,0 +1,46 @@
+import Image from "next/image";
+import Link from "next/link";
+import type React from "react";
+import { cn } from "@/utils/cn";
+
+interface ProfileButtonProps {
+	alt: string;
+	href?: string;
+	size?: "8" | "10" | "12" | "16" | "20"; // restrict to supported Tailwind sizes
+	src: string;
+}
+
+const ProfileButton: React.FC<ProfileButtonProps> = ({
+	src,
+	alt,
+	size = "8",
+	href,
+}) => {
+	const sizeClasses: Record<string, string> = {
+		"8": "w-8 h-8 md:w-10 md:h-10",
+		"10": "w-10 h-10 md:w-12 md:h-12",
+		"12": "w-12 h-12 md:w-16 md:h-16",
+		"16": "w-16 h-16 md:w-20 md:h-20",
+		"20": "w-20 h-20 md:w-32 md:h-32",
+	};
+
+	return (
+		<Link
+			className={cn(
+				"relative cursor-pointer rounded-full transition-all duration-300 hover:opacity-50",
+				sizeClasses[size]
+			)}
+			href={href || "#"}
+		>
+			<Image
+				alt={alt}
+				className="aspect-square rounded-full object-cover"
+				fill
+				sizes="(max-width: 768px) 40px, (max-width: 1200px) 60px, 80px"
+				src={src}
+			/>
+		</Link>
+	);
+};
+
+export default ProfileButton;

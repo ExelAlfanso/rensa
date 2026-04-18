@@ -1,85 +1,90 @@
-import { connectDB } from "@/lib/mongodb";
-import { registerLimiter } from "@/lib/rateLimiter";
-import Roll from "@/models/Roll";
-import User from "@/models/User";
 import bcrypt from "bcryptjs";
-import { startSession } from "mongoose";
 import { NextResponse } from "next/server";
-import { sendVerificationEmail } from "@/services/EmailServices";
+import { ZodError } from "zod";
+import { rollDomain } from "@/backend/domains/rolls/module";
+import { userDomain } from "@/backend/domains/users/module";
+import { registerLimiter } from "@/lib/rateLimiter";
+
+const usersApplication = userDomain.usersApplication;
+const rollsApplication = rollDomain.rollsApplication;
 
 /*
   POST /api/auth/register
   User registration endpoint
 */
 export async function POST(req: Request) {
-  try {
-    const ip =
-      req.headers.get("x-forwarded-for") ||
-      req.headers.get("x-real-ip") ||
-      "unknown";
+	try {
+		// const ip =
+		// 	req.headers.get("x-forwarded-for") ||
+		// 	req.headers.get("x-real-ip") ||
+		// 	"unknown";
 
-    const { success, remaining, limit, reset } =
-      await registerLimiter.limit(ip);
-    if (!success) {
-      return NextResponse.json(
-        { message: "Too many registration attempts. Please try again later." },
-        {
-          status: 429,
-          headers: {
-            "X-RateLimit-Limit": limit.toString(),
-            "X-RateLimit-Remaining": remaining.toString(),
-            "X-RateLimit-Reset": reset.toString(),
-          },
-        },
-      );
-    }
-    const { username, email, password, confirmPassword } = await req.json();
-    if (password != confirmPassword)
-      return NextResponse.json(
-        { message: "Invalid Password" },
-        { status: 400 },
-      );
-    await connectDB();
+		// const { success, remaining, limit, reset } =
+		// 	await registerLimiter.limit(ip);
+		// if (!success) {
+		// 	return NextResponse.json(
+		// 		{ message: "Too many registration attempts. Please try again later." },
+		// 		{
+		// 			status: 429,
+		// 			headers: {
+		// 				"X-RateLimit-Limit": limit.toString(),
+		// 				"X-RateLimit-Remaining": remaining.toString(),
+		// 				"X-RateLimit-Reset": reset.toString(),
+		// 			},
+		// 		}
+		// 	);
+		// }
+		const { username, email, password, confirmPassword } = await req.json();
+		if (password !== confirmPassword) {
+			return NextResponse.json(
+				{ message: "Invalid Password" },
+				{ status: 400 }
+			);
+		}
+		const userExists = await usersApplication.getByEmail(email);
+		if (userExists) {
+			return NextResponse.json(
+				{ message: "Email already exists" },
+				{ status: 409 }
+			);
+		}
+		const hashedPassword = await bcrypt.hash(password, 10);
+		const user = await usersApplication.create({
+			username,
+			email,
+			password: hashedPassword,
+		});
+		await rollsApplication.create(
+			{
+				user_id: user.user_id,
+				name: "All Photos",
+				description: "This is your default roll.",
+			},
+			user.user_id
+		);
 
-    const userExists = await User.findOne({ email });
-    if (userExists)
-      return NextResponse.json(
-        { message: "Email already exists" },
-        { status: 409 },
-      );
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ username, email, password: hashedPassword });
-    const defaultRoll = new Roll({
-      userId: user._id,
-      name: "All Photos",
-      description: "This is your default roll.",
-    });
-    try {
-      await sendVerificationEmail(email);
-    } catch (err) {
-      console.error("Error sending verification email:", err);
-    }
-    const session = await startSession();
-    session.startTransaction();
-    try {
-      await user.save({ session });
-      await defaultRoll.save({ session });
-      await session.commitTransaction();
-    } catch (err) {
-      await session.abortTransaction();
-      throw err;
-    } finally {
-      session.endSession();
-    }
+		// try {
+		// 	await sendVerificationEmail(email);
+		// } catch (err) {
+		// 	console.error("Error sending verification email:", err);
+		// }
 
-    return NextResponse.json(
-      { message: "User registered successfully" },
-      { status: 201 },
-    );
-  } catch (err) {
-    return NextResponse.json(
-      { message: `Error registering user: ${err}` },
-      { status: 500 },
-    );
-  }
+		return NextResponse.json(
+			{ message: "User registered successfully" },
+			{ status: 201 }
+		);
+	} catch (err) {
+		console.log("error in registration route:", err);
+		if (err instanceof ZodError) {
+			console.log("Validation error:", err.message);
+			return NextResponse.json(
+				{ message: `Invalid input data: ${err.message}` },
+				{ status: 400 }
+			);
+		}
+		return NextResponse.json(
+			{ message: `Error registering user: ${err}` },
+			{ status: 500 }
+		);
+	}
 }

@@ -1,70 +1,63 @@
-import { connectDB } from "@/lib/mongodb";
-import Photo from "@/models/Photo";
-import Roll from "@/models/Roll";
-import { Types } from "mongoose";
 import { NextResponse } from "next/server";
+import { ZodError } from "zod";
+import { BackendError } from "@/backend/common/backend.error";
+import { rollDomain } from "@/backend/domains/rolls/module";
+import {
+	listRollPhotosQueryDto,
+	rollIdParamDto,
+} from "@/backend/dtos/roll.dto";
 
-interface RollLean {
-  _id: Types.ObjectId;
-  photos: Types.ObjectId[];
-}
-
-/**
- * GET /api/rolls/[id]/photos?page=1&limit=10
- * Fetch all photos belonging to a specific roll (paginated)
+/*
+ * GET /api/rolls/[rollId]/photos?page=1&limit=10
  */
-
 export async function GET(
-  req: Request,
-  context: { params: Promise<{ rollId: string }> }
+	req: Request,
+	context: { params: Promise<{ rollId: string }> }
 ) {
-  const { rollId } = await context.params;
+	try {
+		const params = rollIdParamDto.parse(await context.params);
+		const { searchParams } = new URL(req.url);
+		const query = listRollPhotosQueryDto.parse({
+			page: searchParams.get("page") ?? undefined,
+			limit: searchParams.get("limit") ?? undefined,
+		});
 
-  try {
-    await connectDB();
-
-    // Parse pagination params
-    const { searchParams } = new URL(req.url);
-    const page = Number(searchParams.get("page")) || 1;
-    const limit = Number(searchParams.get("limit")) || 10;
-    const skip = (page - 1) * limit;
-
-    // Verify roll exists
-    const roll = (await Roll.findById(rollId)
-      .populate("photos")
-      .lean()) as RollLean | null;
-    if (!roll) {
-      return NextResponse.json(
-        { success: false, message: "Roll not found" },
-        { status: 404 }
-      );
-    }
-
-    // Fetch photos belonging to this roll
-    // If `roll.photos` contains ObjectIds, we can query directly.
-    const photos = await Photo.find({ _id: { $in: roll.photos } })
-      .populate("userId", "username avatar")
-      .skip(skip)
-      .limit(limit)
-      .lean();
-
-    const total = await Photo.countDocuments({ _id: { $in: roll.photos } });
-    const totalPages = Math.ceil(total / limit);
-    const hasMore = page < totalPages;
-
-    return NextResponse.json(
-      {
-        success: true,
-        message: "Fetched roll photos successfully",
-        data: { photos, currentPage: page, totalPages, hasMore, total },
-      },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error("Error fetching photos from roll:", error);
-    return NextResponse.json(
-      { success: false, message: "Internal Server Error" },
-      { status: 500 }
-    );
-  }
+		const result = await rollDomain.rollsApplication.listPhotos(
+			params.rollId,
+			query
+		);
+		return NextResponse.json(
+			{
+				success: true,
+				message: "Fetched roll photos successfully",
+				data: result,
+			},
+			{ status: 200 }
+		);
+	} catch (error) {
+		if (error instanceof ZodError) {
+			return NextResponse.json(
+				{
+					success: false,
+					message: "Validation failed",
+					details: error.flatten(),
+				},
+				{ status: 400 }
+			);
+		}
+		if (error instanceof BackendError) {
+			return NextResponse.json(
+				{
+					success: false,
+					message: error.message,
+					code: error.code,
+				},
+				{ status: error.statusCode }
+			);
+		}
+		return NextResponse.json(
+			{ success: false, message: "Internal Server Error" },
+			{ status: 500 }
+		);
+	}
 }

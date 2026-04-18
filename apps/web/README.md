@@ -70,7 +70,7 @@ Whether you're shooting with Fujifilm, Ricoh, or other custom-profile capable ca
 ### Backend Services
 
 - **APIs**: Elysia.js (TypeScript), FastAPI (Python)
-- **Database**: MongoDB
+- **Database**: PostgreSQL + Drizzle ORM
 - **Real-time**: Socket.io
 - **File Storage**: Cloudinary
 - **Caching**: Redis
@@ -98,7 +98,7 @@ Whether you're shooting with Fujifilm, Ricoh, or other custom-profile capable ca
 - **Node.js**: v18.0.0 or higher ([Download](https://nodejs.org/))
 - **npm**: v9.0.0 or higher (comes with Node.js)
 - **git**: Latest version
-- **MongoDB**: Local or cloud instance (MongoDB Atlas)
+- **PostgreSQL**: Project database
 - **Cloudinary Account**: For image hosting ([Sign up](https://cloudinary.com/))
 
 ### Installation
@@ -126,7 +126,7 @@ Then edit `.env.local` and add your configuration:
 
 ```env
 # Database
-MONGODB_URI=mongodb://...
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/rensa
 
 # Authentication
 NEXTAUTH_URL=http://localhost:3000
@@ -195,6 +195,11 @@ npm run format
 1. Navigate to your profile
 2. Create a new "Roll" (collection)
 3. Add photos to organize your photography style
+
+**API Documentation**
+
+1. Open machine-readable API contract at `/api/openapi`
+2. Open interactive Swagger UI at `/swagger`
 
 ## 🧪 Testing
 
@@ -323,7 +328,7 @@ MIT License © 2026 Rensa Contributors
 - [Next.js](https://nextjs.org/) - React framework
 - [Tailwind CSS](https://tailwindcss.com/) - Styling
 - [Framer Motion](https://www.framer.com/motion/) - Animations
-- [MongoDB](https://www.mongodb.com/) - Database
+- [Drizzle ORM](https://orm.drizzle.team/) - Type-safe PostgreSQL ORM
 - [Cloudinary](https://cloudinary.com/) - Image hosting
 
 ### Community

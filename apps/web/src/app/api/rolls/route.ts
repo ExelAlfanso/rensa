@@ -1,97 +1,104 @@
 import { NextResponse } from "next/server";
-import Roll from "@/models/Roll";
-import { connectDB } from "@/lib/mongodb";
-import Photo from "@/models/Photo";
-import { SortOrder } from "mongoose";
 import { getServerSession } from "next-auth";
+import { ZodError } from "zod";
+import {
+	BackendError,
+	UnauthorizedError,
+} from "@/backend/common/backend.error";
+import { rollDomain } from "@/backend/domains/rolls/module";
+import { listRollsQueryDto, rollCreateDto } from "@/backend/dtos/roll.dto";
 import { authOptions } from "@/lib/auth";
 
 /*
-  GET /api/rolls?userId=...&sort=recent||mostPopular||oldest||leastPopular
-  Fetch rolls for a specific user
-  Returns { success: boolean, message: string, data: rolls[] }
+  GET /api/rolls?userId=...&sort=latest|oldest
 */
 export async function GET(req: Request) {
-  await connectDB();
-  const { searchParams } = new URL(req.url);
-  const id = searchParams.get("userId");
-  const sort = searchParams.get("sort") || "latest" || "oldest";
-
-  const sortOptions: Record<string, SortOrder> =
-    sort === "latest" ? { createdAt: -1 } : { createdAt: 1 };
-  try {
-    const rolls = await Roll.find({ userId: id }).sort(sortOptions).lean();
-    const rollsWithPreviews = await Promise.all(
-      rolls.map(async (roll) => {
-        const randomPhotos = await Photo.aggregate([
-          { $match: { _id: { $in: roll.photos } } },
-          { $sample: { size: 4 } },
-          { $project: { url: 1, _id: 1 } },
-        ]);
-        return {
-          ...roll,
-          previewPhotos: randomPhotos.map((p) => p.url),
-        };
-      })
-    );
-    return NextResponse.json(
-      {
-        success: true,
-        message: "Fetched rolls successfully",
-        data: { rolls: rollsWithPreviews },
-      },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error("Error fetching user:", error);
-    return NextResponse.json(
-      { message: "Internal Server Error" },
-      { status: 500 }
-    );
-  }
+	try {
+		const { searchParams } = new URL(req.url);
+		const query = listRollsQueryDto.parse({
+			userId: searchParams.get("userId") ?? undefined,
+			sort: searchParams.get("sort") ?? undefined,
+		});
+		const result = await rollDomain.rollsApplication.listByUserId(
+			query.userId,
+			query.sort
+		);
+		return NextResponse.json(
+			{
+				success: true,
+				message: "Fetched rolls successfully",
+				data: result,
+			},
+			{ status: 200 }
+		);
+	} catch (error) {
+		return mapRouteError(error, "Failed to fetch rolls");
+	}
 }
 
 /*
   POST /api/rolls
-  Create a new roll
 */
-
 export async function POST(req: Request) {
-  await connectDB();
-  const { name, imageUrl, userId } = await req.json();
-  const session = await getServerSession(authOptions);
-  if (!session || !session.user) {
-    return NextResponse.json(
-      { success: false, message: "Unauthorized" },
-      { status: 401 }
-    );
-  }
-  try {
-    const newRoll = new Roll({
-      name: name,
-      userId: userId,
-      photos: [],
-      imageUrl: imageUrl || "/images/image6.JPG",
-    });
-    await newRoll.save();
-    return NextResponse.json(
-      {
-        success: true,
-        message: "Roll created successfully",
-        data: {
-          _id: newRoll._id.toString(),
-          name: newRoll.name,
-          userId: newRoll.userId,
-          imageUrl: newRoll.imageUrl,
-          photos: newRoll.photos,
-        },
-      },
-      { status: 201 }
-    );
-  } catch {
-    return NextResponse.json(
-      { success: false, message: "Failed to create roll" },
-      { status: 500 }
-    );
-  }
+	try {
+		const session = await getServerSession(authOptions);
+		const actorId = session?.user?.id;
+		if (!actorId) {
+			throw new UnauthorizedError();
+		}
+
+		const rawBody = (await req.json()) as {
+			description?: string;
+			imageUrl?: string;
+			name?: string;
+			userId?: string;
+			user_id?: string;
+		};
+		const body = rollCreateDto.parse({
+			name: rawBody.name,
+			description: rawBody.description,
+			imageUrl: rawBody.imageUrl,
+			user_id: rawBody.user_id ?? rawBody.userId,
+		});
+		const createdRoll = await rollDomain.rollsApplication.create(body, actorId);
+		return NextResponse.json(
+			{
+				success: true,
+				message: "Roll created successfully",
+				data: createdRoll,
+			},
+			{ status: 201 }
+		);
+	} catch (error) {
+		return mapRouteError(error, "Failed to create roll");
+	}
+}
+
+function mapRouteError(error: unknown, fallbackMessage: string): NextResponse {
+	if (error instanceof ZodError) {
+		return NextResponse.json(
+			{
+				success: false,
+				message: "Validation failed",
+				details: error.flatten(),
+			},
+			{ status: 400 }
+		);
+	}
+
+	if (error instanceof BackendError) {
+		return NextResponse.json(
+			{
+				success: false,
+				message: error.message,
+				code: error.code,
+			},
+			{ status: error.statusCode }
+		);
+	}
+
+	return NextResponse.json(
+		{ success: false, message: fallbackMessage },
+		{ status: 500 }
+	);
 }

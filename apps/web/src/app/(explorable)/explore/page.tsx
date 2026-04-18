@@ -1,8 +1,28 @@
-import FilterSection from "@/sections/FilterSection";
+import type { Metadata } from "next";
+import ExplorePageContainer from "@/frontend/features/explore/containers/ExplorePageContainer";
+
+export const metadata: Metadata = {
+	title: "Explore Photography Ideas",
+	description:
+		"Browse curated photography inspiration, discover creative styles, and learn visual recipes from the Rensa community.",
+	alternates: {
+		canonical: "/explore",
+	},
+	openGraph: {
+		title: "Explore Photography Ideas | Rensa",
+		description:
+			"Browse curated photography inspiration, discover creative styles, and learn visual recipes from the Rensa community.",
+		url: "/explore",
+		type: "website",
+	},
+	twitter: {
+		card: "summary_large_image",
+		title: "Explore Photography Ideas | Rensa",
+		description:
+			"Browse curated photography inspiration, discover creative styles, and learn visual recipes from the Rensa community.",
+	},
+};
+
 export default function ExplorePage() {
-  return (
-    <div className="flex flex-col items-center w-full min-h-screen bg-white-500">
-      <FilterSection></FilterSection>
-    </div>
-  );
+	return <ExplorePageContainer />;
 }

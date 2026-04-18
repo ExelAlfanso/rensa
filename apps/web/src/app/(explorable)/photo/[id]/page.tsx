@@ -1,50 +1,100 @@
-import MasonryGalleryPage from "@/sections/MasonryGallerySection/MasonryGallerySection";
-import Heading from "@/components/Heading";
-import PhotoInfoCard from "@/components/cards/PhotoInfoCard";
-import ImagePreview from "@/components/ImagePreview";
-
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { fetchPhotoById } from "@/services/PhotoServices";
+import PhotoInfoCard from "@/frontend/components/cards/PhotoInfoCard";
+import Heading from "@/frontend/components/Heading";
+import ImagePreview from "@/frontend/components/ImagePreview";
+import MasonryGalleryPage from "@/frontend/sections/MasonryGallerySection/MasonryGallerySection";
+import { fetchPhotoById } from "@/frontend/services/photo.service";
+
+export async function generateMetadata({
+	params,
+}: {
+	params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+	const { id } = await params;
+	try {
+		const photo = await fetchPhotoById(id);
+		const title = photo?.title || "Photo";
+		const description =
+			photo?.description || "Discover photography inspiration on Rensa.";
+
+		return {
+			title: `${title}`,
+			description,
+			alternates: {
+				canonical: `/photo/${id}`,
+			},
+			openGraph: {
+				title,
+				description,
+				url: `/photo/${id}`,
+				type: "article",
+				images: photo?.url
+					? [
+							{
+								url: photo.url,
+								alt: title,
+							},
+						]
+					: undefined,
+			},
+			twitter: {
+				card: "summary_large_image",
+				title,
+				description,
+				images: photo?.url ? [photo.url] : undefined,
+			},
+		};
+	} catch {
+		return {
+			title: "Photo Not Found",
+			robots: {
+				index: false,
+				follow: false,
+			},
+		};
+	}
+}
 
 export default async function PhotoPage({
-  params,
+	params,
 }: {
-  params: Promise<{ id: string }>;
+	params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
-  let photo = null;
-  try {
-    photo = await fetchPhotoById(id);
-  } catch (error) {
-    console.error("Error fetching photo:", error);
-  }
-  if (!photo) {
-    redirect("/not-found");
-  }
-  return (
-    <div className="bg-white-500 w-full flex flex-col items-center justify-center px-[25px] md:px-[30px] lg:px-[70px] xl:px-[90px] 2xl:px-[260px] gap-10">
-      <div className="flex flex-col lg:flex-row items-start justify-center gap-[67px] pt-35 ">
-        <div className="flex flex-col items-center justify-center gap-2 md:items-start md:justify-start">
-          <ImagePreview
-            src={photo?.url ?? ""}
-            alt={photo?.title ?? "Photo"}
-            width={photo?.metadata?.width}
-            height={photo?.metadata?.height}
-          />
-        </div>
-        <PhotoInfoCard
-          id={id}
-          initialBookmarks={photo?.bookmarkedBy?.length || 0}
-          title={photo?.title}
-          description={photo?.description}
-          metadata={photo?.metadata}
-          ownerId={photo?.userId.toString() || ""}
-        />
-      </div>
-      <Heading className="text-primary" size="s">
-        We thought you will like this
-      </Heading>
-      <MasonryGalleryPage type="explore"></MasonryGalleryPage>
-    </div>
-  );
+	const { id } = await params;
+	let photo: Awaited<ReturnType<typeof fetchPhotoById>> | null = null;
+	try {
+		photo = await fetchPhotoById(id);
+	} catch {
+		photo = null;
+	}
+	if (!photo) {
+		redirect("/not-found");
+	}
+	return (
+		<div className="flex w-full flex-col items-center justify-center gap-10 bg-white-500 px-6.25 md:px-7.5 lg:px-17.5 xl:px-22.5 2xl:px-65">
+			<div className="flex flex-col items-start justify-center gap-16.75 pt-35 lg:flex-row">
+				<div className="flex flex-col items-center justify-center gap-2 md:items-start md:justify-start">
+					<ImagePreview
+						alt={photo?.title ?? "Photo"}
+						height={photo?.metadata?.height}
+						src={photo?.url ?? ""}
+						width={photo?.metadata?.width}
+					/>
+				</div>
+				<PhotoInfoCard
+					description={photo?.description}
+					id={id}
+					initialBookmarks={photo?.bookmarkedBy?.length || 0}
+					metadata={photo?.metadata}
+					ownerId={photo?.userId.toString() || ""}
+					title={photo?.title}
+				/>
+			</div>
+			<Heading className="text-primary" size="s">
+				We thought you will like this
+			</Heading>
+			<MasonryGalleryPage type="explore" />
+		</div>
+	);
 }

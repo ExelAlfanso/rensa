@@ -1,83 +1,70 @@
-import { authOptions } from "@/lib/auth";
-import Photo from "@/models/Photo";
-import User from "@/models/User";
-import { ObjectId } from "mongoose";
-import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { ZodError } from "zod";
+import {
+	BackendError,
+	UnauthorizedError,
+} from "@/backend/common/backend.error";
+import { bookmarkDomain } from "@/backend/domains/bookmarks/module";
+import { bookmarkActionDto } from "@/backend/dtos/bookmark.dto";
+import { photoIdParamDto } from "@/backend/dtos/photo.dto";
+import { authOptions } from "@/lib/auth";
 
 /*
-  POST /api/photos/[id]/bookmark
-  Add or remove bookmark for a photo
+  POST /api/photos/bookmark/[id]
 */
-
 export async function POST(
-  request: Request,
-  context: { params: Promise<{ id: string }> },
+	request: Request,
+	context: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await context.params;
+	try {
+		const params = photoIdParamDto.parse(await context.params);
+		const body = bookmarkActionDto.parse(await request.json());
+		const session = await getServerSession(authOptions);
+		const actorId = session?.user?.id;
+		if (!actorId) {
+			throw new UnauthorizedError();
+		}
 
-  try {
-    const { action, userId } = await request.json();
-    const session = await getServerSession(authOptions);
-    if (!session || !session.user) {
-      return NextResponse.json(
-        { success: false, message: "Unauthorized" },
-        { status: 401 },
-      );
-    }
+		const result = await bookmarkDomain.bookmarksApplication.updateBookmark({
+			photoId: params.id,
+			userId: body.userId,
+			action: body.action,
+			actorId,
+		});
 
-    const user = await User.findById(userId);
-    if (!user) {
-      return NextResponse.json(
-        { success: false, message: "User not found" },
-        { status: 404 },
-      );
-    }
+		return NextResponse.json({
+			success: true,
+			bookmarks: result.bookmarks,
+			isBookmarked: result.isBookmarked,
+			message: "Bookmark updated",
+		});
+	} catch (error) {
+		if (error instanceof ZodError) {
+			return NextResponse.json(
+				{
+					success: false,
+					message: "Validation failed",
+					details: error.flatten(),
+				},
+				{ status: 400 }
+			);
+		}
 
-    const photo = await Photo.findById(id);
-    if (!photo) {
-      return NextResponse.json(
-        { success: false, message: "Photo not found" },
-        { status: 404 },
-      );
-    }
+		if (error instanceof BackendError) {
+			return NextResponse.json(
+				{
+					success: false,
+					message: error.message,
+					code: error.code,
+				},
+				{ status: error.statusCode }
+			);
+		}
 
-    const isBookmarked = user.bookmarks.some(
-      (pid: ObjectId) => pid.toString() === id,
-    );
-
-    if (action === "increment" && !isBookmarked) {
-      await Promise.all([
-        user.updateOne({ $push: { bookmarks: photo._id } }),
-        photo.updateOne({ $push: { bookmarkedBy: user._id } }),
-      ]);
-    }
-
-    if (action === "decrement" && isBookmarked) {
-      await Promise.all([
-        user.updateOne({ $pull: { bookmarks: photo._id } }),
-        photo.updateOne({ $pull: { bookmarkedBy: user._id } }),
-      ]);
-    }
-
-    await Promise.all([user.save(), photo.save()]);
-
-    return NextResponse.json({
-      success: true,
-      bookmarks: user.bookmarks.map((id: ObjectId) => id.toString()),
-      isBookmarked:
-        action === "increment"
-          ? true
-          : action === "decrement"
-            ? false
-            : isBookmarked,
-      message: "Bookmark updated",
-    });
-  } catch (err) {
-    console.error("Error updating bookmark:", err);
-    return NextResponse.json(
-      { error: "Failed to update bookmark" },
-      { status: 500 },
-    );
-  }
+		return NextResponse.json(
+			{ error: "Failed to update bookmark" },
+			{ status: 500 }
+		);
+	}
 }
