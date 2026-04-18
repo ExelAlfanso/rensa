@@ -69,10 +69,13 @@ export async function POST(req: Request) {
 		// 	);
 		// }
 		// creates default "All Photos" roll
-		const defaultRoll = await rollsApplication.create({
-			name: "All Photos",
-			user_id: user.user_id,
-		});
+		const defaultRoll = await rollsApplication.create(
+			{
+				name: "All Photos",
+				user_id: user.user_id,
+			},
+			user.user_id
+		);
 		if (!defaultRoll) {
 			return NextResponse.json(
 				{ success: false, message: "Error creating default roll" },

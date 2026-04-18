@@ -30,9 +30,9 @@ export function useExifDetection(
 	const [selectedCamera, setSelectedCamera] =
 		useState<CameraSettings["Brand"]>(DEFAULT_BRAND);
 
-	const detectMetadata = async () => {
+	const detectMetadata = async (): Promise<DetectedMetadata | null> => {
 		if (!file) {
-			return;
+			return null;
 		}
 		setIsDetecting(true);
 		try {
@@ -47,6 +47,7 @@ export function useExifDetection(
 			return res.data.data as DetectedMetadata;
 		} catch (err) {
 			console.error("Metadata detection failed:", err);
+			return null;
 		} finally {
 			setIsDetecting(false);
 		}
@@ -91,35 +92,43 @@ export function useExifDetection(
 		return extractedNumber ?? value;
 	};
 
-	const autoFillSettings = (detectedMetadata: DetectedMetadata) => {
+	const autoFillSettings = (
+		detectedMetadata: DetectedMetadata
+	): CameraSettings => {
 		const brand = detectBrand(detectedMetadata);
-		const nextSettings = { ...defaultCameraSettings[brand], ...settings };
+		const nextSettings: CameraSettings = { ...defaultCameraSettings[brand] };
+		const settingsRecord = nextSettings as unknown as Record<string, unknown>;
+		const defaultBrandSettings = defaultCameraSettings[
+			brand
+		] as unknown as Record<string, unknown>;
 
 		setSelectedCamera(brand);
 		handleExifChange("Brand", brand);
 
 		for (const [key, rawValue] of Object.entries(detectedMetadata)) {
-			if (!(key in settings)) {
+			if (!(key in defaultBrandSettings)) {
 				continue;
 			}
 
 			const resolvedValue =
 				typeof rawValue === "string"
-					? resolveStringMetadataValue(key, rawValue, brand, selectedCamera)
+					? resolveStringMetadataValue(key, rawValue, brand, brand)
 					: rawValue;
 
-			nextSettings[key as keyof CameraSettings] = resolvedValue as never;
+			settingsRecord[key] = resolvedValue;
 			handleExifChange(key, resolvedValue);
 		}
 
 		setSettings(nextSettings);
+		return nextSettings;
 	};
 
-	const detectAndApplyExif = async () => {
+	const detectAndApplyExif = async (): Promise<CameraSettings | null> => {
 		const metadata = await detectMetadata();
 		if (metadata) {
-			autoFillSettings(metadata);
+			return autoFillSettings(metadata);
 		}
+		return null;
 	};
 
 	return {

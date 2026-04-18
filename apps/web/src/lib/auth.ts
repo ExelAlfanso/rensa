@@ -1,4 +1,4 @@
-import { DrizzleAdapter } from "@auth/drizzle-adapter";
+﻿import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import bcrypt from "bcryptjs";
 import type {
 	DefaultSession,
@@ -60,11 +60,12 @@ export const authOptions: NextAuthOptions = {
 				if (!user) {
 					throw new Error("Invalid email or password");
 				}
-				if (!user.verified) {
-					throw new Error(
-						"Email not verified. We’ve sent a verification email to your email address."
-					);
-				}
+				// Temporarily disable email verification enforcement.
+				// if (!user.verified) {
+				// 	throw new Error(
+				// 		"Email not verified. We’ve sent a verification email to your email address."
+				// 	);
+				// }
 				const isValid = await bcrypt.compare(
 					credentials.password,
 					user.password

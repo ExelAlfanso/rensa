@@ -2,14 +2,13 @@ import { PhotoService } from "./application/photo.service";
 import { PhotosApplication } from "./application/photos.application";
 import { photosInfrastructure } from "./infrastructure/photos.repositories";
 
-const photosApplication = new PhotosApplication(
-	new PhotoService(
-		photosInfrastructure.photoRepository,
-		photosInfrastructure.userRepository
-	)
+const photoService = new PhotoService(
+	photosInfrastructure.photoRepository,
+	photosInfrastructure.userRepository
 );
+const photosApplication = new PhotosApplication(photoService);
 
 export const photoDomain = {
-	...photosInfrastructure,
+	photoService,
 	photosApplication,
 };

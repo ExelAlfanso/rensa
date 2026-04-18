@@ -8,7 +8,7 @@ import { FilterLists } from "@/frontend/data/filterDatas";
 import UploadFormView from "../components/UploadFormView";
 
 export interface UploadFormContainerProps {
-	detectAndApplyExif: () => void;
+	detectAndApplyExif: () => Promise<CameraSettings | null>;
 	file: File | null;
 	handleExifChange: (
 		field: string,
@@ -40,7 +40,10 @@ const UploadFormContainer: React.FC<UploadFormContainerProps> = ({
 }) => {
 	useEffect(() => {
 		if (photo) {
-			detectAndApplyExif();
+			const detectExif = async () => {
+				await detectAndApplyExif();
+			};
+			detectExif();
 		}
 	}, [photo, detectAndApplyExif]);
 

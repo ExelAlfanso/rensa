@@ -7,9 +7,12 @@ const updateBookmarkUseCase = new UpdateBookmarkUseCase(
 	bookmarksInfrastructure.photoRepository
 );
 const bookmarksApplication = new BookmarksApplication(updateBookmarkUseCase);
+const bookmarkService = {
+	updateBookmark: updateBookmarkUseCase.execute.bind(updateBookmarkUseCase),
+};
 
 export const bookmarkDomain = {
-	...bookmarksInfrastructure,
+	bookmarkService,
 	updateBookmarkUseCase,
 	bookmarksApplication,
 };

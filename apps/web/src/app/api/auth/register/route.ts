@@ -54,11 +54,14 @@ export async function POST(req: Request) {
 			email,
 			password: hashedPassword,
 		});
-		await rollsApplication.create({
-			user_id: user.user_id,
-			name: "All Photos",
-			description: "This is your default roll.",
-		});
+		await rollsApplication.create(
+			{
+				user_id: user.user_id,
+				name: "All Photos",
+				description: "This is your default roll.",
+			},
+			user.user_id
+		);
 
 		// try {
 		// 	await sendVerificationEmail(email);

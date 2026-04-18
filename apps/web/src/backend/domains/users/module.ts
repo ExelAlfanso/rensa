@@ -2,11 +2,10 @@ import { UserService } from "./application/user.service";
 import { UsersApplication } from "./application/users.application";
 import { usersInfrastructure } from "./infrastructure/users.repositories";
 
-const usersApplication = new UsersApplication(
-	new UserService(usersInfrastructure.userRepository)
-);
+const userService = new UserService(usersInfrastructure.userRepository);
+const usersApplication = new UsersApplication(userService);
 
 export const userDomain = {
-	...usersInfrastructure,
+	userService,
 	usersApplication,
 };

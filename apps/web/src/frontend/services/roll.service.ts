@@ -5,9 +5,14 @@ export const fetchRollById = async (rollId: string) => {
 	const res = await api.get(`/rolls/${rollId}`);
 	return res.data.data;
 };
-
-export const fetchRollsByUserId = async (userId: string, sort?: string) => {
-	const res = await api.get(`/rolls?userId=${userId}&sort=${sort}`);
+type SortOption = "latest" | "oldest";
+export const fetchRollsByUserId = async (userId: string, sort?: SortOption) => {
+	const res = await api.get("/rolls", {
+		params: {
+			userId,
+			...(sort ? { sort } : {}),
+		},
+	});
 	return res.data.data.rolls;
 };
 

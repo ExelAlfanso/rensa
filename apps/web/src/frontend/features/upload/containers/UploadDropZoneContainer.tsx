@@ -7,12 +7,9 @@ export interface UploadDropZoneContainerProps {
 	content?: React.ReactNode;
 	fileInputRef: React.RefObject<HTMLInputElement | null>;
 	handleBrowseClick: () => void;
-	handleDragLeave: (event: React.DragEvent<HTMLDivElement>) => void;
-	handleDragOver: (event: React.DragEvent<HTMLDivElement>) => void;
-	handleDrop: (
-		event: React.DragEvent<HTMLDivElement>,
-		sizeLimit: number
-	) => void;
+	handleDragLeave: (event: React.DragEvent<HTMLElement>) => void;
+	handleDragOver: (event: React.DragEvent<HTMLElement>) => void;
+	handleDrop: (event: React.DragEvent<HTMLElement>, sizeLimit: number) => void;
 	handleFileChange: (
 		event: React.ChangeEvent<HTMLInputElement>,
 		size: number

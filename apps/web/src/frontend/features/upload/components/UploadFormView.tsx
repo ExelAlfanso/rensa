@@ -1,10 +1,10 @@
 import type React from "react";
-import CameraSettingsForm from "@/frontend/components/forms/CameraSettingsForm";
 import BaseInputField from "@/frontend/components/inputfields/BaseInputField";
 import InputDropdown from "@/frontend/components/inputfields/InputDropdown";
 import TagsInputField from "@/frontend/components/inputfields/TagsInputField";
 import TextAreaInput from "@/frontend/components/inputfields/TextAreaInput";
 import type { CameraSettings } from "@/frontend/data/cameraDatas";
+import CameraSettingsFormContainer from "../containers/CameraSettingsFormContainer";
 
 interface UploadFormViewProps {
 	cameraBrandOptions: string[];
@@ -46,7 +46,13 @@ const UploadFormView: React.FC<UploadFormViewProps> = ({
 	settings,
 }) => {
 	return (
-		<div className="no-scrollbar mt-10 mb-25 flex w-[80%] flex-col gap-5 overflow-y-scroll rounded-3xl bg-white-200 p-10 text-primary shadow-lg md:h-190 lg:h-175">
+		<form
+			aria-label="Upload photo details"
+			className="no-scrollbar mt-10 mb-25 flex w-[80%] flex-col gap-5 overflow-y-scroll rounded-3xl bg-white-200 p-10 text-primary shadow-lg md:h-190 lg:h-175"
+			onSubmit={(event) => {
+				event.preventDefault();
+			}}
+		>
 			<BaseInputField
 				label="Title"
 				onChange={(event) => onTitleChange(event.target.value)}
@@ -81,8 +87,11 @@ const UploadFormView: React.FC<UploadFormViewProps> = ({
 				placeholder="Select Color"
 				values={colorOptions}
 			/>
-			<div className="my-2 w-full border-white-700 border-t" />
-			<div className="flex flex-col items-center justify-center">
+			<hr className="my-2 w-full border-white-700" />
+			<fieldset className="flex flex-col items-center justify-center">
+				<legend className="mb-2 font-figtree text-[13px] text-black-200">
+					Camera settings
+				</legend>
 				{isDetecting ? (
 					<div className="loading loading-spinner loading-xl mt-5 text-primary" />
 				) : (
@@ -97,15 +106,15 @@ const UploadFormView: React.FC<UploadFormViewProps> = ({
 							placeholder={selectedCamera}
 							values={cameraBrandOptions}
 						/>
-						<CameraSettingsForm
+						<CameraSettingsFormContainer
 							cameraModels={cameraModelOptions}
 							handleSettings={setSettings}
 							settings={settings}
 						/>
 					</>
 				)}
-			</div>
-		</div>
+			</fieldset>
+		</form>
 	);
 };
 
