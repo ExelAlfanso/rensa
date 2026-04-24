@@ -51,5 +51,5 @@ export const updateRollDetails = async (
 
 export const fetchDefaultRoll = async () => {
 	const res = await api.get("/rolls/default");
-	return res.data;
+	return res.data.data;
 };

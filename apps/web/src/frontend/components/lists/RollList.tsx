@@ -2,10 +2,10 @@ import RollCard from "@/frontend/components/cards/RollCard";
 import CreateNewRollCard from "../cards/CreateNewRollCard";
 
 export interface Roll {
-	_id: string;
 	createdAt: string;
 	name: string;
 	previewPhotos: string[];
+	roll_id: string;
 	userId: string;
 }
 
@@ -22,9 +22,9 @@ export default function RollList({ rolls, isOwner }: RollListProps) {
 				rolls.map((roll) => (
 					<RollCard
 						createdAt={roll.createdAt}
-						id={roll._id}
+						id={roll.roll_id}
 						imageUrls={roll.previewPhotos}
-						key={roll._id}
+						key={roll.roll_id}
 						name={roll.name}
 						userId={roll.userId}
 					/>

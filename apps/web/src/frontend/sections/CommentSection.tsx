@@ -5,7 +5,7 @@ import CommentInputField from "@/frontend/components/inputfields/CommentInputFie
 import { api } from "@/lib/axios-client";
 
 export interface CommentType {
-	_id: string;
+	comment_id: string;
 	createdAt: string;
 	text: string;
 	userId: {
@@ -89,7 +89,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ id }) => {
 			<div className="no-scrollbar mb-5 max-h-90 overflow-y-auto">
 				{comments.length > 0 ? (
 					comments.map((comment, idx) => (
-						<div className="relative" key={comment._id}>
+						<div className="relative" key={comment.comment_id}>
 							<Comment
 								avatarUrl={comment.userId.avatarUrl}
 								createdAt={comment.createdAt}

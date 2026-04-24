@@ -7,7 +7,7 @@ const commentUserDto = z.object({
 });
 
 export const commentResponseDto = z.object({
-	_id: z.string().min(1),
+	comment_id: z.string().min(1),
 	photoId: z.string().min(1),
 	userId: z.union([z.string().min(1), commentUserDto]),
 	text: z.string().min(1).max(500),

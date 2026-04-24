@@ -12,7 +12,6 @@ import type { UserRepositoryInterface } from "@/backend/interfaces/user-reposito
 
 export class UserService {
 	readonly userRepository: UserRepositoryInterface;
-
 	constructor(userRepository: UserRepositoryInterface) {
 		this.userRepository = userRepository;
 	}

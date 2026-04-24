@@ -45,8 +45,12 @@ const ExploreNavbarView = ({ user }: ExploreNavbarViewProps) => {
 						</>
 					) : (
 						<>
-							<PrimaryButton href="/login">Login</PrimaryButton>
-							<TertiaryButton href="/register">Sign Up</TertiaryButton>
+							<PrimaryButton href="/login" type="button">
+								Login
+							</PrimaryButton>
+							<TertiaryButton href="/register" type="button">
+								Sign Up
+							</TertiaryButton>
 						</>
 					)}
 				</span>

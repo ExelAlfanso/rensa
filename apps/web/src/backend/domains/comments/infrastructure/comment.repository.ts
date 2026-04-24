@@ -29,7 +29,7 @@ export class CommentRepository implements CommentRepositoryInterface {
 		}
 
 		return {
-			_id: row.commentId,
+			comment_id: row.commentId,
 			photoId: row.photoId ?? "",
 			userId: row.userId ?? "",
 			text: row.text,
@@ -77,7 +77,7 @@ export class CommentRepository implements CommentRepositoryInterface {
 					: (row.userId ?? "");
 
 			return {
-				_id: row.commentId,
+				comment_id: row.commentId,
 				photoId: row.photoId ?? "",
 				userId: user,
 				text: row.text,

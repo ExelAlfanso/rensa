@@ -28,7 +28,7 @@ export const useCreateRoll = () => {
 
 interface CreateRollProviderProps {
 	children: ReactNode;
-	onRollCreate?: (roll: { _id: string; name: string }) => void;
+	onRollCreate?: (roll: { roll_id: string; name: string }) => void;
 }
 
 export const CreateRollProvider = ({

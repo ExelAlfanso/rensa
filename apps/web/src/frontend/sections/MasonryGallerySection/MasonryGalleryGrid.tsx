@@ -49,7 +49,7 @@ const MasonryGalleryGrid: React.FC<MasonryGalleryGridProps> = ({ photos }) => {
 				columnClassName="my-masonry-grid_column"
 			>
 				{photos.map((photo: PopulatedPhoto) => {
-					const photoId = photo._id.toString();
+					const photoId = photo.photo_id.toString();
 					return (
 						<PhotoCard
 							closeAllDropdowns={() => setActiveDropdownId(null)}

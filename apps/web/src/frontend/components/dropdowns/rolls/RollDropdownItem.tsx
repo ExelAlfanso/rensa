@@ -8,9 +8,9 @@ import Text from "../../Text";
 interface RollDropdownItemProps {
 	isCreating?: boolean;
 	isSaved?: boolean;
-	onSelectedRoll: (roll: { id: string; name: string }) => void;
+	onSelectedRoll: (roll: { roll_id: string; name: string }) => void;
 	roll: {
-		_id: string;
+		roll_id: string;
 		name: string;
 		imageUrl?: string;
 	};
@@ -24,12 +24,12 @@ const RollDropdownItem: React.FC<RollDropdownItemProps> = ({
 	isCreating,
 	isSaved,
 }) => {
-	const isSelected = selectedRollId === roll._id;
+	const isSelected = selectedRollId === roll.roll_id;
 	const handleClick = () => {
 		if (isCreating) {
 			return;
 		}
-		onSelectedRoll({ id: roll._id, name: roll.name });
+		onSelectedRoll({ roll_id: roll.roll_id, name: roll.name });
 	};
 	return (
 		<motion.li
@@ -40,7 +40,7 @@ const RollDropdownItem: React.FC<RollDropdownItemProps> = ({
 			)}
 			exit="exit"
 			initial="hidden"
-			key={roll._id}
+			key={roll.roll_id}
 			variants={rollDropdownItemVariants}
 		>
 			<button

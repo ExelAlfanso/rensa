@@ -27,10 +27,10 @@ interface PhotoInfoCardViewProps {
 	profileAvatarUrl?: string;
 	profileUsername?: string;
 	savedToRolls: string[];
-	selectedRoll: { id: string; name: string } | null;
+	selectedRoll: { roll_id: string; name: string } | null;
 	setIsDropdownOpen: React.Dispatch<React.SetStateAction<boolean>>;
 	setSelectedRoll: React.Dispatch<
-		React.SetStateAction<{ id: string; name: string } | null>
+		React.SetStateAction<{ roll_id: string; name: string } | null>
 	>;
 	title?: string;
 	userId?: string;

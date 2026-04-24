@@ -67,7 +67,7 @@ const UploadPageView: React.FC<UploadPageViewProps> = ({
 							{error}
 						</p>
 					)}
-					<div className="flex flex-col items-start justify-center gap-8 lg:flex-row">
+					<div className="flex flex-col items-center justify-center gap-8 lg:flex-row lg:items-start">
 						<UploadPreviewPanel photo={photo} />
 						<UploadFormContainer {...formProps} />
 					</div>

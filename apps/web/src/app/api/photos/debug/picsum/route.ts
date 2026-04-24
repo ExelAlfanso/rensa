@@ -11,7 +11,6 @@ interface PicsumPhoto {
 }
 
 const toPopulatedPhoto = (photo: PicsumPhoto): PopulatedPhoto => ({
-	_id: photo.id,
 	bookmarks: 0,
 	createdAt: undefined,
 	description: `Photo by ${photo.author}`,
@@ -20,6 +19,7 @@ const toPopulatedPhoto = (photo: PicsumPhoto): PopulatedPhoto => ({
 		width: photo.width,
 		format: "jpg",
 	},
+	photo_id: photo.id,
 	title: `Picsum #${photo.id}`,
 	url: photo.download_url,
 	userId: {

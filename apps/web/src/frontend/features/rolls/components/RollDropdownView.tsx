@@ -9,9 +9,9 @@ import SearchInputField from "@/frontend/components/inputfields/SearchInputField
 import Text from "@/frontend/components/Text";
 
 interface RollOption {
-	_id: string;
 	imageUrl?: string;
 	name: string;
+	roll_id: string;
 }
 
 interface RollDropdownViewProps {
@@ -29,11 +29,11 @@ interface RollDropdownViewProps {
 	newRollName: string;
 	rolls: RollOption[];
 	savedToRolls: string[];
-	selectedRoll: { id: string; name: string } | null;
+	selectedRoll: { roll_id: string; name: string } | null;
 	setIsCreating: React.Dispatch<React.SetStateAction<boolean>>;
 	setNewRollName: React.Dispatch<React.SetStateAction<string>>;
 	setSelectedRoll: React.Dispatch<
-		React.SetStateAction<{ id: string; name: string } | null>
+		React.SetStateAction<{ roll_id: string; name: string } | null>
 	>;
 }
 
@@ -90,13 +90,16 @@ const RollDropdownView: React.FC<RollDropdownViewProps> = ({
 							rolls.map((roll) => (
 								<RollDropdownItem
 									isCreating={isCreating}
-									isSaved={savedToRolls.includes(roll._id)}
-									key={roll._id}
+									isSaved={savedToRolls.includes(roll.roll_id)}
+									key={roll.roll_id}
 									onSelectedRoll={() =>
-										setSelectedRoll({ id: roll._id, name: roll.name })
+										setSelectedRoll({
+											roll_id: roll.roll_id,
+											name: roll.name,
+										})
 									}
 									roll={roll}
-									selectedRollId={selectedRoll?.id || null}
+									selectedRollId={selectedRoll?.roll_id || null}
 								/>
 							))
 						) : (

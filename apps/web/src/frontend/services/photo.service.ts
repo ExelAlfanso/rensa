@@ -11,11 +11,11 @@ export interface PhotoMetadata {
 }
 
 export interface Photo {
-	_id: string;
 	bookmarks: number;
 	createdAt?: string;
 	description: string;
 	metadata: PhotoMetadata;
+	photo_id: string;
 	tags: string[];
 	title: string;
 	updatedAt?: string;

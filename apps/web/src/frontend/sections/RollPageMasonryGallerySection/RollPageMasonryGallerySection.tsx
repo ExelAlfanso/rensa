@@ -78,7 +78,9 @@ const RollPageMasonryGallerySection: React.FC<
 					...oldData,
 					pages: oldData.pages.map((page: FetchPhotosResponse) => ({
 						...page,
-						data: page.data.filter((photo) => photo._id.toString() !== photoId),
+						data: page.data.filter(
+							(photo) => photo.photo_id.toString() !== photoId
+						),
 					})),
 				};
 			}

@@ -3,9 +3,15 @@ import { api } from "@/lib/axios-client";
 import { useAuthStore } from "./useAuthStore";
 
 interface Roll {
-	_id: string;
 	imageUrl: string;
 	name: string;
+	roll_id: string;
+}
+
+interface ApiRoll {
+	imageUrl?: string;
+	name: string;
+	roll_id?: string;
 }
 
 interface RollsState {
@@ -15,6 +21,19 @@ interface RollsState {
 	isLoading: boolean;
 	rolls: Roll[];
 }
+
+const normalizeRoll = (roll: ApiRoll): Roll | null => {
+	const rollId = roll.roll_id;
+	if (!rollId) {
+		return null;
+	}
+
+	return {
+		roll_id: rollId,
+		name: roll.name,
+		imageUrl: roll.imageUrl ?? "/images/default-roll.jpg",
+	};
+};
 
 export const useRollsStore = create<RollsState>((set, get) => ({
 	rolls: [],
@@ -34,7 +53,11 @@ export const useRollsStore = create<RollsState>((set, get) => ({
 		set({ isLoading: true });
 		try {
 			const res = await api.get(`/rolls?userId=${user.id}`);
-			set({ rolls: res.data.data.rolls || [] });
+			const apiRolls = (res.data.data.rolls ?? []) as ApiRoll[];
+			const normalizedRolls = apiRolls
+				.map(normalizeRoll)
+				.filter((roll): roll is Roll => roll !== null);
+			set({ rolls: normalizedRolls });
 		} catch {
 			set({ rolls: [] });
 		} finally {
@@ -52,8 +75,12 @@ export const useRollsStore = create<RollsState>((set, get) => ({
 				...newRoll,
 				userId: user.id,
 			});
+			const normalizedRoll = normalizeRoll(res.data.data as ApiRoll);
+			if (!normalizedRoll) {
+				throw new Error("Created roll is missing roll_id");
+			}
 			set((state) => ({
-				rolls: [...state.rolls, res.data.data],
+				rolls: [...state.rolls, normalizedRoll],
 			}));
 		} catch (error) {
 			throw error instanceof Error ? error : new Error("Failed to create roll");

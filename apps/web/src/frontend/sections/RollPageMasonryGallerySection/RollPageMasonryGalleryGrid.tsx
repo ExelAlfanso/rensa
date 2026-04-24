@@ -51,7 +51,7 @@ const RollPageMasonryGalleryGrid: React.FC<RollPageMasonryGalleryGridProps> = ({
 				columnClassName="my-masonry-grid_column"
 			>
 				{photos.map((photo) => {
-					const photoId = photo._id.toString();
+					const photoId = photo.photo_id.toString();
 					return (
 						<RollPagePhotoCard
 							id={photoId}

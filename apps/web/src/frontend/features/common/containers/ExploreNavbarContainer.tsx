@@ -5,6 +5,8 @@ import ExploreNavbarView from "../components/ExploreNavbarView";
 
 const ExploreNavbarContainer = () => {
 	const user = useAuthStore((state) => state.user);
+
+	console.log("ExploreNavbarContainer: user", user);
 	return <ExploreNavbarView user={user} />;
 };
 

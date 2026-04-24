@@ -9,6 +9,11 @@ import {
 } from "@/frontend/services/roll.service";
 import { useAuthStore } from "@/frontend/stores/useAuthStore";
 
+interface DefaultRoll {
+	name: string;
+	roll_id: string;
+}
+
 export function usePhotoRoll(photoId: string | null) {
 	const { showToast } = useToast();
 	const queryClient = useQueryClient();
@@ -16,25 +21,24 @@ export function usePhotoRoll(photoId: string | null) {
 
 	const actorId = user?.id || "";
 	const [selectedRoll, setSelectedRoll] = useState<{
-		id: string;
+		roll_id: string;
 		name: string;
 	} | null>(null);
 
 	// -----------------------
 	// Fetch DEFAULT ROLL
 	// -----------------------
-	const { data: defaultRoll } = useQuery({
+	const { data: defaultRoll } = useQuery<DefaultRoll>({
 		queryKey: ["defaultRoll"],
 		queryFn: fetchDefaultRoll,
 		enabled: !!user?.id,
-		select: (res) => res.data, // res.data.data → changed based on your API structure
 	});
 
 	// Set selected roll once default roll is loaded
 	useEffect(() => {
 		if (defaultRoll && !selectedRoll) {
 			setSelectedRoll({
-				id: defaultRoll._id,
+				roll_id: defaultRoll.roll_id,
 				name: defaultRoll.name,
 			});
 		}
@@ -111,12 +115,12 @@ export function usePhotoRoll(photoId: string | null) {
 	return {
 		selectedRoll,
 		isLoading: saveMutation.isPending || removeMutation.isPending,
-		isSaved: selectedRoll ? savedToRolls.includes(selectedRoll.id) : false,
+		isSaved: selectedRoll ? savedToRolls.includes(selectedRoll.roll_id) : false,
 		savedToRolls,
 		setSelectedRoll,
-		saveToRoll: () => selectedRoll && saveMutation.mutate(selectedRoll.id),
+		saveToRoll: () => selectedRoll && saveMutation.mutate(selectedRoll.roll_id),
 		removeFromRoll: () =>
-			selectedRoll && removeMutation.mutate(selectedRoll.id),
+			selectedRoll && removeMutation.mutate(selectedRoll.roll_id),
 	};
 }
 

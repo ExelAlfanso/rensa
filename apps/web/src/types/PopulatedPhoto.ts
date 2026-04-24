@@ -7,7 +7,6 @@ interface PopulatedPhotoUser {
 }
 
 export interface PopulatedPhoto {
-	_id: string;
 	bookmarkedBy?: string[];
 	bookmarks?: number;
 	camera?: string;
@@ -16,6 +15,7 @@ export interface PopulatedPhoto {
 	createdAt?: string;
 	description: string;
 	metadata?: PhotoMetadata;
+	photo_id: string;
 	style?: string;
 	tags?: string[];
 	title: string;

@@ -7,10 +7,10 @@ export interface RollDropdownContainerProps {
 	disabled: boolean;
 	isOpen: boolean;
 	savedToRolls: string[];
-	selectedRoll: { id: string; name: string } | null;
+	selectedRoll: { roll_id: string; name: string } | null;
 	setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 	setSelectedRoll: React.Dispatch<
-		React.SetStateAction<{ id: string; name: string } | null>
+		React.SetStateAction<{ roll_id: string; name: string } | null>
 	>;
 }
 

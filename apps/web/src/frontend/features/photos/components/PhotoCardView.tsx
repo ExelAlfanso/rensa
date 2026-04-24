@@ -18,9 +18,9 @@ interface PhotoCardViewProps {
 	onToggleDropdown: React.Dispatch<React.SetStateAction<boolean>>;
 	photo: PopulatedPhoto;
 	savedToRolls: string[];
-	selectedRoll: { id: string; name: string } | null;
+	selectedRoll: { roll_id: string; name: string } | null;
 	setSelectedRoll: React.Dispatch<
-		React.SetStateAction<{ id: string; name: string } | null>
+		React.SetStateAction<{ roll_id: string; name: string } | null>
 	>;
 	showVisitPageCta: boolean;
 }

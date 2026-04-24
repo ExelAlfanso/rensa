@@ -42,7 +42,7 @@ export default function ProfilePageClient({
 					return [];
 				}
 				return oldRolls.map((r) =>
-					r._id === roll.rollId ? { ...r, name: roll.name } : r
+					r.roll_id === roll.rollId ? { ...r, name: roll.name } : r
 				);
 			}
 		);
@@ -54,12 +54,12 @@ export default function ProfilePageClient({
 				if (!oldRolls) {
 					return [];
 				}
-				return oldRolls.filter((r) => r._id !== rollId);
+				return oldRolls.filter((r) => r.roll_id !== rollId);
 			}
 		);
 	};
 
-	const handleRollCreate = (roll: { _id: string; name: string }) => {
+	const handleRollCreate = (roll: { roll_id: string; name: string }) => {
 		queryClient.setQueryData<Roll[]>(
 			["profileRolls", profileData.user.id, filter],
 			(oldRolls) => {
@@ -68,7 +68,7 @@ export default function ProfilePageClient({
 				}
 				return [
 					{
-						_id: roll._id,
+						roll_id: roll.roll_id,
 						userId: user?.id || "",
 						name: roll.name,
 						previewPhotos: [],

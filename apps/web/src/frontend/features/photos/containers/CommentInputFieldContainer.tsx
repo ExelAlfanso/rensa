@@ -24,7 +24,7 @@ const CommentInputFieldContainer: React.FC<CommentInputFieldContainerProps> = ({
 
 		const tempId = Math.random().toString(36).substr(2, 9);
 		const newComment: CommentType = {
-			_id: tempId,
+			comment_id: tempId,
 			text: comment,
 			userId: {
 				_id: user?.id || "unknown",
