@@ -20,6 +20,14 @@ RUN bun build \
   --outfile healthcheck \
   src/healthcheck.ts
 
+# ===== Development =====
+FROM base AS dev
+ENV NODE_ENV=development
+COPY src ./src
+
+EXPOSE 3002
+CMD ["bun", "run", "src/index.ts"]
+
 # ===== Production =====
 FROM gcr.io/distroless/base AS prod
 WORKDIR /app

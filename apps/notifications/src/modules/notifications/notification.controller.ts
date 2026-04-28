@@ -1,12 +1,13 @@
-import { Elysia, t } from "elysia";
 import { jwt } from "@elysiajs/jwt";
-import { NotificationService } from "./service";
+import { Elysia, t } from "elysia";
+import { env } from "../../config/env";
+import { NotificationService } from "./notification.service";
 
-export const NotificationController = new Elysia()
+export const notificationController = new Elysia({ prefix: "/notifications" })
   .use(
     jwt({
       name: "jwt",
-      secret: process.env.NEXTAUTH_SECRET!,
+      secret: env.jwtSecret,
     })
   )
   .derive(async ({ jwt, headers }) => {
@@ -18,53 +19,48 @@ export const NotificationController = new Elysia()
 
     if (!payload) return {};
 
-    return {
-      user: payload,
-    };
+    return { user: payload as { id: string } };
   })
-  /*
-  POST /notifications
-  Body: { actorId, recipientId, photoId,type}
-  Creates a notification when a photo is saved by actorId for recipientId
-*/
   .post(
-    "/notifications",
+    "",
     async ({ user, body }) => {
-      if (!user) return { success: false, message: "Unauthorized" };
+      if (!user?.id) return { success: false, message: "Unauthorized" };
 
-      return await NotificationService.notify({ user, body });
+      return await NotificationService.notify({
+        actorId: user.id,
+        recipientId: body.recipientId,
+        photoId: body.photoId,
+        type: body.type,
+      });
     },
     {
       body: t.Object({
-        actorId: t.String(),
         recipientId: t.String(),
         photoId: t.String(),
         type: t.String(),
       }),
     }
   )
-  // /*
-  //   GET /notifications?recipientId=&page=&limit=
-  //   Fetch notifications for a user with pagination
-  // */
   .get(
-    "/notifications",
+    "",
     async ({ user, query }) => {
       if (!user?.id) return { success: false, message: "Unauthorized" };
+
       return await NotificationService.fetchNotifications({
-        query: { ...query, recipientId: user.id },
+        recipientId: user.id,
+        page: query.page,
+        limit: query.limit,
       });
     },
     {
       query: t.Object({
-        recipientId: t.String(),
         page: t.Optional(t.Numeric()),
         limit: t.Optional(t.Numeric()),
       }),
     }
   )
   .put(
-    "/notifications/:id/read",
+    "/:id/read",
     async ({ params }) => {
       return await NotificationService.markNotificationAsRead(params.id);
     },
@@ -75,9 +71,9 @@ export const NotificationController = new Elysia()
     }
   )
   .delete(
-    "/notifications/:userId",
+    "/:userId",
     async ({ params }) => {
-      return await NotificationService.clearNotifications({ params });
+      return await NotificationService.clearNotifications(params.userId);
     },
     {
       params: t.Object({
@@ -85,3 +81,4 @@ export const NotificationController = new Elysia()
       }),
     }
   );
+

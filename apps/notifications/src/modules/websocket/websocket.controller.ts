@@ -1,12 +1,13 @@
-import { Elysia, t } from "elysia";
 import { jwt } from "@elysiajs/jwt";
-import { WebSocketService } from "./service";
+import { Elysia, t } from "elysia";
+import { env } from "../../config/env";
+import { WebSocketService } from "./websocket.service";
 
-export const WebSocketController = new Elysia()
+export const websocketController = new Elysia()
   .use(
     jwt({
       name: "jwt",
-      secret: process.env.NEXTAUTH_SECRET!,
+      secret: env.jwtSecret,
     })
   )
   .ws("/ws", {
@@ -17,6 +18,6 @@ export const WebSocketController = new Elysia()
       userId: "" as string,
     },
     open: WebSocketService.open,
-    // message: WebSocketService.message,
     close: WebSocketService.close,
   });
+

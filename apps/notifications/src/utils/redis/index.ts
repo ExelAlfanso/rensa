@@ -1,9 +1,7 @@
 import Redis from "ioredis";
+import { env } from "../../config/env";
 
-const redisUrl = process.env.REDIS_URL || "redis://localhost:6379";
-
-// Create Redis client
-const client = new Redis(redisUrl, {
+const client = new Redis(env.redisUrl, {
   maxRetriesPerRequest: 3,
   retryStrategy(times) {
     const delay = Math.min(times * 50, 2000);
@@ -18,7 +16,6 @@ const client = new Redis(redisUrl, {
   },
 });
 
-// Track connection status
 let isConnected = false;
 
 client.on("connect", () => {
@@ -32,15 +29,16 @@ client.on("ready", () => {
 });
 
 client.on("error", (error) => {
+  return;
   console.error("Redis connection error:", error.message);
   isConnected = false;
 });
 
 client.on("close", () => {
+  return;
   console.warn("Redis connection closed");
   isConnected = false;
 });
 
-// Export both client and connection status
 export { client as redis };
 export const redisConnected = () => isConnected;

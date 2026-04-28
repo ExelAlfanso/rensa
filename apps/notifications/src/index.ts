@@ -1,26 +1,22 @@
 import Elysia from "elysia";
-import { NotificationController } from "./routes/notifications";
-import { WebSocketController } from "./routes/ws";
-import { EXIFController } from "./routes/exif";
 import cors from "@elysiajs/cors";
+import { env } from "./config/env";
+import { connectDatabase } from "./database";
+import { apiController } from "./modules";
+
+await connectDatabase();
+
 export const app = new Elysia()
   .use(
     cors({
-      origin: process.env.CORS_ORIGIN || "http://localhost:3000",
+      origin: env.corsOrigin,
       credentials: true,
       methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
       allowedHeaders: ["Content-Type", "Authorization"],
     })
   )
   .get("/health", () => ({ status: "ok" }))
-  .group("/api", (app) =>
-    app.use(WebSocketController).use(NotificationController).use(EXIFController)
-  )
-  .listen({ port: process.env.PORT || 3002, hostname: "0.0.0.0" }, () =>
-    console.log(
-      `Server is running on http://0.0.0.0:${process.env.PORT || 3002}`
-    )
+  .use(apiController)
+  .listen({ port: env.port }, () =>
+    console.log(`Server is running on http://localhost:${env.port}`)
   );
-
-// Trigger CI/CD change
-console.log("CI/CD Triggered");
