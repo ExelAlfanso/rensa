@@ -8,12 +8,30 @@ importers:
 
   .:
     devDependencies:
+      '@biomejs/biome':
+        specifier: ^2.4.13
+        version: 2.4.13
+      '@types/node':
+        specifier: ^25.6.0
+        version: 25.6.0
+      '@types/pg':
+        specifier: ^8.20.0
+        version: 8.20.0
+      drizzle-kit:
+        specifier: ^0.31.10
+        version: 0.31.10
+      lefthook:
+        specifier: ^2.1.6
+        version: 2.1.6
       turbo:
         specifier: latest
         version: 2.9.6
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
+      ultracite:
+        specifier: ^7.3.2
+        version: 7.6.2
 
   apps/ai: {}
 
@@ -78,18 +96,9 @@ importers:
       '@types/bun':
         specifier: ^1.3.3
         version: 1.3.13
-      '@types/node':
-        specifier: ^25.0.3
-        version: 25.6.0
-      '@types/pg':
-        specifier: ^8.20.0
-        version: 8.20.0
       bun-types:
         specifier: latest
         version: 1.3.13
-      drizzle-kit:
-        specifier: ^0.31.10
-        version: 0.31.10
       tsx:
         specifier: ^4.21.0
         version: 4.21.0
@@ -202,9 +211,6 @@ importers:
         specifier: ^5.0.8
         version: 5.0.12(@types/react@19.2.14)(react@19.2.5)(use-sync-external-store@1.6.0(react@19.2.5))
     devDependencies:
-      '@biomejs/biome':
-        specifier: ^2.4.7
-        version: 2.4.13
       '@eslint/eslintrc':
         specifier: ^3
         version: 3.3.5
@@ -223,15 +229,9 @@ importers:
       '@types/multer':
         specifier: ^2.0.0
         version: 2.1.0
-      '@types/node':
-        specifier: ^20
-        version: 20.19.39
       '@types/nodemailer':
         specifier: ^7.0.4
         version: 7.0.11
-      '@types/pg':
-        specifier: ^8.20.0
-        version: 8.20.0
       '@types/react':
         specifier: ^19
         version: 19.2.14
@@ -244,9 +244,6 @@ importers:
       autoprefixer:
         specifier: ^10.4.21
         version: 10.5.0(postcss@8.5.12)
-      drizzle-kit:
-        specifier: ^0.31.10
-        version: 0.31.10
       eslint:
         specifier: ^9
         version: 9.39.4(jiti@2.6.1)
@@ -256,9 +253,6 @@ importers:
       eslint-plugin-tailwind-canonical-classes:
         specifier: ^1.3.2
         version: 1.3.3(eslint@9.39.4(jiti@2.6.1))
-      lefthook:
-        specifier: ^2.1.4
-        version: 2.1.6
       postcss:
         specifier: ^8.5.6
         version: 8.5.12
@@ -267,13 +261,7 @@ importers:
         version: 4.2.4
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@20.19.39)(typescript@5.9.3)
-      typescript:
-        specifier: ^5
-        version: 5.9.3
-      ultracite:
-        specifier: ^7.3.2
-        version: 7.6.2
+        version: 10.9.2(@types/node@25.6.0)(typescript@5.9.3)
 
   packages/config: {}
 
@@ -1749,9 +1737,6 @@ packages:
 
   '@types/multer@2.1.0':
     resolution: {integrity: sha512-zYZb0+nJhOHtPpGDb3vqPjwpdeGlGC157VpkqNQL+UU2qwoacoQ7MpsAmUptI/0Oa127X32JzWDqQVEXp2RcIA==}
-
-  '@types/node@20.19.39':
-    resolution: {integrity: sha512-orrrD74MBUyK8jOAD/r0+lfa1I2MO6I+vAkmAWzMYbCcgrN4lCrmK52gRFQq/JRxfYPfonkr4b0jcY7Olqdqbw==}
 
   '@types/node@25.6.0':
     resolution: {integrity: sha512-+qIYRKdNYJwY3vRCZMdJbPLJAtGjQBudzZzdzwQYkEPQd+PJGixUL5QfvCLDaULoLv+RhT3LDkwEfKaAkgSmNQ==}
@@ -4624,9 +4609,6 @@ packages:
   undefsafe@2.0.5:
     resolution: {integrity: sha512-WxONCrssBM8TSPRqN5EmsjVrsv4A8X12J4ArBiiayv3DyyG3ZlIg6yysuuSYdZsVz3TKcTg2fd//Ujd4CHV1iA==}
 
-  undici-types@6.21.0:
-    resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
-
   undici-types@7.19.2:
     resolution: {integrity: sha512-qYVnV5OEm2AW8cJMCpdV20CDyaN3g0AjDlOGf1OW4iaDEx8MwdtChUp4zu4H0VP3nDRF/8RKWH+IPp9uW0YGZg==}
 
@@ -6128,7 +6110,7 @@ snapshots:
   '@types/body-parser@1.19.6':
     dependencies:
       '@types/connect': 3.4.38
-      '@types/node': 20.19.39
+      '@types/node': 25.6.0
 
   '@types/bun@1.3.13':
     dependencies:
@@ -6136,13 +6118,13 @@ snapshots:
 
   '@types/connect@3.4.38':
     dependencies:
-      '@types/node': 20.19.39
+      '@types/node': 25.6.0
 
   '@types/estree@1.0.8': {}
 
   '@types/express-serve-static-core@5.1.1':
     dependencies:
-      '@types/node': 20.19.39
+      '@types/node': 25.6.0
       '@types/qs': 6.15.0
       '@types/range-parser': 1.2.7
       '@types/send': 1.2.1
@@ -6166,7 +6148,7 @@ snapshots:
   '@types/jsonwebtoken@9.0.10':
     dependencies:
       '@types/ms': 2.1.0
-      '@types/node': 20.19.39
+      '@types/node': 25.6.0
 
   '@types/luxon@3.7.1': {}
 
@@ -6176,17 +6158,13 @@ snapshots:
     dependencies:
       '@types/express': 5.0.6
 
-  '@types/node@20.19.39':
-    dependencies:
-      undici-types: 6.21.0
-
   '@types/node@25.6.0':
     dependencies:
       undici-types: 7.19.2
 
   '@types/nodemailer@7.0.11':
     dependencies:
-      '@types/node': 20.19.39
+      '@types/node': 25.6.0
 
   '@types/pg@8.20.0':
     dependencies:
@@ -6214,12 +6192,12 @@ snapshots:
 
   '@types/send@1.2.1':
     dependencies:
-      '@types/node': 20.19.39
+      '@types/node': 25.6.0
 
   '@types/serve-static@2.2.0':
     dependencies:
       '@types/http-errors': 2.0.5
-      '@types/node': 20.19.39
+      '@types/node': 25.6.0
 
   '@types/swagger-jsdoc@6.0.4': {}
 
@@ -9156,14 +9134,14 @@ snapshots:
 
   ts-mixer@6.0.4: {}
 
-  ts-node@10.9.2(@types/node@20.19.39)(typescript@5.9.3):
+  ts-node@10.9.2(@types/node@25.6.0)(typescript@5.9.3):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       '@tsconfig/node10': 1.0.12
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
-      '@types/node': 20.19.39
+      '@types/node': 25.6.0
       acorn: 8.16.0
       acorn-walk: 8.3.5
       arg: 4.1.3
@@ -9285,8 +9263,6 @@ snapshots:
   uncrypto@0.1.3: {}
 
   undefsafe@2.0.5: {}
-
-  undici-types@6.21.0: {}
 
   undici-types@7.19.2: {}
 

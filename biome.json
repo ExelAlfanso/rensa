@@ -61,7 +61,7 @@
       "linter": { "enabled": false }
     },
     {
-      "includes": ["src/frontend/components/SchemaMarkup.tsx"],
+      "includes": ["apps/web/src/frontend/components/SchemaMarkup.tsx"],
       "linter": {
         "rules": {
           "security": {
@@ -71,19 +71,23 @@
       }
     },
     {
-      "includes": ["src/app/api/**", "src/backend/**", "src/models/**"],
+      "includes": [
+        "apps/web/src/app/api/**",
+        "apps/web/src/backend/**",
+        "apps/web/src/models/**"
+      ],
       "linter": { "enabled": false }
     },
     {
-      "includes": ["src/app/test/**"],
+      "includes": ["apps/web/src/app/test/**"],
       "linter": { "enabled": false }
     },
     {
-      "includes": ["src/app/globals.css"],
+      "includes": ["apps/web/src/app/globals.css"],
       "linter": { "enabled": false }
     },
     {
-      "includes": ["src/lib/validation.ts"],
+      "includes": ["apps/web/src/lib/validation.ts"],
       "linter": {
         "rules": {
           "complexity": {

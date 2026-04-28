@@ -12,7 +12,7 @@ Applies to:
 - `src/app/globals.css`
 
 For backend/controller/service/repository rules, follow
-`src/backend/AGENTS.md`.
+`.agents/apps/web/src/backend/AGENTS.md`.
 
 ## Current Frontend Direction (As Of April 2026)
 
