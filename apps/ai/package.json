@@ -1,0 +1,8 @@
+{
+  "name": "@rensa/ai",
+  "private": true,
+  "scripts": {
+    "dev": "python main.py",
+    "start": "python main.py"
+  }
+}
