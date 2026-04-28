@@ -1,0 +1,149 @@
+import { CaretDownIcon } from "@phosphor-icons/react";
+import type React from "react";
+import { createPortal } from "react-dom";
+import PrimaryButton from "@/frontend/components/buttons/PrimaryButton";
+import RollDropdownInputItem from "@/frontend/components/dropdowns/rolls/RollDropdownInputItem";
+import RollDropdownItem from "@/frontend/components/dropdowns/rolls/RollDropdownItem";
+import Heading from "@/frontend/components/Heading";
+import SearchInputField from "@/frontend/components/inputfields/SearchInputField";
+import Text from "@/frontend/components/Text";
+
+interface RollOption {
+	imageUrl?: string;
+	name: string;
+	roll_id: string;
+}
+
+interface RollDropdownViewProps {
+	buttonRef: React.RefObject<HTMLButtonElement | null>;
+	disabled: boolean;
+	dropdownPosition: { left: number; top: number };
+	dropdownRef: React.RefObject<HTMLDivElement | null>;
+	handleClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
+	handleCreate: () => void;
+	handleCreateRoll: () => Promise<void>;
+	isCreating: boolean;
+	isLoading: boolean;
+	isOpen: boolean;
+	listRef: React.RefObject<HTMLUListElement | null>;
+	newRollName: string;
+	rolls: RollOption[];
+	savedToRolls: string[];
+	selectedRoll: { roll_id: string; name: string } | null;
+	setIsCreating: React.Dispatch<React.SetStateAction<boolean>>;
+	setNewRollName: React.Dispatch<React.SetStateAction<string>>;
+	setSelectedRoll: React.Dispatch<
+		React.SetStateAction<{ roll_id: string; name: string } | null>
+	>;
+}
+
+const RollDropdownView: React.FC<RollDropdownViewProps> = ({
+	buttonRef,
+	disabled,
+	dropdownPosition,
+	dropdownRef,
+	handleClick,
+	handleCreate,
+	handleCreateRoll,
+	isCreating,
+	isLoading,
+	isOpen,
+	listRef,
+	newRollName,
+	rolls,
+	savedToRolls,
+	selectedRoll,
+	setIsCreating,
+	setNewRollName,
+	setSelectedRoll,
+}) => {
+	const dropdownContent = (
+		<div
+			className="item-start flex w-50 origin-top transform flex-col justify-center gap-4 rounded-2xl border border-gray-400 bg-white py-4 text-primary shadow-lg ease-out md:w-82"
+			onClick={(e) => e.stopPropagation()}
+			ref={dropdownRef}
+			style={{
+				position: "absolute",
+				top: dropdownPosition.top,
+				left: dropdownPosition.left,
+				zIndex: 9999,
+				visibility:
+					dropdownPosition.top === 0 && dropdownPosition.left === 0
+						? "hidden"
+						: "visible",
+			}}
+		>
+			<Heading alignment="center" className="py-2" size="m">
+				Rolls
+			</Heading>
+
+			<SearchInputField className="ml-2 w-44.5 md:w-77.25" />
+
+			<ul className="max-h-60 w-full overflow-y-auto" ref={listRef}>
+				{isLoading ? (
+					<div className="relative flex h-32 w-full items-center justify-center">
+						<div className="loading loading-spinner" />
+					</div>
+				) : (
+					<>
+						{rolls.length > 0 ? (
+							rolls.map((roll) => (
+								<RollDropdownItem
+									isCreating={isCreating}
+									isSaved={savedToRolls.includes(roll.roll_id)}
+									key={roll.roll_id}
+									onSelectedRoll={() =>
+										setSelectedRoll({
+											roll_id: roll.roll_id,
+											name: roll.name,
+										})
+									}
+									roll={roll}
+									selectedRollId={selectedRoll?.roll_id || null}
+								/>
+							))
+						) : (
+							<li className="px-4 py-2 text-center text-gray-500">
+								No rolls found
+							</li>
+						)}
+						{isCreating && (
+							<RollDropdownInputItem
+								handleCreateRoll={handleCreateRoll}
+								newRollName={newRollName}
+								setIsCreating={setIsCreating}
+								setNewRollName={setNewRollName}
+							/>
+						)}
+					</>
+				)}
+			</ul>
+
+			<PrimaryButton
+				className="mx-4 mt-2"
+				disabled={isLoading}
+				onClick={isCreating ? handleCreateRoll : handleCreate}
+			>
+				{isCreating ? "Add Roll" : "New Roll"}
+			</PrimaryButton>
+		</div>
+	);
+
+	return (
+		<div>
+			<button
+				className="flex cursor-pointer flex-row items-center gap-2 rounded-3xl px-4 py-2 font-semibold outline-0 ring-0"
+				disabled={disabled}
+				onClick={handleClick}
+				ref={buttonRef}
+			>
+				<Text size="xs">{selectedRoll ? selectedRoll.name : "None"}</Text>
+				{!disabled && <CaretDownIcon weight="bold" />}
+			</button>
+
+			{isOpen && createPortal(dropdownContent, document.body)}
+		</div>
+	);
+};
+
+export default RollDropdownView;
