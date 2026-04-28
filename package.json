@@ -1,0 +1,18 @@
+{
+  "name": "rensa",
+  "private": true,
+  "scripts": {
+    "dev": "docker compose -f docker-compose-development.yaml up --build",
+    "dev:web": "pnpm --filter @rensa/web dev",
+    "dev:notifications": "pnpm --filter @rensa/notifications dev",
+    "dev:exif": "pnpm --filter @rensa/exif dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck"
+  },
+  "packageManager": "pnpm@10.33.2",
+  "devDependencies": {
+    "turbo": "latest",
+    "typescript": "^5.9.3"
+  }
+}

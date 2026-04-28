@@ -1,0 +1,107 @@
+services:
+  rensa-frontend:
+    image: rensa-frontend:dev
+    build:
+      context: ./rensa-frontend
+      dockerfile: Dockerfile
+      target: dev
+    container_name: rensa-frontend
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./rensa-frontend/.env.local
+    volumes:
+      - ./rensa-frontend:/app
+      - /app/node_modules
+    restart: unless-stopped
+    networks:
+      - rensa-net
+    depends_on:
+      rensa-elysia:
+        condition: service_started
+      rensa-fastapi:
+        condition: service_started
+      rensa-express:
+        condition: service_started
+
+  rensa-fastapi:
+    image: rensa-fastapi:dev
+    build:
+      context: ./rensa-fastapi
+      dockerfile: Dockerfile
+      target: dev
+    container_name: rensa-fastapi
+    ports:
+      - "3001:3001"
+    restart: unless-stopped
+    networks:
+      - rensa-net
+
+  rensa-elysia:
+    image: rensa-elysia:dev
+    build:
+      context: ./rensa-elysia
+      dockerfile: Dockerfile
+      target: dev
+    container_name: rensa-elysia
+    ports:
+      - "3002:3002"
+    env_file:
+      - ./rensa-elysia/.env.local
+    volumes:
+      - ./rensa-elysia:/app
+      - elysia-node-modules:/app/node_modules
+    restart: unless-stopped
+    networks:
+      - rensa-net
+    depends_on:
+      rensa-redis:
+        condition: service_healthy
+
+  rensa-express:
+    image: rensa-express:dev
+    build:
+      context: ./rensa-express
+      dockerfile: Dockerfile
+      target: dev
+    container_name: rensa-express
+    ports:
+      - "3003:3003"
+    env_file:
+      - ./rensa-express/.env.local
+    volumes:
+      - ./rensa-express:/app
+      - /app/node_modules
+    restart: unless-stopped
+    networks:
+      - rensa-net
+    environment:
+      PORT: 3003
+    depends_on:
+      rensa-redis:
+        condition: service_healthy
+
+  rensa-redis:
+    image: redis:7-alpine
+    container_name: rensa-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - rensa-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+networks:
+  rensa-net:
+    driver: bridge
+
+volumes:
+  redis-data:
+  elysia-node-modules:

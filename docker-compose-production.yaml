@@ -1,0 +1,119 @@
+services:
+  rensa-frontend:
+    image: rensa-frontend:prod
+    build:
+      context: ./rensa-frontend
+      dockerfile: Dockerfile
+      target: prod
+    container_name: rensa-frontend
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./envs/frontend.env
+    restart: unless-stopped
+    networks:
+      - rensa-net
+    depends_on:
+      rensa-elysia:
+        condition: service_healthy
+      rensa-fastapi:
+        condition: service_healthy
+      rensa-express:
+        condition: service_healthy
+
+  rensa-fastapi:
+    image: rensa-fastapi:prod
+    build:
+      context: ./rensa-fastapi
+      dockerfile: Dockerfile
+      target: prod
+    container_name: rensa-fastapi
+    ports:
+      - "3001:3001"
+    restart: unless-stopped
+    networks:
+      - rensa-net
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - python -c "import urllib.request; urllib.request.urlopen('http://localhost:3001/health')"
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  rensa-elysia:
+    image: rensa-elysia:prod
+    build:
+      context: ./rensa-elysia
+      dockerfile: Dockerfile
+      target: prod
+    container_name: rensa-elysia
+    ports:
+      - "3002:3002"
+    env_file:
+      - ./envs/elysia.env
+    restart: unless-stopped
+    networks:
+      - rensa-net
+    depends_on:
+      rensa-redis:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - /app/healthcheck
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  rensa-express:
+    image: rensa-express:prod
+    build:
+      context: ./rensa-express
+      dockerfile: Dockerfile
+      target: prod
+    container_name: rensa-express
+    ports:
+      - "3003:3003"
+    restart: unless-stopped
+    networks:
+      - rensa-net
+    depends_on:
+      rensa-redis:
+        condition: service_healthy
+    environment:
+      PORT: 3003
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - node -e "fetch('http://localhost:3003/health').then(()=>process.exit(0)).catch(()=>process.exit(1))"
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  rensa-redis:
+    image: redis:7-alpine
+    container_name: rensa-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - rensa-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+networks:
+  rensa-net:
+    driver: bridge
+
+volumes:
+  redis-data:

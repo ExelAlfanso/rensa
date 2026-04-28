@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowArcRightIcon } from "@phosphor-icons/react";
-import { motion, useScroll, useSpring, useTransform } from "framer-motion";
+import { motion, useScroll, useSpring, useTransform } from "motion/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRef } from "react";

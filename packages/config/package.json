@@ -1,0 +1,12 @@
+{
+  "name": "@rensa/config",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared lint, TypeScript, and tooling configuration for Rensa packages.",
+  "type": "module",
+  "scripts": {
+    "build": "echo \"@rensa/config: no build step yet\"",
+    "lint": "echo \"@rensa/config: no lint step yet\"",
+    "typecheck": "echo \"@rensa/config: no typecheck step yet\""
+  }
+}
