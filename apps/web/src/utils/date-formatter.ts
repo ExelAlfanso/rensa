@@ -47,4 +47,3 @@ export function formatTimeAgo(dateString: string) {
 
 	return "0 sec";
 }
-

@@ -2,12 +2,12 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { ZodError } from "zod";
 import { BackendError } from "@/backend/common/backend.error";
-import { commentController } from "@/backend/services/comments/controller";
 import {
 	commentPhotoParamsDto,
 	createCommentDto,
 	listCommentsQueryDto,
 } from "@/backend/dtos/comment.dto";
+import { commentController } from "@/backend/services/comments/controller";
 import { authOptions } from "@/lib/auth";
 
 /*
@@ -108,4 +108,3 @@ function mapRouteError(error: unknown, fallbackMessage: string): NextResponse {
 		{ status: 500 }
 	);
 }
-

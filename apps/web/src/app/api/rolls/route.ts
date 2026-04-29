@@ -5,8 +5,8 @@ import {
 	BackendError,
 	UnauthorizedError,
 } from "@/backend/common/backend.error";
-import { rollController } from "@/backend/services/rolls/controller";
 import { listRollsQueryDto, rollCreateDto } from "@/backend/dtos/roll.dto";
+import { rollController } from "@/backend/services/rolls/controller";
 import { authOptions } from "@/lib/auth";
 
 /*
@@ -19,10 +19,7 @@ export async function GET(req: Request) {
 			userId: searchParams.get("userId") ?? undefined,
 			sort: searchParams.get("sort") ?? undefined,
 		});
-		const result = await rollController.listByUserId(
-			query.userId,
-			query.sort
-		);
+		const result = await rollController.listByUserId(query.userId, query.sort);
 		return NextResponse.json(
 			{
 				success: true,
@@ -102,4 +99,3 @@ function mapRouteError(error: unknown, fallbackMessage: string): NextResponse {
 		{ status: 500 }
 	);
 }
-

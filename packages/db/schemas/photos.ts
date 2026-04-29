@@ -77,7 +77,9 @@ export interface ListPhotosResult {
 }
 
 export interface PhotoRepositoryInterface {
-	createUploadedPhoto(payload: CreateUploadedPhotoDto): Promise<UploadedPhotoDto>;
+	createUploadedPhoto(
+		payload: CreateUploadedPhotoDto
+	): Promise<UploadedPhotoDto>;
 	deleteById(id: string): Promise<void>;
 	exists(id: string): Promise<boolean>;
 	getById(id: string): Promise<PhotoResponseDto | null>;

@@ -1,12 +1,12 @@
+import type {
+	CommentRepositoryInterface,
+	CreateCommentDto,
+} from "@rensa/db/schema";
 import {
 	ForbiddenError,
 	UnauthorizedError,
 	ValidationError,
 } from "@/backend/common/backend.error";
-import type {
-	CommentRepositoryInterface,
-	CreateCommentDto,
-} from "@rensa/db/schema";
 
 export interface ListCommentsResult {
 	comments: unknown[];
@@ -66,4 +66,3 @@ export class CommentService {
 		};
 	}
 }
-

@@ -1,8 +1,8 @@
 import {
-  accounts as authAccounts,
-  sessions as authSessions,
-  users as authUsers,
-  verificationTokens as authVerificationTokens,
+	accounts as authAccounts,
+	sessions as authSessions,
+	users as authUsers,
+	verificationTokens as authVerificationTokens,
 } from "./auth";
 import { bookmarks } from "./bookmarks";
 import { bugReports } from "./bug-reports";
@@ -14,7 +14,9 @@ import {
 	contactStatusEnum,
 	userRoleEnum,
 } from "./enums";
+
 export type * from "./notifications";
+
 import { photoMetadata, photos } from "./photos";
 import { rollPhotos, rolls } from "./rolls";
 import { users } from "./users";
@@ -28,44 +30,44 @@ export type * from "./rolls";
 export type * from "./users";
 
 export {
-  authAccounts,
-  authSessions,
-  authUsers,
-  authVerificationTokens,
-  bookmarks,
-  bugReports,
-  bugSeverityEnum,
-  bugStatusEnum,
-  comments,
-  contacts,
-  contactStatusEnum,
-  photoMetadata,
-  photos,
-  rollPhotos,
-  rolls,
-  userRoleEnum,
-  users,
+	authAccounts,
+	authSessions,
+	authUsers,
+	authVerificationTokens,
+	bookmarks,
+	bugReports,
+	bugSeverityEnum,
+	bugStatusEnum,
+	comments,
+	contactStatusEnum,
+	contacts,
+	photoMetadata,
+	photos,
+	rollPhotos,
+	rolls,
+	userRoleEnum,
+	users,
 };
 
 export const schema = {
-  auth: {
-    users: authUsers,
-    sessions: authSessions,
-    accounts: authAccounts,
-    verificationTokens: authVerificationTokens,
-  },
-  core: {
-    bookmarks,
-    bugReports,
-    comments,
-    contacts,
-    photos,
-    rolls,
-  },
-  enums: {
-    bugSeverityEnum,
-    bugStatusEnum,
-    userRoleEnum,
-    contactStatusEnum,
-  },
+	auth: {
+		users: authUsers,
+		sessions: authSessions,
+		accounts: authAccounts,
+		verificationTokens: authVerificationTokens,
+	},
+	core: {
+		bookmarks,
+		bugReports,
+		comments,
+		contacts,
+		photos,
+		rolls,
+	},
+	enums: {
+		bugSeverityEnum,
+		bugStatusEnum,
+		userRoleEnum,
+		contactStatusEnum,
+	},
 };

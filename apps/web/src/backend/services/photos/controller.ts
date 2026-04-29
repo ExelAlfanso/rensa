@@ -1,6 +1,6 @@
-import type { ListPhotosQueryDto } from "@rensa/db/schema";
 import { PhotoRepository } from "@rensa/db/queries/photo.repository";
 import { UserRepository } from "@rensa/db/queries/user.repository";
+import type { ListPhotosQueryDto } from "@rensa/db/schema";
 import { PhotoService } from "./service";
 
 export class PhotosController {
@@ -40,4 +40,3 @@ const userRepository = new UserRepository();
 const photoService = new PhotoService(photoRepository, userRepository);
 
 export const photoController = new PhotosController(photoService);
-

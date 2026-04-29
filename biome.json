@@ -55,9 +55,11 @@
         "useExhaustiveDependencies": "off"
       },
       "performance": {
-        "useTopLevelRegex": "off"
+        "useTopLevelRegex": "off",
+        "noBarrelFile": "off"
       },
       "style": {
+        "useConsistentArrayType": { "options": { "syntax": "generic" } },
         "noNestedTernary": "off",
         "noNonNullAssertion": "off",
         "noExportedImports": "off",

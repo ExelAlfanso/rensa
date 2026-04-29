@@ -1,8 +1,5 @@
-import type {
-	CreateContactDto,
-	ListContactsQueryDto,
-} from "@rensa/db/schema";
 import { ContactRepository } from "@rensa/db/queries/contact.repository";
+import type { CreateContactDto, ListContactsQueryDto } from "@rensa/db/schema";
 import {
 	type ContactListResult,
 	ContactService,
@@ -38,4 +35,3 @@ const contactRepository = new ContactRepository();
 const contactService = new ContactService(contactRepository);
 
 export const contactController = new ContactsController(contactService);
-

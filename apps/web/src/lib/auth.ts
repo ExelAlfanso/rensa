@@ -54,9 +54,7 @@ export const authOptions: NextAuthOptions = {
 					throw new Error("Email and password are required");
 				}
 
-				const user = await userController.getByEmail(
-					credentials.email
-				);
+				const user = await userController.getByEmail(credentials.email);
 				if (!user) {
 					throw new Error("Invalid email or password");
 				}
@@ -128,4 +126,3 @@ export const authOptions: NextAuthOptions = {
 	},
 	debug: process.env.NODE_ENV === "development",
 };
-

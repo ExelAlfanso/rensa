@@ -5,9 +5,9 @@ import {
 	BackendError,
 	UnauthorizedError,
 } from "@/backend/common/backend.error";
-import { bookmarkController } from "@/backend/services/bookmarks/controller";
 import { bookmarkActionDto } from "@/backend/dtos/bookmark.dto";
 import { photoIdParamDto } from "@/backend/dtos/photo.dto";
+import { bookmarkController } from "@/backend/services/bookmarks/controller";
 import { authOptions } from "@/lib/auth";
 
 /*
@@ -68,4 +68,3 @@ export async function POST(
 		);
 	}
 }
-

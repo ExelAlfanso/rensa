@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { BackendError } from "@/backend/common/backend.error";
-import { rollController } from "@/backend/services/rolls/controller";
 import {
 	listRollPhotosQueryDto,
 	rollIdParamDto,
 } from "@/backend/dtos/roll.dto";
+import { rollController } from "@/backend/services/rolls/controller";
 
 /*
  * GET /api/rolls/[rollId]/photos?page=1&limit=10
@@ -22,10 +22,7 @@ export async function GET(
 			limit: searchParams.get("limit") ?? undefined,
 		});
 
-		const result = await rollController.listPhotos(
-			params.rollId,
-			query
-		);
+		const result = await rollController.listPhotos(params.rollId, query);
 		return NextResponse.json(
 			{
 				success: true,
@@ -61,4 +58,3 @@ export async function GET(
 		);
 	}
 }
-

@@ -1,9 +1,9 @@
+import { UserRepository } from "@rensa/db/queries/user.repository";
 import type {
 	UserRegisterDto,
 	UserResponseDto,
 	UserWithPasswordResponseDto,
 } from "@rensa/db/schema";
-import { UserRepository } from "@rensa/db/queries/user.repository";
 import { UserService } from "./service";
 
 export class UsersController {
@@ -30,4 +30,3 @@ const userRepository = new UserRepository();
 const userService = new UserService(userRepository);
 
 export const userController = new UsersController(userService);
-

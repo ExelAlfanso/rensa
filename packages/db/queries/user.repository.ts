@@ -181,7 +181,9 @@ export class UserRepository implements UserRepositoryInterface {
 				passwordChangedAt: new Date(),
 				updatedAt: new Date(),
 			})
-			.where(and(eq(users.email, params.email), eq(users.userId, params.userId)))
+			.where(
+				and(eq(users.email, params.email), eq(users.userId, params.userId))
+			)
 			.returning({ id: users.userId });
 
 		return Boolean(updated);

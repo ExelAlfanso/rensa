@@ -1,14 +1,14 @@
-import {
-	ForbiddenError,
-	NotFoundError,
-	UnauthorizedError,
-} from "@/backend/common/backend.error";
 import type {
 	UserRegisterDto,
 	UserRepositoryInterface,
 	UserResponseDto,
 	UserWithPasswordResponseDto,
 } from "@rensa/db/schema";
+import {
+	ForbiddenError,
+	NotFoundError,
+	UnauthorizedError,
+} from "@/backend/common/backend.error";
 
 export class UserService {
 	readonly userRepository: UserRepositoryInterface;
@@ -39,4 +39,3 @@ export class UserService {
 		return user;
 	}
 }
-

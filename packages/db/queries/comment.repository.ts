@@ -1,95 +1,95 @@
 import { asc, count, eq } from "drizzle-orm";
 import type {
-  CommentRepositoryInterface,
-  CommentResponseDto,
-  ListCommentsResult,
+	CommentRepositoryInterface,
+	CommentResponseDto,
+	ListCommentsResult,
 } from "../schemas/comments";
 import { comments } from "../schemas/comments";
 import { users } from "../schemas/users";
 import db from "../src/db";
 
 const toIso = (value: Date | null): string | undefined =>
-  value ? value.toISOString() : undefined;
+	value ? value.toISOString() : undefined;
 
 export class CommentRepository implements CommentRepositoryInterface {
-  async create(params: {
-    photoId: string;
-    userId: string;
-    text: string;
-  }): Promise<CommentResponseDto> {
-    const [row] = await db
-      .insert(comments)
-      .values({
-        photoId: params.photoId,
-        text: params.text,
-        userId: params.userId,
-      })
-      .returning();
-    if (!row) {
-      throw new Error("Failed to create comment");
-    }
+	async create(params: {
+		photoId: string;
+		userId: string;
+		text: string;
+	}): Promise<CommentResponseDto> {
+		const [row] = await db
+			.insert(comments)
+			.values({
+				photoId: params.photoId,
+				text: params.text,
+				userId: params.userId,
+			})
+			.returning();
+		if (!row) {
+			throw new Error("Failed to create comment");
+		}
 
-    return {
-      comment_id: row.commentId,
-      photoId: row.photoId ?? "",
-      userId: row.userId ?? "",
-      text: row.text,
-      createdAt: toIso(row.createdAt),
-      updatedAt: toIso(row.updatedAt),
-    };
-  }
+		return {
+			comment_id: row.commentId,
+			photoId: row.photoId ?? "",
+			userId: row.userId ?? "",
+			text: row.text,
+			createdAt: toIso(row.createdAt),
+			updatedAt: toIso(row.updatedAt),
+		};
+	}
 
-  async listByPhotoId(params: {
-    photoId: string;
-    offset: number;
-    limit: number;
-  }): Promise<ListCommentsResult> {
-    const rows = await db
-      .select({
-        avatar: users.avatar,
-        commentId: comments.commentId,
-        createdAt: comments.createdAt,
-        photoId: comments.photoId,
-        text: comments.text,
-        updatedAt: comments.updatedAt,
-        userId: comments.userId,
-        username: users.username,
-      })
-      .from(comments)
-      .leftJoin(users, eq(comments.userId, users.userId))
-      .where(eq(comments.photoId, params.photoId))
-      .orderBy(asc(comments.createdAt))
-      .limit(params.limit)
-      .offset(params.offset);
+	async listByPhotoId(params: {
+		photoId: string;
+		offset: number;
+		limit: number;
+	}): Promise<ListCommentsResult> {
+		const rows = await db
+			.select({
+				avatar: users.avatar,
+				commentId: comments.commentId,
+				createdAt: comments.createdAt,
+				photoId: comments.photoId,
+				text: comments.text,
+				updatedAt: comments.updatedAt,
+				userId: comments.userId,
+				username: users.username,
+			})
+			.from(comments)
+			.leftJoin(users, eq(comments.userId, users.userId))
+			.where(eq(comments.photoId, params.photoId))
+			.orderBy(asc(comments.createdAt))
+			.limit(params.limit)
+			.offset(params.offset);
 
-    const [countRow] = await db
-      .select({ total: count() })
-      .from(comments)
-      .where(eq(comments.photoId, params.photoId));
+		const [countRow] = await db
+			.select({ total: count() })
+			.from(comments)
+			.where(eq(comments.photoId, params.photoId));
 
-    const mapped = rows.map((row) => {
-      const user =
-        row.userId && row.username
-          ? {
-              _id: row.userId,
-              username: row.username,
-              avatarUrl: row.avatar ?? undefined,
-            }
-          : (row.userId ?? "");
+		const mapped = rows.map((row) => {
+			const user =
+				row.userId && row.username
+					? {
+							_id: row.userId,
+							username: row.username,
+							avatarUrl: row.avatar ?? undefined,
+						}
+					: (row.userId ?? "");
 
-      return {
-        comment_id: row.commentId,
-        photoId: row.photoId ?? "",
-        userId: user,
-        text: row.text,
-        createdAt: toIso(row.createdAt),
-        updatedAt: toIso(row.updatedAt),
-      };
-    });
+			return {
+				comment_id: row.commentId,
+				photoId: row.photoId ?? "",
+				userId: user,
+				text: row.text,
+				createdAt: toIso(row.createdAt),
+				updatedAt: toIso(row.updatedAt),
+			};
+		});
 
-    return {
-      comments: mapped as CommentResponseDto[],
-      total: Number(countRow?.total ?? 0),
-    };
-  }
+		return {
+			comments: mapped as CommentResponseDto[],
+			total: Number(countRow?.total ?? 0),
+		};
+	}
 }

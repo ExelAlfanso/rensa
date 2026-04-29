@@ -69,4 +69,3 @@ export type PhotoResponseDto = z.infer<typeof photoResponseDto>;
 export type CreatePhotoDto = z.infer<typeof createPhotoDto>;
 export type UpdatePhotoDto = z.infer<typeof updatePhotoDto>;
 export type ListPhotosQueryDto = z.infer<typeof listPhotosQueryDto>;
-

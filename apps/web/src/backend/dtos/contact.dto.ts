@@ -33,4 +33,3 @@ export const listContactsQueryDto = paginationQueryDto.extend({
 export type ContactResponseDto = z.infer<typeof contactResponseDto>;
 export type CreateContactDto = z.infer<typeof createContactDto>;
 export type ListContactsQueryDto = z.infer<typeof listContactsQueryDto>;
-

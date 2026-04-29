@@ -8,4 +8,3 @@ export const uploadFormData = async (formData: FormData) => {
 	});
 	return res.data.data;
 };
-

@@ -1,7 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
-import { notificationController } from "@/backend/services/notifications/controller";
 import { notificationIdParamDto } from "@/backend/dtos/notification.dto";
+import { notificationController } from "@/backend/services/notifications/controller";
 
 export async function PUT(
 	_req: NextRequest,
@@ -62,4 +62,3 @@ function mapRouteError(error: unknown, fallbackMessage: string): NextResponse {
 		{ status: 500 }
 	);
 }
-

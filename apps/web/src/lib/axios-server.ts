@@ -40,4 +40,3 @@ elysiaApi.interceptors.request.use(
 );
 
 export { elysiaApi, expressApi, fastApi };
-

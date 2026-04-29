@@ -1,8 +1,8 @@
 import { and, count, desc, eq, type SQL } from "drizzle-orm";
 import {
-	bugReports,
 	type BugReportSeverity,
 	type BugReportStatus,
+	bugReports,
 	type CreateBugReportDto,
 	type CreatedBugReportDto,
 	type ListBugReportsQueryDto,
@@ -53,7 +53,9 @@ export class BugReportRepository {
 				bugReports.severity,
 				query.severity as BugReportSeverity
 			);
-			whereClause = whereClause ? and(whereClause, severityWhere) : severityWhere;
+			whereClause = whereClause
+				? and(whereClause, severityWhere)
+				: severityWhere;
 		}
 
 		const orderByClause =

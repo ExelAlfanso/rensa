@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { BackendError } from "@/backend/common/backend.error";
-import { photoController } from "@/backend/services/photos/controller";
 import { photoIdParamDto } from "@/backend/dtos/photo.dto";
+import { photoController } from "@/backend/services/photos/controller";
 
 /*
   GET /api/photos/[id]/owner
@@ -46,4 +46,3 @@ export async function GET(
 		);
 	}
 }
-

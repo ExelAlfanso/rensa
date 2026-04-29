@@ -1,13 +1,13 @@
-import {
-	ForbiddenError,
-	NotFoundError,
-	UnauthorizedError,
-} from "@/backend/common/backend.error";
 import type {
 	ListPhotosQueryDto,
 	PhotoRepositoryInterface,
 	UserRepositoryInterface,
 } from "@rensa/db/schema";
+import {
+	ForbiddenError,
+	NotFoundError,
+	UnauthorizedError,
+} from "@/backend/common/backend.error";
 
 interface PaginatedPhotosResult {
 	currentPage: number;
@@ -121,4 +121,3 @@ export class PhotoService {
 		};
 	}
 }
-

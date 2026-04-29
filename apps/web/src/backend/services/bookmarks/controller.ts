@@ -27,4 +27,3 @@ const photoRepository = new PhotoRepository();
 const bookmarkService = new BookmarkService(userRepository, photoRepository);
 
 export const bookmarkController = new BookmarksController(bookmarkService);
-

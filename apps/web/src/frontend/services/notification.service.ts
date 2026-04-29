@@ -56,4 +56,3 @@ export const markUserNotificationAsRead = async (notificationId: string) => {
 	const res = await api.put(`/notifications/${notificationId}/read`);
 	return res.data?.success ?? false;
 };
-

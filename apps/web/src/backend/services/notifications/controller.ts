@@ -1,9 +1,9 @@
+import { NotificationRepository } from "@rensa/db/queries/notification.repository";
 import type {
 	CreateNotificationDto,
 	ListNotificationsQueryDto,
 	NotificationResponseDto,
 } from "@rensa/db/schema";
-import { NotificationRepository } from "@rensa/db/queries/notification.repository";
 import { elysiaApi } from "@/lib/axios-server";
 import { NotificationService } from "./service";
 
@@ -37,4 +37,3 @@ const notificationService = new NotificationService(notificationRepository);
 export const notificationController = new NotificationsController(
 	notificationService
 );
-

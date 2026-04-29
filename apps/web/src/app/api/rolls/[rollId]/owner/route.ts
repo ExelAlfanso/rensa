@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { BackendError } from "@/backend/common/backend.error";
-import { rollController } from "@/backend/services/rolls/controller";
 import { rollIdParamDto } from "@/backend/dtos/roll.dto";
+import { rollController } from "@/backend/services/rolls/controller";
 
 export async function GET(
 	_req: Request,
@@ -49,4 +49,3 @@ export async function GET(
 		);
 	}
 }
-

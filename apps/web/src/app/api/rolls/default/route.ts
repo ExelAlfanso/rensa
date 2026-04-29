@@ -11,8 +11,7 @@ export async function GET() {
 	try {
 		const session = await getServerSession(authOptions);
 		const actorId = session?.user?.id;
-		const defaultRoll =
-			await rollController.getDefaultByUserId(actorId);
+		const defaultRoll = await rollController.getDefaultByUserId(actorId);
 		return NextResponse.json(
 			{
 				success: true,
@@ -41,4 +40,3 @@ export async function GET() {
 		);
 	}
 }
-

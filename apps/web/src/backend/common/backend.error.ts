@@ -44,4 +44,3 @@ export class TooManyRequestsError extends BackendError {
 		this.name = "TooManyRequestsError";
 	}
 }
-

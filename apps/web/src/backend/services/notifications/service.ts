@@ -28,4 +28,3 @@ export class NotificationService {
 		await this.notificationRepository.clearByUserId(userId);
 	}
 }
-

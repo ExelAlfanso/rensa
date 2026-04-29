@@ -6,4 +6,3 @@ export interface PhotoMetadata {
 	uploadedAt?: Date | string;
 	width?: number;
 }
-

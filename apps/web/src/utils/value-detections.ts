@@ -26,4 +26,3 @@ export function extractModelFromString(str: string) {
 	const match = str.match(CAMERA_MODEL_PATTERN);
 	return match ? match[1] : null;
 }
-

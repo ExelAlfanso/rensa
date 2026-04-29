@@ -1,10 +1,10 @@
+import { PhotoRepository } from "@rensa/db/queries/photo.repository";
+import { RollRepository } from "@rensa/db/queries/roll.repository";
 import type {
 	ListRollPhotosQueryDto,
 	RollCreateDto,
 	RollUpdateDto,
 } from "@rensa/db/schema";
-import { PhotoRepository } from "@rensa/db/queries/photo.repository";
-import { RollRepository } from "@rensa/db/queries/roll.repository";
 import { RollService } from "./service";
 
 export class RollsController {
@@ -82,4 +82,3 @@ const photoRepository = new PhotoRepository();
 const rollService = new RollService(rollRepository, photoRepository);
 
 export const rollController = new RollsController(rollService);
-

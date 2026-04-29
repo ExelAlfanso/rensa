@@ -165,4 +165,3 @@ export const fetchUserBookmarkedPhotos = async (userId: string) => {
 	const res = await api.get(`/users/${userId}`);
 	return res.data.data.user.bookmarks;
 };
-

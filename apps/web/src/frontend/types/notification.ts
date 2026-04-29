@@ -15,4 +15,3 @@ export interface NotificationData {
 	type: string;
 	updatedAt?: Date | string;
 }
-

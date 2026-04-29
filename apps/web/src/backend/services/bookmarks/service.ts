@@ -1,12 +1,12 @@
+import type {
+	PhotoRepositoryInterface,
+	UserRepositoryInterface,
+} from "@rensa/db/schema";
 import {
 	ForbiddenError,
 	NotFoundError,
 	UnauthorizedError,
 } from "@/backend/common/backend.error";
-import type {
-	PhotoRepositoryInterface,
-	UserRepositoryInterface,
-} from "@rensa/db/schema";
 
 export class BookmarkService {
 	readonly photoRepository: PhotoRepositoryInterface;
@@ -56,4 +56,3 @@ export class BookmarkService {
 		};
 	}
 }
-

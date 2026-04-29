@@ -46,17 +46,17 @@ export interface UserRepositoryInterface {
 		password: string;
 		userId: string;
 	}): Promise<boolean>;
+	updateBookmarks(
+		userId: string,
+		photoId: string,
+		action: "increment" | "decrement"
+	): Promise<UserResponseDto | null>;
 	updateProfile(params: {
 		avatar: string;
 		email: string;
 		userId: string;
 		username: string;
 	}): Promise<UserProfileDto | null>;
-	updateBookmarks(
-		userId: string,
-		photoId: string,
-		action: "increment" | "decrement"
-	): Promise<UserResponseDto | null>;
 	verifyEmail(email: string): Promise<boolean>;
 }
 

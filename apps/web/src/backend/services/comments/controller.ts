@@ -1,5 +1,5 @@
-import type { CreateCommentDto } from "@rensa/db/schema";
 import { CommentRepository } from "@rensa/db/queries/comment.repository";
+import type { CreateCommentDto } from "@rensa/db/schema";
 import { CommentService, type ListCommentsResult } from "./service";
 
 export class CommentsController {
@@ -30,4 +30,3 @@ const commentRepository = new CommentRepository();
 const commentService = new CommentService(commentRepository);
 
 export const commentController = new CommentsController(commentService);
-

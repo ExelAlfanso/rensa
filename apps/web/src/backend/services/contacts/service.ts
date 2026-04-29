@@ -1,12 +1,12 @@
+import type {
+	ContactRepositoryInterface,
+	CreateContactDto,
+	ListContactsQueryDto,
+} from "@rensa/db/schema";
 import {
 	TooManyRequestsError,
 	UnauthorizedError,
 } from "@/backend/common/backend.error";
-import type {
-	CreateContactDto,
-	ContactRepositoryInterface,
-	ListContactsQueryDto,
-} from "@rensa/db/schema";
 import ContactAdminEmail from "@/frontend/components/emailTemplates/ContactAdminEmail";
 import ContactConfirmationEmail from "@/frontend/components/emailTemplates/ContactConfirmationEmail";
 import { contactFormLimiter } from "@/lib/rateLimiter";
@@ -114,4 +114,3 @@ export class ContactService {
 		});
 	}
 }
-

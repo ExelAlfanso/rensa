@@ -51,4 +51,3 @@ export const sendPasswordResetEmail = async (email: string): Promise<void> => {
 		react: PasswordResetEmail({ resetLink }),
 	});
 };
-

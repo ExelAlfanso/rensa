@@ -5,8 +5,8 @@ import {
 	BackendError,
 	UnauthorizedError,
 } from "@/backend/common/backend.error";
-import { photoController } from "@/backend/services/photos/controller";
 import { photoIdParamDto } from "@/backend/dtos/photo.dto";
+import { photoController } from "@/backend/services/photos/controller";
 import { authOptions } from "@/lib/auth";
 
 /*
@@ -87,4 +87,3 @@ function mapRouteError(error: unknown, fallbackMessage: string): NextResponse {
 		{ status: 500 }
 	);
 }
-

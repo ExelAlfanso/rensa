@@ -37,4 +37,3 @@ export const commentPhoto = async (
 export const removeUserPhoto = async (photoId: string) => {
 	await api.delete(`/photos/${photoId}`);
 };
-

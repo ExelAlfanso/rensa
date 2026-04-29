@@ -5,8 +5,8 @@ import {
 	BackendError,
 	UnauthorizedError,
 } from "@/backend/common/backend.error";
-import { userController } from "@/backend/services/users/controller";
 import { userIdParamDto } from "@/backend/dtos/user.dto";
+import { userController } from "@/backend/services/users/controller";
 import { authOptions } from "@/lib/auth";
 
 /*
@@ -62,4 +62,3 @@ export async function GET(
 		);
 	}
 }
-

@@ -9,4 +9,3 @@ export const fetchProfileByRollId = async (rollId: string) => {
 	const res = await api.get(`/rolls/${rollId}/owner`);
 	return res.data.data.userId;
 };
-

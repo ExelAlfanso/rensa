@@ -43,4 +43,3 @@ export type ListNotificationsQueryDto = z.infer<
 	typeof listNotificationsQueryDto
 >;
 export type CreateNotificationDto = z.infer<typeof createNotificationDto>;
-

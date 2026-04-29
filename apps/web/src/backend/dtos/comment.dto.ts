@@ -32,4 +32,3 @@ export const listCommentsQueryDto = z.object({
 export type CommentResponseDto = z.infer<typeof commentResponseDto>;
 export type CreateCommentDto = z.infer<typeof createCommentDto>;
 export type ListCommentsQueryDto = z.infer<typeof listCommentsQueryDto>;
-

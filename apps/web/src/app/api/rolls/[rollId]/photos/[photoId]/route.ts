@@ -5,8 +5,8 @@ import {
 	BackendError,
 	UnauthorizedError,
 } from "@/backend/common/backend.error";
-import { rollController } from "@/backend/services/rolls/controller";
 import { photoIdParamDto, rollIdParamDto } from "@/backend/dtos/roll.dto";
+import { rollController } from "@/backend/services/rolls/controller";
 import { authOptions } from "@/lib/auth";
 
 /*
@@ -59,11 +59,7 @@ export async function DELETE(
 			throw new UnauthorizedError();
 		}
 
-		await rollController.removePhotoFromRoll(
-			rollId,
-			photoId,
-			actorId
-		);
+		await rollController.removePhotoFromRoll(rollId, photoId, actorId);
 
 		return NextResponse.json({
 			success: true,
@@ -102,4 +98,3 @@ function mapRouteError(error: unknown, fallbackMessage: string): NextResponse {
 		{ status: 500 }
 	);
 }
-

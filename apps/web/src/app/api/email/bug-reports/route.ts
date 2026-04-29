@@ -1,10 +1,5 @@
-import {
-	BugReportRepository,
-} from "@rensa/db/queries/bug-report.repository";
-import type {
-	BugReportSeverity,
-	BugReportStatus,
-} from "@rensa/db/schema";
+import { BugReportRepository } from "@rensa/db/queries/bug-report.repository";
+import type { BugReportSeverity, BugReportStatus } from "@rensa/db/schema";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { BugReportConfirmationEmail } from "@/frontend/components/emailTemplates/BugReportConfirmationEmail";
@@ -242,4 +237,3 @@ export async function GET(req: Request) {
 		);
 	}
 }
-

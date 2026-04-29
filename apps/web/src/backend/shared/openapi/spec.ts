@@ -92,4 +92,3 @@ export const openApiSpec = {
 		examples: mergeComponentGroup(fragments, "examples"),
 	},
 } as const;
-
