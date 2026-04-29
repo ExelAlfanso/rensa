@@ -29,3 +29,4 @@ export const bookmarkActionDto = z.object({
 export type BookmarkResponseDto = z.infer<typeof bookmarkResponseDto>;
 export type CreateBookmarkDto = z.infer<typeof createBookmarkDto>;
 export type UpdateBookmarkDto = z.infer<typeof updateBookmarkDto>;
+

@@ -5,7 +5,7 @@ import {
 	BackendError,
 	UnauthorizedError,
 } from "@/backend/common/backend.error";
-import { rollDomain } from "@/backend/domains/rolls/module";
+import { rollController } from "@/backend/services/rolls/controller";
 import { photoIdParamDto, rollIdParamDto } from "@/backend/dtos/roll.dto";
 import { authOptions } from "@/lib/auth";
 
@@ -26,7 +26,7 @@ export async function POST(
 			throw new UnauthorizedError();
 		}
 
-		const modifiedCount = await rollDomain.rollsApplication.addPhotoToRoll(
+		const modifiedCount = await rollController.addPhotoToRoll(
 			rollId,
 			photoId,
 			actorId
@@ -59,7 +59,7 @@ export async function DELETE(
 			throw new UnauthorizedError();
 		}
 
-		await rollDomain.rollsApplication.removePhotoFromRoll(
+		await rollController.removePhotoFromRoll(
 			rollId,
 			photoId,
 			actorId
@@ -102,3 +102,4 @@ function mapRouteError(error: unknown, fallbackMessage: string): NextResponse {
 		{ status: 500 }
 	);
 }
+

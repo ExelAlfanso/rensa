@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { BackendError } from "@/backend/common/backend.error";
-import { rollDomain } from "@/backend/domains/rolls/module";
+import { rollController } from "@/backend/services/rolls/controller";
 import { authOptions } from "@/lib/auth";
 
 /*
@@ -12,7 +12,7 @@ export async function GET() {
 		const session = await getServerSession(authOptions);
 		const actorId = session?.user?.id;
 		const defaultRoll =
-			await rollDomain.rollsApplication.getDefaultByUserId(actorId);
+			await rollController.getDefaultByUserId(actorId);
 		return NextResponse.json(
 			{
 				success: true,
@@ -41,3 +41,4 @@ export async function GET() {
 		);
 	}
 }
+

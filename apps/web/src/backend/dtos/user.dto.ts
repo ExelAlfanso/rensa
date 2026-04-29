@@ -47,3 +47,4 @@ export type UserUpdateDto = z.infer<typeof userUpdateDto>;
 export type UserResponseDto = z.infer<typeof userResponseDto>;
 export type UserLoginDto = z.infer<typeof userLoginDto>;
 export type UserRegisterDto = z.infer<typeof userRegisterDto>;
+

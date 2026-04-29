@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
-import { notificationDomain } from "@/backend/domains/notifications/module";
+import { notificationController } from "@/backend/services/notifications/controller";
 import { notificationIdParamDto } from "@/backend/dtos/notification.dto";
 
 export async function PUT(
@@ -9,7 +9,7 @@ export async function PUT(
 ) {
 	try {
 		const params = notificationIdParamDto.parse(await context.params);
-		await notificationDomain.notificationsApplication.markAsRead(params.id);
+		await notificationController.markAsRead(params.id);
 		return NextResponse.json(
 			{
 				success: true,
@@ -28,7 +28,7 @@ export async function DELETE(
 ) {
 	try {
 		const params = notificationIdParamDto.parse(await context.params);
-		await notificationDomain.notificationsApplication.clearByUserId(params.id);
+		await notificationController.clearByUserId(params.id);
 		return NextResponse.json(
 			{
 				success: true,
@@ -62,3 +62,4 @@ function mapRouteError(error: unknown, fallbackMessage: string): NextResponse {
 		{ status: 500 }
 	);
 }
+

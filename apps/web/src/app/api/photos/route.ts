@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { BackendError } from "@/backend/common/backend.error";
-import { photoDomain } from "@/backend/domains/photos/module";
+import { photoController } from "@/backend/services/photos/controller";
 import { listPhotosQueryDto } from "@/backend/dtos/photo.dto";
 
 /*
@@ -17,7 +17,7 @@ export async function GET(req: Request) {
 			filters: searchParams.get("filters") ?? undefined,
 		});
 
-		const result = await photoDomain.photosApplication.list(query);
+		const result = await photoController.list(query);
 		return NextResponse.json(result);
 	} catch (error) {
 		if (error instanceof ZodError) {
@@ -49,3 +49,4 @@ export async function GET(req: Request) {
 		);
 	}
 }
+

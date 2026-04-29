@@ -11,3 +11,4 @@ export function formatLabelFirstLetter(key: string): string {
 	const lowerCasedKey = key.toLowerCase();
 	return lowerCasedKey.charAt(0).toUpperCase() + lowerCasedKey.slice(1);
 }
+

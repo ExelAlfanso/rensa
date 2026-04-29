@@ -12,3 +12,4 @@ export const getApiDocs = async () => {
 	});
 	return await spec;
 };
+

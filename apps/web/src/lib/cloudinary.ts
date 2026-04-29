@@ -50,3 +50,4 @@ export function validateCloudinaryUrl(url: string): boolean {
 }
 
 export default cloudinary;
+

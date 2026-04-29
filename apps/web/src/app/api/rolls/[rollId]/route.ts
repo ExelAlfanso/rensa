@@ -5,7 +5,7 @@ import {
 	BackendError,
 	UnauthorizedError,
 } from "@/backend/common/backend.error";
-import { rollDomain } from "@/backend/domains/rolls/module";
+import { rollController } from "@/backend/services/rolls/controller";
 import { rollIdParamDto, rollUpdateDto } from "@/backend/dtos/roll.dto";
 import { authOptions } from "@/lib/auth";
 
@@ -18,7 +18,7 @@ export async function GET(
 ) {
 	try {
 		const params = rollIdParamDto.parse(await context.params);
-		const roll = await rollDomain.rollsApplication.getById(params.rollId);
+		const roll = await rollController.getById(params.rollId);
 		return NextResponse.json(
 			{ success: true, message: "Fetched roll successfully", data: roll },
 			{ status: 200 }
@@ -44,7 +44,7 @@ export async function PATCH(
 			throw new UnauthorizedError();
 		}
 
-		const updatedRoll = await rollDomain.rollsApplication.update(
+		const updatedRoll = await rollController.update(
 			params.rollId,
 			body,
 			actorId
@@ -77,7 +77,7 @@ export async function DELETE(
 			throw new UnauthorizedError();
 		}
 
-		const deletedRoll = await rollDomain.rollsApplication.deleteById(
+		const deletedRoll = await rollController.deleteById(
 			params.rollId,
 			actorId
 		);
@@ -122,3 +122,4 @@ function mapRouteError(error: unknown, fallbackMessage: string): NextResponse {
 		{ status: 500 }
 	);
 }
+

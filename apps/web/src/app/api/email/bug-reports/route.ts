@@ -1,14 +1,20 @@
-import { and, count, desc, eq, type SQL } from "drizzle-orm";
+import {
+	BugReportRepository,
+} from "@rensa/db/queries/bug-report.repository";
+import type {
+	BugReportSeverity,
+	BugReportStatus,
+} from "@rensa/db/schema";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { bugReports } from "@/backend/db/schema";
 import { BugReportConfirmationEmail } from "@/frontend/components/emailTemplates/BugReportConfirmationEmail";
 import { BugReportTeamEmail } from "@/frontend/components/emailTemplates/BugReportTeamEmail";
 import { authOptions } from "@/lib/auth";
-import db from "@/lib/drizzle";
 import { bugReportLimiter } from "@/lib/rateLimiter";
 import getResend from "@/lib/resend";
 import { validateBugReportData } from "@/lib/validation";
+
+const bugReportRepository = new BugReportRepository();
 
 /**
  * POST /api/bug-reports
@@ -60,7 +66,7 @@ export async function POST(req: Request) {
 		);
 	}
 
-	let severity: "low" | "medium" | "high" | "critical" = "medium";
+	let severity: BugReportSeverity = "medium";
 	const validatedTitle = validation.data.title;
 	const validatedEmail = validation.data.email;
 	const validatedDescription = validation.data.description;
@@ -89,27 +95,20 @@ export async function POST(req: Request) {
 		severity = "high";
 	}
 
-	const [bugReport] = await db
-		.insert(bugReports)
-		.values({
-			title: validatedTitle,
-			email: validatedEmail,
-			description: validatedDescription,
-			steps: validatedSteps ?? null,
-			expectedBehavior: validatedExpected ?? null,
+	let bugReport;
+	try {
+		bugReport = await bugReportRepository.create({
 			actualBehavior: validatedActual ?? null,
-			severity,
+			description: validatedDescription,
+			email: validatedEmail,
+			expectedBehavior: validatedExpected ?? null,
 			ipAddress: ip,
+			severity,
+			steps: validatedSteps ?? null,
+			title: validatedTitle,
 			userAgent: req.headers.get("user-agent") || "",
-		})
-		.returning({
-			bugReportId: bugReports.bugReportId,
-			createdAt: bugReports.createdAt,
-			email: bugReports.email,
-			title: bugReports.title,
 		});
-
-	if (!bugReport) {
+	} catch {
 		return NextResponse.json(
 			{
 				success: false,
@@ -194,65 +193,32 @@ export async function GET(req: Request) {
 		}
 
 		const { searchParams } = new URL(req.url);
-		const status = searchParams.get("status");
-		const severity = searchParams.get("severity");
+		const status = searchParams.get("status") as BugReportStatus | null;
+		const severity = searchParams.get("severity") as BugReportSeverity | null;
 		const page = Number.parseInt(searchParams.get("page") || "1");
 		const limit = Number.parseInt(searchParams.get("limit") || "10");
 		const sortBy = searchParams.get("sortBy") || "-createdAt";
-
-		const descending = sortBy.startsWith("-");
-		const sortField = descending ? sortBy.slice(1) : sortBy;
-		const from = (page - 1) * limit;
-		type BugStatus = NonNullable<typeof bugReports.$inferInsert.status>;
-		type BugSeverity = NonNullable<typeof bugReports.$inferInsert.severity>;
-		const validStatuses: BugStatus[] = [
+		const validStatuses: BugReportStatus[] = [
 			"new",
 			"investigating",
 			"acknowledged",
 			"resolved",
 			"closed",
 		];
-		const validSeverities: BugSeverity[] = [
+		const validSeverities: BugReportSeverity[] = [
 			"low",
 			"medium",
 			"high",
 			"critical",
 		];
-		let whereClause: SQL<unknown> | undefined;
-		if (status) {
-			if (validStatuses.includes(status as BugStatus)) {
-				whereClause = eq(bugReports.status, status as BugStatus);
-			}
-		}
-		if (severity) {
-			if (validSeverities.includes(severity as BugSeverity)) {
-				const severityWhere = eq(bugReports.severity, severity as BugSeverity);
-				whereClause = whereClause
-					? and(whereClause, severityWhere)
-					: severityWhere;
-			}
-		}
-		const orderByClause =
-			sortField === "updatedAt"
-				? descending
-					? desc(bugReports.updatedAt)
-					: bugReports.updatedAt
-				: descending
-					? desc(bugReports.createdAt)
-					: bugReports.createdAt;
-
-		const data = await db
-			.select()
-			.from(bugReports)
-			.where(whereClause)
-			.orderBy(orderByClause)
-			.limit(limit)
-			.offset(from);
-		const [countRow] = await db
-			.select({ total: count() })
-			.from(bugReports)
-			.where(whereClause);
-		const total = Number(countRow?.total ?? 0);
+		const { data, total } = await bugReportRepository.list({
+			limit,
+			page,
+			severity:
+				severity && validSeverities.includes(severity) ? severity : undefined,
+			sortBy,
+			status: status && validStatuses.includes(status) ? status : undefined,
+		});
 
 		return NextResponse.json({
 			success: true,
@@ -276,3 +242,4 @@ export async function GET(req: Request) {
 		);
 	}
 }
+

@@ -75,3 +75,4 @@ export const photoUploadLimiter = createLazyRatelimit({
 	limiter: Ratelimit.slidingWindow(5, "2 m"),
 	prefix: "photo_upload_limit",
 });
+

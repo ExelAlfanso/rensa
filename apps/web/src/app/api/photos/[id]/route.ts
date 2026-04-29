@@ -5,7 +5,7 @@ import {
 	BackendError,
 	UnauthorizedError,
 } from "@/backend/common/backend.error";
-import { photoDomain } from "@/backend/domains/photos/module";
+import { photoController } from "@/backend/services/photos/controller";
 import { photoIdParamDto } from "@/backend/dtos/photo.dto";
 import { authOptions } from "@/lib/auth";
 
@@ -18,7 +18,7 @@ export async function GET(
 ) {
 	try {
 		const params = photoIdParamDto.parse(await context.params);
-		const photo = await photoDomain.photosApplication.getById(params.id);
+		const photo = await photoController.getById(params.id);
 		return NextResponse.json({
 			success: true,
 			message: "Successfully fetched photo.",
@@ -44,7 +44,7 @@ export async function DELETE(
 			throw new UnauthorizedError();
 		}
 
-		await photoDomain.photosApplication.deleteById(params.id, actorId);
+		await photoController.deleteById(params.id, actorId);
 
 		return NextResponse.json({
 			success: true,
@@ -87,3 +87,4 @@ function mapRouteError(error: unknown, fallbackMessage: string): NextResponse {
 		{ status: 500 }
 	);
 }
+

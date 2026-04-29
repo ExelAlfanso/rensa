@@ -6,3 +6,4 @@ export interface OpenApiFragment {
 	paths?: Record<string, Record<string, unknown>>;
 	tags?: Array<{ name: string; description?: string }>;
 }
+

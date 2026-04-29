@@ -1,11 +1,11 @@
-import { eq } from "drizzle-orm";
+import { UserRepository } from "@rensa/db/queries/user.repository";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { users } from "@/backend/db/schema";
 import { authOptions } from "@/lib/auth";
 import cloudinary from "@/lib/cloudinary";
-import db from "@/lib/drizzle";
 import { compressImageUnder10MB } from "../../photos/upload/route";
+
+const userRepository = new UserRepository();
 
 /*
   GET /api/profile/[id]
@@ -17,16 +17,7 @@ export async function GET(
 ) {
 	const { id } = await context.params;
 	try {
-		const [user] = await db
-			.select({
-				avatar: users.avatar,
-				email: users.email,
-				userId: users.userId,
-				username: users.username,
-			})
-			.from(users)
-			.where(eq(users.userId, id))
-			.limit(1);
+		const user = await userRepository.getProfileById(id);
 
 		if (!user) {
 			return NextResponse.json(
@@ -41,7 +32,7 @@ export async function GET(
 				message: "Successfully fetched user profile!",
 				data: {
 					user: {
-						id: user.userId,
+						id: user.id,
 						username: user.username,
 						email: user.email,
 						avatar: user.avatar ?? undefined,
@@ -92,14 +83,7 @@ export async function POST(req: Request) {
 			email = String(body.email ?? "");
 		}
 
-		const [user] = await db
-			.select({
-				avatar: users.avatar,
-				userId: users.userId,
-			})
-			.from(users)
-			.where(eq(users.userId, id))
-			.limit(1);
+		const user = await userRepository.getProfileById(id);
 
 		if (!user) {
 			return NextResponse.json(
@@ -108,7 +92,7 @@ export async function POST(req: Request) {
 			);
 		}
 
-		if (user.userId !== session.user.id) {
+		if (user.id !== session.user.id) {
 			return NextResponse.json(
 				{ success: false, message: "Unauthorized to update this profile" },
 				{ status: 403 }
@@ -171,21 +155,12 @@ export async function POST(req: Request) {
 			}
 		}
 
-		const [updatedUser] = await db
-			.update(users)
-			.set({
-				username,
-				email,
-				avatar: avatarUrl,
-				updatedAt: new Date(),
-			})
-			.where(eq(users.userId, id))
-			.returning({
-				avatar: users.avatar,
-				email: users.email,
-				userId: users.userId,
-				username: users.username,
-			});
+		const updatedUser = await userRepository.updateProfile({
+			avatar: avatarUrl,
+			email,
+			userId: id,
+			username,
+		});
 
 		if (!updatedUser) {
 			return NextResponse.json(
@@ -200,7 +175,7 @@ export async function POST(req: Request) {
 				message: "Successfully updated user profile!",
 				data: {
 					user: {
-						id: updatedUser.userId,
+						id: updatedUser.id,
 						username: updatedUser.username,
 						email: updatedUser.email,
 						avatar: updatedUser.avatar ?? undefined,
@@ -217,3 +192,6 @@ export async function POST(req: Request) {
 		);
 	}
 }
+
+
+

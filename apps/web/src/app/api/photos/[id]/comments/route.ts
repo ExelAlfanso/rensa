@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { ZodError } from "zod";
 import { BackendError } from "@/backend/common/backend.error";
-import { commentDomain } from "@/backend/domains/comments/module";
+import { commentController } from "@/backend/services/comments/controller";
 import {
 	commentPhotoParamsDto,
 	createCommentDto,
@@ -23,7 +23,7 @@ export async function POST(
 		const body = createCommentDto.parse(await request.json());
 		const session = await getServerSession(authOptions);
 		const actorId = session?.user?.id;
-		const newComment = await commentDomain.commentsApplication.createForPhoto(
+		const newComment = await commentController.createForPhoto(
 			params.id,
 			body,
 			actorId
@@ -57,7 +57,7 @@ export async function GET(
 			offset: searchParams.get("offset") ?? undefined,
 			limit: searchParams.get("limit") ?? undefined,
 		});
-		const result = await commentDomain.commentsApplication.listByPhotoId(
+		const result = await commentController.listByPhotoId(
 			params.id,
 			query.offset,
 			query.limit
@@ -108,3 +108,4 @@ function mapRouteError(error: unknown, fallbackMessage: string): NextResponse {
 		{ status: 500 }
 	);
 }
+

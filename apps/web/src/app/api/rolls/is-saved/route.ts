@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { ZodError } from "zod";
 import { BackendError } from "@/backend/common/backend.error";
-import { rollDomain } from "@/backend/domains/rolls/module";
+import { rollController } from "@/backend/services/rolls/controller";
 import { isSavedQueryDto } from "@/backend/dtos/roll.dto";
 import { authOptions } from "@/lib/auth";
 
@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
 			photoId: searchParams.get("photoId") ?? undefined,
 		});
 
-		const result = await rollDomain.rollsApplication.listContainingPhoto(
+		const result = await rollController.listContainingPhoto(
 			query.photoId,
 			actorId
 		);
@@ -57,3 +57,4 @@ export async function GET(req: NextRequest) {
 		);
 	}
 }
+

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { BackendError } from "@/backend/common/backend.error";
-import { photoDomain } from "@/backend/domains/photos/module";
+import { photoController } from "@/backend/services/photos/controller";
 import { photoBookmarkQueryDto } from "@/backend/dtos/photo.dto";
 
 /*
@@ -16,7 +16,7 @@ export async function GET(req: Request) {
 			limit: searchParams.get("limit") ?? undefined,
 		});
 
-		const result = await photoDomain.photosApplication.listBookmarkedByUser(
+		const result = await photoController.listBookmarkedByUser(
 			query.userId,
 			query.page,
 			query.limit
@@ -55,3 +55,4 @@ export async function GET(req: Request) {
 		);
 	}
 }
+

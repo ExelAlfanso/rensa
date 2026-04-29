@@ -5,7 +5,7 @@ import {
 	BackendError,
 	UnauthorizedError,
 } from "@/backend/common/backend.error";
-import { rollDomain } from "@/backend/domains/rolls/module";
+import { rollController } from "@/backend/services/rolls/controller";
 import { listRollsQueryDto, rollCreateDto } from "@/backend/dtos/roll.dto";
 import { authOptions } from "@/lib/auth";
 
@@ -19,7 +19,7 @@ export async function GET(req: Request) {
 			userId: searchParams.get("userId") ?? undefined,
 			sort: searchParams.get("sort") ?? undefined,
 		});
-		const result = await rollDomain.rollsApplication.listByUserId(
+		const result = await rollController.listByUserId(
 			query.userId,
 			query.sort
 		);
@@ -60,7 +60,7 @@ export async function POST(req: Request) {
 			imageUrl: rawBody.imageUrl,
 			user_id: rawBody.user_id ?? rawBody.userId,
 		});
-		const createdRoll = await rollDomain.rollsApplication.create(body, actorId);
+		const createdRoll = await rollController.create(body, actorId);
 		return NextResponse.json(
 			{
 				success: true,
@@ -102,3 +102,4 @@ function mapRouteError(error: unknown, fallbackMessage: string): NextResponse {
 		{ status: 500 }
 	);
 }
+

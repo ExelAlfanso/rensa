@@ -1,9 +1,9 @@
-import { eq } from "drizzle-orm";
+import { UserRepository } from "@rensa/db/queries/user.repository";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { type NextRequest, NextResponse } from "next/server";
-import { users } from "@/backend/db/schema";
-import { userDomain } from "@/backend/domains/users/module";
-import db from "@/lib/drizzle";
+import { userController } from "@/backend/services/users/controller";
+
+const userRepository = new UserRepository();
 
 interface VerifyTokenPayload extends JwtPayload {
 	email: string;
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
 		}
 
 		const { email } = payload;
-		const user = await userDomain.usersApplication.getByEmail(email);
+		const user = await userController.getByEmail(email);
 
 		if (!user) {
 			return NextResponse.json(
@@ -57,14 +57,7 @@ export async function POST(req: NextRequest) {
 			);
 		}
 
-		const [updated] = await db
-			.update(users)
-			.set({
-				updatedAt: new Date(),
-				verified: true,
-			})
-			.where(eq(users.email, email))
-			.returning({ id: users.userId });
+		const updated = await userRepository.verifyEmail(email);
 		if (!updated) {
 			return NextResponse.json(
 				{ success: false, message: "Failed to verify email" },
@@ -83,3 +76,6 @@ export async function POST(req: NextRequest) {
 		);
 	}
 }
+
+
+

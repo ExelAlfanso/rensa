@@ -6,4 +6,4 @@ Cross-domain backend building blocks:
 - pagination primitives
 - OpenAPI/documentation utilities
 
-Domain behavior should stay inside `src/backend/domains/<domain>`.
+Backend behavior should stay inside `src/backend/services/<feature>`.

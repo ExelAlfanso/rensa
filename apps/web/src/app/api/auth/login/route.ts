@@ -1,15 +1,15 @@
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
-import { rollDomain } from "@/backend/domains/rolls/module";
-import { userDomain } from "@/backend/domains/users/module";
+import { rollController } from "@/backend/services/rolls/controller";
+import { userController } from "@/backend/services/users/controller";
 import { loginLimiter } from "@/lib/rateLimiter";
 
 /*
   POST /api/auth/login
   User login endpoint
 */
-const usersApplication = userDomain.usersApplication;
-const rollsApplication = rollDomain.rollsApplication;
+const usersApplication = userController;
+const rollsApplication = rollController;
 export async function POST(req: Request) {
 	try {
 		const { email, password } = await req.json();
@@ -109,3 +109,4 @@ export async function POST(req: Request) {
 		);
 	}
 }
+

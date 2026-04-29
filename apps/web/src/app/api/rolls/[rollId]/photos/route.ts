@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { BackendError } from "@/backend/common/backend.error";
-import { rollDomain } from "@/backend/domains/rolls/module";
+import { rollController } from "@/backend/services/rolls/controller";
 import {
 	listRollPhotosQueryDto,
 	rollIdParamDto,
@@ -22,7 +22,7 @@ export async function GET(
 			limit: searchParams.get("limit") ?? undefined,
 		});
 
-		const result = await rollDomain.rollsApplication.listPhotos(
+		const result = await rollController.listPhotos(
 			params.rollId,
 			query
 		);
@@ -61,3 +61,4 @@ export async function GET(
 		);
 	}
 }
+

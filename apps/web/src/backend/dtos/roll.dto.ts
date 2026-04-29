@@ -60,3 +60,4 @@ export type RollCreateDto = z.infer<typeof rollCreateDto>;
 export type RollUpdateDto = z.infer<typeof rollUpdateDto>;
 export type RollResponseDto = z.infer<typeof rollResponseDto>;
 export type ListRollPhotosQueryDto = z.infer<typeof listRollPhotosQueryDto>;
+

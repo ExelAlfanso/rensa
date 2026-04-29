@@ -16,3 +16,4 @@ export const rollsOpenApiSchemaFragment: OpenApiFragment = {
 		},
 	},
 };
+

@@ -1,17 +1,16 @@
+import { PhotoRepository } from "@rensa/db/queries/photo.repository";
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import sharp from "sharp";
-import { photoMetadata, photos } from "@/backend/db/schema";
 import {
 	PHOTO_UPLOAD_COMPRESSION_MIN_QUALITY,
 	PHOTO_UPLOAD_COMPRESSION_QUALITY_STEP,
 	PHOTO_UPLOAD_COMPRESSION_START_QUALITY,
 	PHOTO_UPLOAD_MAX_DIMENSION_PX,
-} from "@/backend/domains/photos/configs/photo-upload.config";
+} from "@/backend/services/photos/configs/photo-upload.config";
 import { authOptions } from "@/lib/auth";
 import { fastApi } from "@/lib/axios-server";
 import cloudinary, { validateCloudinaryUrl } from "@/lib/cloudinary";
-import db from "@/lib/drizzle";
 import { photoUploadLimiter } from "@/lib/rateLimiter";
 import { sanitizeInput } from "@/lib/validation";
 import {
@@ -20,6 +19,8 @@ import {
 	PHOTO_UPLOAD_MAX_INPUT_SIZE_MB,
 	PHOTO_UPLOAD_TARGET_OUTPUT_SIZE_BYTES,
 } from "@/shared/configs/photo-upload.config";
+
+const photoRepository = new PhotoRepository();
 
 export async function compressImageUnder10MB(buffer: Buffer): Promise<Buffer> {
 	let quality = PHOTO_UPLOAD_COMPRESSION_START_QUALITY;
@@ -85,7 +86,7 @@ export async function POST(req: Request) {
 		const file = formData.get("file") as File;
 		const userId = session.user.id;
 
-		// 🔒 SECURITY: Sanitize and validate all photo metadata
+		// ðŸ”’ SECURITY: Sanitize and validate all photo metadata
 		const rawTitle = formData.get("title") as string;
 		const rawDescription = formData.get("description") as string;
 		const rawCategory = formData.get("category") as string;
@@ -285,20 +286,25 @@ export async function POST(req: Request) {
 			);
 		}
 
-		const [photo] = await db
-			.insert(photos)
-			.values({
-				userId,
-				url: secure_url,
-				title,
-				description,
-				category,
-				style,
-				color,
+		let photo;
+		try {
+			photo = await photoRepository.createUploadedPhoto({
 				camera,
-			})
-			.returning();
-		if (!photo) {
+				category,
+				color,
+				description,
+				format,
+				height,
+				size: bytes,
+				style,
+				title,
+				uploadedAt: new Date(created_at),
+				url: secure_url,
+				userId,
+				width,
+			});
+		} catch (persistError) {
+			console.error("Failed to persist uploaded photo:", persistError);
 			return NextResponse.json(
 				{
 					success: false,
@@ -306,31 +312,6 @@ export async function POST(req: Request) {
 				},
 				{ status: 500 }
 			);
-		}
-
-		try {
-			await db
-				.insert(photoMetadata)
-				.values({
-					photoMetadataId: photo.photoId,
-					width,
-					height,
-					format,
-					size: bytes,
-					uploadedAt: new Date(created_at),
-				})
-				.onConflictDoUpdate({
-					target: photoMetadata.photoMetadataId,
-					set: {
-						width,
-						height,
-						format,
-						size: bytes,
-						uploadedAt: new Date(created_at),
-					},
-				});
-		} catch (metadataError) {
-			console.error("Failed to persist photo metadata:", metadataError);
 		}
 
 		return NextResponse.json({
@@ -363,3 +344,4 @@ export async function POST(req: Request) {
 		return NextResponse.json({ success: false, error: err }, { status: 500 });
 	}
 }
+

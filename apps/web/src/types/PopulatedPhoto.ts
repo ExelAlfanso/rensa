@@ -23,3 +23,4 @@ export interface PopulatedPhoto {
 	url: string;
 	userId: PopulatedPhotoUser;
 }
+

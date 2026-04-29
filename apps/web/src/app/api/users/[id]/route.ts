@@ -5,7 +5,7 @@ import {
 	BackendError,
 	UnauthorizedError,
 } from "@/backend/common/backend.error";
-import { userDomain } from "@/backend/domains/users/module";
+import { userController } from "@/backend/services/users/controller";
 import { userIdParamDto } from "@/backend/dtos/user.dto";
 import { authOptions } from "@/lib/auth";
 
@@ -24,7 +24,7 @@ export async function GET(
 			throw new UnauthorizedError();
 		}
 
-		const user = await userDomain.usersApplication.getById(params.id, actorId);
+		const user = await userController.getById(params.id, actorId);
 		return NextResponse.json(
 			{
 				success: true,
@@ -62,3 +62,4 @@ export async function GET(
 		);
 	}
 }
+

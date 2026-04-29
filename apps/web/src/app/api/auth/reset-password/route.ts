@@ -1,10 +1,10 @@
+import { UserRepository } from "@rensa/db/queries/user.repository";
 import bcrypt from "bcryptjs";
-import { and, eq } from "drizzle-orm";
 import jwt from "jsonwebtoken";
 import { type NextRequest, NextResponse } from "next/server";
-import { users } from "@/backend/db/schema";
-import db from "@/lib/drizzle";
 import { resetPasswordLimiter } from "@/lib/rateLimiter";
+
+const userRepository = new UserRepository();
 
 /*
   POST /api/auth/reset-password
@@ -87,15 +87,11 @@ export async function POST(req: NextRequest) {
 		}
 
 		const hashedPassword = await bcrypt.hash(password, 10);
-		const [updated] = await db
-			.update(users)
-			.set({
-				password: hashedPassword,
-				passwordChangedAt: new Date(),
-				updatedAt: new Date(),
-			})
-			.where(and(eq(users.email, payload.email), eq(users.userId, payload.id)))
-			.returning({ id: users.userId });
+		const updated = await userRepository.resetPassword({
+			email: payload.email,
+			password: hashedPassword,
+			userId: payload.id,
+		});
 
 		if (!updated) {
 			return NextResponse.json(
@@ -116,3 +112,6 @@ export async function POST(req: NextRequest) {
 		);
 	}
 }
+
+
+

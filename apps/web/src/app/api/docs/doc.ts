@@ -16,3 +16,4 @@ export const docsRouteFragment: OpenApiFragment = {
 		},
 	},
 };
+

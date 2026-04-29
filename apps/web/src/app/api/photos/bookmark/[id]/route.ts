@@ -5,7 +5,7 @@ import {
 	BackendError,
 	UnauthorizedError,
 } from "@/backend/common/backend.error";
-import { bookmarkDomain } from "@/backend/domains/bookmarks/module";
+import { bookmarkController } from "@/backend/services/bookmarks/controller";
 import { bookmarkActionDto } from "@/backend/dtos/bookmark.dto";
 import { photoIdParamDto } from "@/backend/dtos/photo.dto";
 import { authOptions } from "@/lib/auth";
@@ -26,7 +26,7 @@ export async function POST(
 			throw new UnauthorizedError();
 		}
 
-		const result = await bookmarkDomain.bookmarksApplication.updateBookmark({
+		const result = await bookmarkController.updateBookmark({
 			photoId: params.id,
 			userId: body.userId,
 			action: body.action,
@@ -68,3 +68,4 @@ export async function POST(
 		);
 	}
 }
+

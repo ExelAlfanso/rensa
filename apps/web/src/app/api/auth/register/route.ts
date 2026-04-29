@@ -1,12 +1,12 @@
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
-import { rollDomain } from "@/backend/domains/rolls/module";
-import { userDomain } from "@/backend/domains/users/module";
+import { rollController } from "@/backend/services/rolls/controller";
+import { userController } from "@/backend/services/users/controller";
 import { registerLimiter } from "@/lib/rateLimiter";
 
-const usersApplication = userDomain.usersApplication;
-const rollsApplication = rollDomain.rollsApplication;
+const usersApplication = userController;
+const rollsApplication = rollController;
 
 /*
   POST /api/auth/register
@@ -88,3 +88,4 @@ export async function POST(req: Request) {
 		);
 	}
 }
+

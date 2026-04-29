@@ -1,4 +1,11 @@
-﻿import { DrizzleAdapter } from "@auth/drizzle-adapter";
+import { DrizzleAdapter } from "@auth/drizzle-adapter";
+import db from "@rensa/db";
+import {
+	authAccounts,
+	authSessions,
+	authUsers,
+	authVerificationTokens,
+} from "@rensa/db/schema";
 import bcrypt from "bcryptjs";
 import type {
 	DefaultSession,
@@ -7,14 +14,7 @@ import type {
 	Session,
 } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import {
-	authAccounts,
-	authSessions,
-	authUsers,
-	authVerificationTokens,
-} from "@/backend/db/schema";
-import { userDomain } from "../backend/domains/users/module";
-import db from "./drizzle";
+import { userController } from "../backend/services/users/controller";
 
 declare module "next-auth" {
 	interface Session {
@@ -54,7 +54,7 @@ export const authOptions: NextAuthOptions = {
 					throw new Error("Email and password are required");
 				}
 
-				const user = await userDomain.usersApplication.getByEmail(
+				const user = await userController.getByEmail(
 					credentials.email
 				);
 				if (!user) {
@@ -128,3 +128,4 @@ export const authOptions: NextAuthOptions = {
 	},
 	debug: process.env.NODE_ENV === "development",
 };
+

@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
-import { notificationDomain } from "@/backend/domains/notifications/module";
+import { notificationController } from "@/backend/services/notifications/controller";
 import {
 	createNotificationDto,
 	listNotificationsQueryDto,
@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
 			limit: searchParams.get("limit") ?? undefined,
 		});
 		const notifications =
-			await notificationDomain.notificationsApplication.list(query);
+			await notificationController.list(query);
 
 		return NextResponse.json(
 			{
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
 	try {
 		const payload = createNotificationDto.parse(await req.json());
 		const response =
-			await notificationDomain.notificationsApplication.create(payload);
+			await notificationController.create(payload);
 
 		return NextResponse.json(
 			{
@@ -70,3 +70,4 @@ function mapRouteError(error: unknown, fallbackMessage: string): NextResponse {
 		{ status: 500 }
 	);
 }
+
