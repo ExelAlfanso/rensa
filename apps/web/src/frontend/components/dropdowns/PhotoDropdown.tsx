@@ -5,8 +5,8 @@ import PhotoDropdownContainer, {
 
 export type PhotoDropdownProps = PhotoDropdownContainerProps;
 
-const PhotoDropdown: React.FC<PhotoDropdownProps> = (props) => {
-	return <PhotoDropdownContainer {...props} />;
-};
+const PhotoDropdown: React.FC<PhotoDropdownProps> = (props) => (
+	<PhotoDropdownContainer {...props} />
+);
 
 export default PhotoDropdown;

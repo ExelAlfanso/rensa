@@ -2,8 +2,6 @@
 
 import NotificationDropdownContainer from "@/frontend/features/notifications/containers/NotificationDropdownContainer";
 
-const NotificationDropdown = () => {
-	return <NotificationDropdownContainer />;
-};
+const NotificationDropdown = () => <NotificationDropdownContainer />;
 
 export default NotificationDropdown;

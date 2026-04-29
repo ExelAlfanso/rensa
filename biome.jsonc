@@ -6,7 +6,35 @@
     "useIgnoreFile": true
   },
   "files": {
-    "ignoreUnknown": false
+    "ignoreUnknown": false,
+    "includes": [
+      "!pnpm-lock.yaml",
+      "!apps/web/coverage",
+      "!apps/web/.next",
+      "!apps/web/out",
+      "!apps/web/build",
+      "!apps/web/.vercel",
+      "!apps/web/**/*.tsbuildinfo",
+      "!apps/web/next-env.d.ts",
+      "!apps/notifications/coverage",
+      "!apps/notifications/.next",
+      "!apps/notifications/out",
+      "!apps/notifications/build",
+      "!apps/notifications/.vercel",
+      "!apps/notifications/**/*.trace",
+      "!apps/notifications/**/*.zip",
+      "!apps/notifications/**/*.tar.gz",
+      "!apps/notifications/**/*.tgz",
+      "!apps/notifications/package-lock.json",
+      "!apps/notifications/**/*.bun",
+      "!apps/exif/uploads",
+      "!apps/exif/logs",
+      "!apps/exif/dist",
+      "!apps/exif/build",
+      "!apps/exif/.vscode",
+      "!apps/exif/.idea",
+      "!apps/ai/samples"
+    ]
   },
   "formatter": {
     "enabled": true,
@@ -44,6 +72,11 @@
   "javascript": {
     "formatter": {
       "quoteStyle": "double"
+    }
+  },
+  "json": {
+    "parser": {
+      "allowComments": true
     }
   },
   "assist": {

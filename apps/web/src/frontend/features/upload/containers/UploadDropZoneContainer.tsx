@@ -21,19 +21,17 @@ const UploadDropZoneContainer: React.FC<UploadDropZoneContainerProps> = ({
 	fileInputRef,
 	handleFileChange,
 	content,
-}) => {
-	return (
-		<UploadDropZoneView
-			content={content}
-			fileInputRef={fileInputRef}
-			isDragOver={isDragOver}
-			isUploading={isUploading}
-			onDragLeave={handleDragLeave}
-			onDragOver={handleDragOver}
-			onDrop={handleDrop}
-			onFileChange={handleFileChange}
-		/>
-	);
-};
+}) => (
+	<UploadDropZoneView
+		content={content}
+		fileInputRef={fileInputRef}
+		isDragOver={isDragOver}
+		isUploading={isUploading}
+		onDragLeave={handleDragLeave}
+		onDragOver={handleDragOver}
+		onDrop={handleDrop}
+		onFileChange={handleFileChange}
+	/>
+);
 
 export default UploadDropZoneContainer;

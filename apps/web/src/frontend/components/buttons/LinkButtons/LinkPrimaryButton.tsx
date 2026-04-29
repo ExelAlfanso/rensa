@@ -9,12 +9,10 @@ const LinkPrimaryButton: React.FC<LinkButtonProps> = ({
 	href,
 	className,
 	children,
-}) => {
-	return (
-		<PrimaryButton className={className} href={href}>
-			{children}
-		</PrimaryButton>
-	);
-};
+}) => (
+	<PrimaryButton className={className} href={href}>
+		{children}
+	</PrimaryButton>
+);
 
 export default LinkPrimaryButton;

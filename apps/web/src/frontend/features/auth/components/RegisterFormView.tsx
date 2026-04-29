@@ -25,57 +25,55 @@ const RegisterFormView: React.FC<RegisterFormViewProps> = ({
 	form,
 	onChange,
 	onSubmit,
-}) => {
-	return (
-		<AuthFormLayout
-			button={
-				<PrimaryButton className="my-7 h-13 md:h-15.5" type="submit">
-					Register
-				</PrimaryButton>
-			}
-			error={error}
-			footer={
-				<span className="flex items-center justify-center gap-1 text-gray-700">
-					Have an account?
-					<Link className="text-orange-500" href="/login">
-						Login
-					</Link>
-				</span>
-			}
-			onSubmit={onSubmit}
-			title="Register"
-		>
-			<TextInputField
-				name="username"
-				onChange={(event) => onChange("username", event.target.value)}
-				placeholder="Username"
-				type="text"
-				value={form.username}
-			/>
-			<TextInputField
-				name="email"
-				onChange={(event) => onChange("email", event.target.value)}
-				placeholder="Email"
-				type="email"
-				value={form.email}
-			/>
-			<TextInputField
-				name="password"
-				onChange={(event) => onChange("password", event.target.value)}
-				placeholder="Password"
-				type="password"
-				value={form.password}
-			/>
-			<TextInputField
-				name="confirmPassword"
-				onChange={(event) => onChange("confirmPassword", event.target.value)}
-				placeholder="Confirm Password"
-				type="password"
-				value={form.confirmPassword}
-			/>
-		</AuthFormLayout>
-	);
-};
+}) => (
+	<AuthFormLayout
+		button={
+			<PrimaryButton className="my-7 h-13 md:h-15.5" type="submit">
+				Register
+			</PrimaryButton>
+		}
+		error={error}
+		footer={
+			<span className="flex items-center justify-center gap-1 text-gray-700">
+				Have an account?
+				<Link className="text-orange-500" href="/login">
+					Login
+				</Link>
+			</span>
+		}
+		onSubmit={onSubmit}
+		title="Register"
+	>
+		<TextInputField
+			name="username"
+			onChange={(event) => onChange("username", event.target.value)}
+			placeholder="Username"
+			type="text"
+			value={form.username}
+		/>
+		<TextInputField
+			name="email"
+			onChange={(event) => onChange("email", event.target.value)}
+			placeholder="Email"
+			type="email"
+			value={form.email}
+		/>
+		<TextInputField
+			name="password"
+			onChange={(event) => onChange("password", event.target.value)}
+			placeholder="Password"
+			type="password"
+			value={form.password}
+		/>
+		<TextInputField
+			name="confirmPassword"
+			onChange={(event) => onChange("confirmPassword", event.target.value)}
+			placeholder="Confirm Password"
+			type="password"
+			value={form.confirmPassword}
+		/>
+	</AuthFormLayout>
+);
 
 export type { RegisterFormState };
 export default RegisterFormView;

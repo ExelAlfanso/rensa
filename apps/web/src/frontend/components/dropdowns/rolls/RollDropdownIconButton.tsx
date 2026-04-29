@@ -9,8 +9,6 @@ export type RollDropdownIconButtonProps = RollDropdownIconButtonContainerProps;
 
 const RollDropdownIconButton: React.FC<RollDropdownIconButtonProps> = (
 	props
-) => {
-	return <RollDropdownIconButtonContainer {...props} />;
-};
+) => <RollDropdownIconButtonContainer {...props} />;
 
 export default RollDropdownIconButton;

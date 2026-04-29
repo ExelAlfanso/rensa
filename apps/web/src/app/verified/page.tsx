@@ -13,16 +13,12 @@ export const metadata: Metadata = {
 };
 
 async function checkTokenValidity(token?: string) {
-	try {
-		const secret = process.env.NEXTAUTH_SECRET;
-		if (!(token && secret)) {
-			return false;
-		}
-		await api.post("/auth/verify-email", { token });
-		return true;
-	} catch (_err) {
+	const secret = process.env.NEXTAUTH_SECRET;
+	if (!(token && secret)) {
 		return false;
 	}
+	await api.post("/auth/verify-email", { token });
+	return true;
 }
 
 export default async function VerifiedPage({

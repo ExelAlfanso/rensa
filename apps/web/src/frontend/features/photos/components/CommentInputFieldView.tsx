@@ -15,33 +15,31 @@ const CommentInputFieldView: React.FC<CommentInputFieldViewProps> = ({
 	onChangeComment,
 	onSubmit,
 	userExists,
-}) => {
-	return (
-		<div className="relative mt-4">
-			<InputField
-				disabled={!userExists}
-				Icon={ChatTeardropIcon}
-				iconPosition="left"
-				onChange={(e) => onChangeComment(e.target.value)}
-				onKeyDown={(e) => {
-					if (e.key === "Enter") {
-						e.preventDefault();
-						onSubmit().catch(() => undefined);
-					}
-				}}
-				placeholder={`  ${userExists ? "Comment" : "Log in to comment..."}`}
-				size="m"
-				type="text"
-				value={comment}
+}) => (
+	<div className="relative mt-4">
+		<InputField
+			disabled={!userExists}
+			Icon={ChatTeardropIcon}
+			iconPosition="left"
+			onChange={(e) => onChangeComment(e.target.value)}
+			onKeyDown={(e) => {
+				if (e.key === "Enter") {
+					e.preventDefault();
+					onSubmit().catch(() => undefined);
+				}
+			}}
+			placeholder={`  ${userExists ? "Comment" : "Log in to comment..."}`}
+			size="m"
+			type="text"
+			value={comment}
+		/>
+		{!userExists && (
+			<Link
+				className="absolute top-0 left-0 h-full w-full rounded-3xl bg-transparent transition-all duration-200 hover:bg-gray-50 hover:opacity-50"
+				href="/login"
 			/>
-			{!userExists && (
-				<Link
-					className="absolute top-0 left-0 h-full w-full rounded-3xl bg-transparent transition-all duration-200 hover:bg-gray-50 hover:opacity-50"
-					href="/login"
-				/>
-			)}
-		</div>
-	);
-};
+		)}
+	</div>
+);
 
 export default CommentInputFieldView;

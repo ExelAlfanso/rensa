@@ -10,10 +10,8 @@ type ExploreTabsProps = ExploreTabsContainerProps;
 const ExploreTabs: React.FC<ExploreTabsProps> = ({
 	className,
 	setActiveTab,
-}) => {
-	return (
-		<ExploreTabsContainer className={className} setActiveTab={setActiveTab} />
-	);
-};
+}) => (
+	<ExploreTabsContainer className={className} setActiveTab={setActiveTab} />
+);
 
 export default ExploreTabs;

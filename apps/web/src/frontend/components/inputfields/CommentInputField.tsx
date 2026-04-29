@@ -10,8 +10,8 @@ export interface CommentInputFieldProps
 	onAddComment: (c: CommentType) => void;
 }
 
-const CommentInputField: React.FC<CommentInputFieldProps> = (props) => {
-	return <CommentInputFieldContainer {...props} />;
-};
+const CommentInputField: React.FC<CommentInputFieldProps> = (props) => (
+	<CommentInputFieldContainer {...props} />
+);
 
 export default CommentInputField;

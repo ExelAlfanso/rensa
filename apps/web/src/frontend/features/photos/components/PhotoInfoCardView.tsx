@@ -56,60 +56,58 @@ const PhotoInfoCardView: React.FC<PhotoInfoCardViewProps> = ({
 	isDropdownOpen,
 	setIsDropdownOpen,
 	onSaveToggle,
-}) => {
-	return (
-		<div
-			className={cn(
-				"flex w-full flex-col gap-1.5 rounded-3xl bg-white-200 p-10 text-primary shadow-lg lg:max-w-3xl xl:w-[40%]",
-				className
-			)}
-			id={id}
-		>
-			{userId && (
-				<div className="inline-flex w-full items-center justify-between">
-					<BookmarkToggleContainer
-						initialBookmarks={initialBookmarks}
-						photoId={id}
-					/>
-					<div className="inline-flex gap-5">
-						<RollDropdownIconButton
-							disabled={isLoading || isSaved}
-							isOpen={isDropdownOpen}
-							savedToRolls={savedToRolls}
-							selectedRoll={selectedRoll}
-							setIsOpen={setIsDropdownOpen}
-							setSelectedRoll={setSelectedRoll}
-						/>
-						<PrimaryButton onClick={onSaveToggle}>
-							{isSaved ? "Saved" : "Save"}
-						</PrimaryButton>
-
-						<PhotoDropdown isOwner={isOwner} photoId={id} />
-					</div>
-				</div>
-			)}
-			<div className="mb-9">
-				<div className="mb-7">
-					<Text className="text-white-700" size="s">
-						{formatDate(metadata?.uploadedAt || "")}
-					</Text>
-					<Heading size="m">{title}</Heading>
-				</div>
-				<ProfileBadge
-					alt={profileUsername}
-					avatarUrl={profileAvatarUrl}
-					className="mb-5"
-					href={`/profile/${ownerId}`}
-					username={profileUsername || "loading..."}
+}) => (
+	<div
+		className={cn(
+			"flex w-full flex-col gap-1.5 rounded-3xl bg-white-200 p-10 text-primary shadow-lg lg:max-w-3xl xl:w-[40%]",
+			className
+		)}
+		id={id}
+	>
+		{userId && (
+			<div className="inline-flex w-full items-center justify-between">
+				<BookmarkToggleContainer
+					initialBookmarks={initialBookmarks}
+					photoId={id}
 				/>
-				<p className="max-w-87.5 text-[16px] text-black-200">{description}</p>
+				<div className="inline-flex gap-5">
+					<RollDropdownIconButton
+						disabled={isLoading || isSaved}
+						isOpen={isDropdownOpen}
+						savedToRolls={savedToRolls}
+						selectedRoll={selectedRoll}
+						setIsOpen={setIsDropdownOpen}
+						setSelectedRoll={setSelectedRoll}
+					/>
+					<PrimaryButton onClick={onSaveToggle}>
+						{isSaved ? "Saved" : "Save"}
+					</PrimaryButton>
+
+					<PhotoDropdown isOwner={isOwner} photoId={id} />
+				</div>
 			</div>
-			<div>
-				<RecipeList metadata={metadata} />
+		)}
+		<div className="mb-9">
+			<div className="mb-7">
+				<Text className="text-white-700" size="s">
+					{formatDate(metadata?.uploadedAt || "")}
+				</Text>
+				<Heading size="m">{title}</Heading>
 			</div>
-			<CommentSection id={id} />
+			<ProfileBadge
+				alt={profileUsername}
+				avatarUrl={profileAvatarUrl}
+				className="mb-5"
+				href={`/profile/${ownerId}`}
+				username={profileUsername || "loading..."}
+			/>
+			<p className="max-w-87.5 text-[16px] text-black-200">{description}</p>
 		</div>
-	);
-};
+		<div>
+			<RecipeList metadata={metadata} />
+		</div>
+		<CommentSection id={id} />
+	</div>
+);
 
 export default PhotoInfoCardView;

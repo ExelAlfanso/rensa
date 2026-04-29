@@ -4,7 +4,6 @@ import { notificationController } from "./notifications/notification.controller"
 import { websocketController } from "./websocket/websocket.controller";
 
 export const apiController = new Elysia({ prefix: "/api" })
-  .use(websocketController)
-  .use(notificationController)
-  .use(exifController);
-
+	.use(websocketController)
+	.use(notificationController)
+	.use(exifController);

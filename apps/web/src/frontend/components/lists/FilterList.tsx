@@ -7,8 +7,8 @@ interface FilterListProps {
 	onFilterChange: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-const FilterList: React.FC<FilterListProps> = ({ ...props }) => {
-	return <FilterListContainer {...props} />;
-};
+const FilterList: React.FC<FilterListProps> = ({ ...props }) => (
+	<FilterListContainer {...props} />
+);
 
 export default FilterList;

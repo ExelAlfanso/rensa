@@ -17,32 +17,30 @@ const RollPageDropdownView: React.FC<RollPageDropdownViewProps> = ({
 	onDelete,
 	onRename,
 	onShare,
-}) => {
-	return (
-		<div className="z-20">
-			<IconDropdown
-				className="no-scrollbar flex max-h-40 flex-col items-center justify-center overflow-y-auto font-figtree font-semibold"
-				closeOnItemClick={false}
-				iconSize={48}
-				Tag={DotsThreeCircleIcon}
-				weight="light"
-			>
-				{isOwner && (
-					<DropdownItem className="px-10" onClick={onRename}>
-						Rename
-					</DropdownItem>
-				)}
-				<DropdownItem className="px-10" onClick={onShare}>
-					Share
+}) => (
+	<div className="z-20">
+		<IconDropdown
+			className="no-scrollbar flex max-h-40 flex-col items-center justify-center overflow-y-auto font-figtree font-semibold"
+			closeOnItemClick={false}
+			iconSize={48}
+			Tag={DotsThreeCircleIcon}
+			weight="light"
+		>
+			{isOwner && (
+				<DropdownItem className="px-10" onClick={onRename}>
+					Rename
 				</DropdownItem>
-				{isOwner && (
-					<DropdownItem className="px-10" onClick={onDelete}>
-						Delete
-					</DropdownItem>
-				)}
-			</IconDropdown>
-		</div>
-	);
-};
+			)}
+			<DropdownItem className="px-10" onClick={onShare}>
+				Share
+			</DropdownItem>
+			{isOwner && (
+				<DropdownItem className="px-10" onClick={onDelete}>
+					Delete
+				</DropdownItem>
+			)}
+		</IconDropdown>
+	</div>
+);
 
 export default RollPageDropdownView;

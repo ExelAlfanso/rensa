@@ -18,53 +18,51 @@ interface AccountDropdownProps {
 	} | null;
 }
 
-const AccountDropdown = ({ src, user }: AccountDropdownProps) => {
-	return (
-		<div className="relative z-50">
-			<IconDropdown
-				closeOnItemClick={false}
-				iconSize={24}
-				position="left"
-				Tag={CaretDownIcon}
-				weight="regular"
+const AccountDropdown = ({ src, user }: AccountDropdownProps) => (
+	<div className="relative z-50">
+		<IconDropdown
+			closeOnItemClick={false}
+			iconSize={24}
+			position="left"
+			Tag={CaretDownIcon}
+			weight="regular"
+		>
+			<DropdownItem
+				className="flex flex-col items-start justify-start gap-2 rounded-t-2xl"
+				href={`/profile/${user?.id}`}
 			>
-				<DropdownItem
-					className="flex flex-col items-start justify-start gap-2 rounded-t-2xl"
-					href={`/profile/${user?.id}`}
-				>
-					<div className="flex flex-row items-center justify-center gap-3">
-						<div className="relative h-10 w-10 rounded-full md:h-12 md:w-12">
-							<Image
-								alt="Profile"
-								className="aspect-square rounded-full object-cover"
-								fill
-								src={src}
-							/>
-						</div>
-						<div className="flex flex-col items-start justify-center">
-							<Text size="s">{user?.name}</Text>
-							<Text className="font-light text-gray-600" size="s">
-								Free Plan
-							</Text>
-						</div>
+				<div className="flex flex-row items-center justify-center gap-3">
+					<div className="relative h-10 w-10 rounded-full md:h-12 md:w-12">
+						<Image
+							alt="Profile"
+							className="aspect-square rounded-full object-cover"
+							fill
+							src={src}
+						/>
 					</div>
+					<div className="flex flex-col items-start justify-center">
+						<Text size="s">{user?.name}</Text>
+						<Text className="font-light text-gray-600" size="s">
+							Free Plan
+						</Text>
+					</div>
+				</div>
+			</DropdownItem>
+			<div className="my-2 w-[90%] border-white-700 border-t" />
+			{accountDropdownDatas.map((item, idx) => (
+				<DropdownItem
+					className={cn(
+						idx === accountDropdownDatas.length - 1 && "rounded-b-2xl"
+					)}
+					href={item.href}
+					key={idx}
+				>
+					<item.icon className="mr-2 h-6 w-6" />
+					<Text size="s">{item.title}</Text>
 				</DropdownItem>
-				<div className="my-2 w-[90%] border-white-700 border-t" />
-				{accountDropdownDatas.map((item, idx) => (
-					<DropdownItem
-						className={cn(
-							idx === accountDropdownDatas.length - 1 && "rounded-b-2xl"
-						)}
-						href={item.href}
-						key={idx}
-					>
-						<item.icon className="mr-2 h-6 w-6" />
-						<Text size="s">{item.title}</Text>
-					</DropdownItem>
-				))}
-			</IconDropdown>
-		</div>
-	);
-};
+			))}
+		</IconDropdown>
+	</div>
+);
 
 export default AccountDropdown;

@@ -12,8 +12,8 @@ export interface RollPagePhotoCardProps
 	rollId: string;
 }
 
-const RollPagePhotoCard: React.FC<RollPagePhotoCardProps> = (props) => {
-	return <RollPagePhotoCardContainer {...props} />;
-};
+const RollPagePhotoCard: React.FC<RollPagePhotoCardProps> = (props) => (
+	<RollPagePhotoCardContainer {...props} />
+);
 
 export default RollPagePhotoCard;

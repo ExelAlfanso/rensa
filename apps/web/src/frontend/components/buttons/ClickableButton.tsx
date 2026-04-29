@@ -10,19 +10,17 @@ interface CaretIconProps {
 	id?: string;
 }
 
-const CaretIcon: React.FC<CaretIconProps> = ({ id, className, children }) => {
-	return (
-		<div
-			className={cn(
-				"cursor-pointer transition-colors duration-300 hover:text-gray-800",
-				className
-			)}
-			id={id}
-		>
-			<CaretDownIcon size={32} />
-			{children}
-		</div>
-	);
-};
+const CaretIcon: React.FC<CaretIconProps> = ({ id, className, children }) => (
+	<div
+		className={cn(
+			"cursor-pointer transition-colors duration-300 hover:text-gray-800",
+			className
+		)}
+		id={id}
+	>
+		<CaretDownIcon size={32} />
+		{children}
+	</div>
+);
 
 export default CaretIcon;

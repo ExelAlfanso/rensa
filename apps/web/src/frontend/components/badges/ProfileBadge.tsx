@@ -18,18 +18,16 @@ const ProfileBadge: React.FC<ProfileBadgeProps> = ({
 	avatarUrl,
 	username,
 	href,
-}) => {
-	return (
-		<span className={cn("inline-flex items-center gap-3", className)}>
-			<ProfileIconButton
-				alt={alt}
-				href={href}
-				size={size}
-				src={avatarUrl || "/profile.jpg"}
-			/>
-			<h2 className="font-figtree text-[13px] text-black-200">@{username}</h2>
-		</span>
-	);
-};
+}) => (
+	<span className={cn("inline-flex items-center gap-3", className)}>
+		<ProfileIconButton
+			alt={alt}
+			href={href}
+			size={size}
+			src={avatarUrl || "/profile.jpg"}
+		/>
+		<h2 className="font-figtree text-[13px] text-black-200">@{username}</h2>
+	</span>
+);
 
 export default ProfileBadge;

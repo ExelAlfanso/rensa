@@ -37,49 +37,45 @@ const UploadPageView: React.FC<UploadPageViewProps> = ({
 	error,
 	photo,
 	formProps,
-}) => {
-	return (
-		<section className="w-full gap-2 px-5 md:px-10 xl:px-65">
-			<UploadSectionHeader
-				hasFile={hasFile}
-				isDetecting={isDetecting}
-				onBack={onBack}
-				onCancel={onCancel}
-				onUpload={onUpload}
-			/>
+}) => (
+	<section className="w-full gap-2 px-5 md:px-10 xl:px-65">
+		<UploadSectionHeader
+			hasFile={hasFile}
+			isDetecting={isDetecting}
+			onBack={onBack}
+			onCancel={onCancel}
+			onUpload={onUpload}
+		/>
 
-			{!hasFile && (
-				<h1
-					className="text-center font-forum text-[24px] text-primary"
-					id="upload-title"
-				>
-					Show us the scene that stayed with you.
+		{!hasFile && (
+			<h1
+				className="text-center font-forum text-[24px] text-primary"
+				id="upload-title"
+			>
+				Show us the scene that stayed with you.
+			</h1>
+		)}
+
+		{hasFile ? (
+			<section aria-labelledby="upload-editing-title" className="pt-15">
+				<h1 className="sr-only" id="upload-editing-title">
+					Upload details
 				</h1>
-			)}
-
-			{hasFile ? (
-				<section aria-labelledby="upload-editing-title" className="pt-15">
-					<h1 className="sr-only" id="upload-editing-title">
-						Upload details
-					</h1>
-					{error && (
-						<p className="mb-2 text-center font-figtree text-red-500">
-							{error}
-						</p>
-					)}
-					<div className="flex flex-col items-center justify-center gap-8 lg:flex-row lg:items-start">
-						<UploadPreviewPanel photo={photo} />
-						<UploadFormContainer {...formProps} />
-					</div>
-				</section>
-			) : (
-				<UploadDropZoneContainer
-					{...dropZoneProps}
-					content={<UploadDropZoneStatus {...dropZoneMessage} />}
-				/>
-			)}
-		</section>
-	);
-};
+				{error && (
+					<p className="mb-2 text-center font-figtree text-red-500">{error}</p>
+				)}
+				<div className="flex flex-col items-center justify-center gap-8 lg:flex-row lg:items-start">
+					<UploadPreviewPanel photo={photo} />
+					<UploadFormContainer {...formProps} />
+				</div>
+			</section>
+		) : (
+			<UploadDropZoneContainer
+				{...dropZoneProps}
+				content={<UploadDropZoneStatus {...dropZoneMessage} />}
+			/>
+		)}
+	</section>
+);
 
 export default UploadPageView;

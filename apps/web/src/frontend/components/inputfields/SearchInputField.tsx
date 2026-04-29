@@ -8,17 +8,15 @@ interface SearchInputFieldProps {
 	className?: string;
 }
 
-const SearchInputField: React.FC<SearchInputFieldProps> = ({ className }) => {
-	return (
-		<IconInputField
-			className={className}
-			Icon={MagnifyingGlassIcon}
-			iconPosition="right"
-			onChange={(e) => console.log(e.target.value)}
-			placeholder="Search"
-			type="text"
-		/>
-	);
-};
+const SearchInputField: React.FC<SearchInputFieldProps> = ({ className }) => (
+	<IconInputField
+		className={className}
+		Icon={MagnifyingGlassIcon}
+		iconPosition="right"
+		onChange={(e) => console.log(e.target.value)}
+		placeholder="Search"
+		type="text"
+	/>
+);
 
 export default SearchInputField;

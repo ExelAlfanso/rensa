@@ -27,7 +27,7 @@ interface IconDropdownProps {
 const IconDropdown: React.FC<IconDropdownProps> = ({
 	children,
 	iconSize = 32,
-	Tag = undefined,
+	Tag,
 	position = "center",
 	closeOnItemClick = true,
 	weight = "fill",

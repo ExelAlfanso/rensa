@@ -112,11 +112,7 @@
     "public.notification_type": {
       "name": "notification_type",
       "schema": "public",
-      "values": [
-        "photo-saved",
-        "photo-bookmarked",
-        "photo-commented"
-      ]
+      "values": ["photo-saved", "photo-bookmarked", "photo-commented"]
     }
   },
   "schemas": {},

@@ -5,8 +5,8 @@ import RollDropdownContainer, {
 
 type RollDropdownProps = RollDropdownContainerProps;
 
-const RollDropdown: React.FC<RollDropdownProps> = (props) => {
-	return <RollDropdownContainer {...props} />;
-};
+const RollDropdown: React.FC<RollDropdownProps> = (props) => (
+	<RollDropdownContainer {...props} />
+);
 
 export default RollDropdown;

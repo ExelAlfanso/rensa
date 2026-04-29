@@ -22,7 +22,7 @@ const CommentInputFieldContainer: React.FC<CommentInputFieldContainerProps> = ({
 			return;
 		}
 
-		const tempId = Math.random().toString(36).substr(2, 9);
+		const tempId = Math.random().toString(36).slice(2, 9);
 		const newComment: CommentType = {
 			comment_id: tempId,
 			text: comment,

@@ -17,13 +17,11 @@ const LinkIconButtonView: React.FC<LinkIconButtonViewProps> = ({
 	onClick,
 	children,
 	Icon,
-}) => {
-	return (
-		<Link className={className} href={href} onClick={onClick}>
-			{Icon && <Icon className="text-primary hover:text-black-200" size={32} />}
-			{children}
-		</Link>
-	);
-};
+}) => (
+	<Link className={className} href={href} onClick={onClick}>
+		{Icon && <Icon className="text-primary hover:text-black-200" size={32} />}
+		{children}
+	</Link>
+);
 
 export default LinkIconButtonView;

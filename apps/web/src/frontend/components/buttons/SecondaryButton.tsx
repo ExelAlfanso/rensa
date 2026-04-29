@@ -9,21 +9,19 @@ const SecondaryButton: React.FC<ButtonProps> = ({
 	children,
 	onClick,
 	type,
-}) => {
-	return (
-		<Button
-			className={cn(
-				"btn-secondary text-white hover:bg-orange-300 focus:bg-orange-700",
-				className
-			)}
-			href={href}
-			id={id}
-			onClick={onClick}
-			type={type}
-		>
-			{children}
-		</Button>
-	);
-};
+}) => (
+	<Button
+		className={cn(
+			"btn-secondary text-white hover:bg-orange-300 focus:bg-orange-700",
+			className
+		)}
+		href={href}
+		id={id}
+		onClick={onClick}
+		type={type}
+	>
+		{children}
+	</Button>
+);
 
 export default SecondaryButton;

@@ -6,8 +6,8 @@ import RollPageDropdownContainer, {
 
 type RollPageDropdownProps = RollPageDropdownContainerProps;
 
-const RollPageDropdown: React.FC<RollPageDropdownProps> = (props) => {
-	return <RollPageDropdownContainer {...props} />;
-};
+const RollPageDropdown: React.FC<RollPageDropdownProps> = (props) => (
+	<RollPageDropdownContainer {...props} />
+);
 
 export default RollPageDropdown;

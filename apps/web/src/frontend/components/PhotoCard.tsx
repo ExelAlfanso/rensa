@@ -5,8 +5,8 @@ import PhotoCardContainer, {
 
 export type PhotoCardProps = PhotoCardContainerProps;
 
-const PhotoCard: React.FC<PhotoCardProps> = (props) => {
-	return <PhotoCardContainer {...props} />;
-};
+const PhotoCard: React.FC<PhotoCardProps> = (props) => (
+	<PhotoCardContainer {...props} />
+);
 
 export default PhotoCard;

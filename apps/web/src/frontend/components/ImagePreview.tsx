@@ -16,20 +16,18 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({
 	alt,
 	width,
 	height,
-}) => {
-	return (
-		<div className="relative flex flex-col items-center justify-center gap-5">
-			<LinkIconButton className="self-start" href={"back"} Icon={XIcon} />
-			<div className="w-full xl:max-w-2xl">
-				<Image
-					alt={alt}
-					className="rounded-3xl"
-					height={height}
-					src={src}
-					width={width}
-				/>
-			</div>
+}) => (
+	<div className="relative flex flex-col items-center justify-center gap-5">
+		<LinkIconButton className="self-start" href={"back"} Icon={XIcon} />
+		<div className="w-full xl:max-w-2xl">
+			<Image
+				alt={alt}
+				className="rounded-3xl"
+				height={height}
+				src={src}
+				width={width}
+			/>
 		</div>
-	);
-};
+	</div>
+);
 export default ImagePreview;

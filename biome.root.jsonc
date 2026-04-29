@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": ["./biome.jsonc"],
+  "files": {
+    "ignoreUnknown": false,
+    "includes": [
+      "*.json",
+      "*.jsonc",
+      "*.js",
+      "*.jsx",
+      "*.ts",
+      "*.tsx",
+      "*.css",
+      "!apps",
+      "!packages",
+      "!pnpm-lock.yaml"
+    ]
+  }
+}

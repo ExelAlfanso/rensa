@@ -1,5 +1,5 @@
-export type PublicUser = {
-  id: string;
-  username: string;
-  avatar: string | null;
-};
+export interface PublicUser {
+	avatar: string | null;
+	id: string;
+	username: string;
+}

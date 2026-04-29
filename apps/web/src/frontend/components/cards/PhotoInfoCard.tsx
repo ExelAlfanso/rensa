@@ -8,8 +8,8 @@ export interface PhotoInfoCardProps extends PhotoInfoCardContainerProps {
 	children?: React.ReactNode;
 }
 
-const PhotoInfoCard: React.FC<PhotoInfoCardProps> = (props) => {
-	return <PhotoInfoCardContainer {...props} />;
-};
+const PhotoInfoCard: React.FC<PhotoInfoCardProps> = (props) => (
+	<PhotoInfoCardContainer {...props} />
+);
 
 export default PhotoInfoCard;

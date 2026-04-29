@@ -7,8 +7,8 @@ import LinkIconButtonContainer, {
 
 export type LinkIconButtonProps = LinkIconButtonContainerProps;
 
-const LinkIconButton: React.FC<LinkIconButtonProps> = (props) => {
-	return <LinkIconButtonContainer {...props} />;
-};
+const LinkIconButton: React.FC<LinkIconButtonProps> = (props) => (
+	<LinkIconButtonContainer {...props} />
+);
 
 export default LinkIconButton;
