@@ -74,6 +74,9 @@ importers:
       '@elysiajs/jwt':
         specifier: ^1.1.1
         version: 1.4.2(elysia@1.4.28(@sinclair/typebox@0.34.49)(@types/bun@1.3.13)(exact-mirror@1.0.0)(file-type@22.0.1)(openapi-types@12.1.3)(typescript@5.9.3))
+      '@rensa/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       '@sinclair/typebox':
         specifier: ^0.34.9
         version: 0.34.49
@@ -102,6 +105,9 @@ importers:
       bun-types:
         specifier: latest
         version: 1.3.13
+      drizzle-kit:
+        specifier: ^0.31.10
+        version: 0.31.10
       tsx:
         specifier: ^4.21.0
         version: 4.21.0
@@ -129,12 +135,6 @@ importers:
       '@tanstack/react-query-devtools':
         specifier: ^5.90.2
         version: 5.100.5(@tanstack/react-query@5.100.5(react@19.2.5))(react@19.2.5)
-      '@upstash/ratelimit':
-        specifier: ^2.0.7
-        version: 2.0.8(@upstash/redis@1.37.0)
-      '@upstash/redis':
-        specifier: ^1.35.6
-        version: 1.37.0
       axios:
         specifier: ^1.11.0
         version: 1.15.2
@@ -1866,15 +1866,6 @@ packages:
     resolution: {integrity: sha512-lrW200hZdbfRtztbygyaq/6jP6AKE8qQN2KvPcJ+x7wiD038YtnYtZ82IMNJ69GJibV7bwL3y9FgK+5w/pYt6g==}
     cpu: [x64]
     os: [win32]
-
-  '@upstash/core-analytics@0.0.10':
-    resolution: {integrity: sha512-7qJHGxpQgQr9/vmeS1PktEwvNAF7TI4iJDi8Pu2CFZ9YUGHZH4fOP5TfYlZ4aVxfopnELiE4BS4FBjyK7V1/xQ==}
-    engines: {node: '>=16.0.0'}
-
-  '@upstash/ratelimit@2.0.8':
-    resolution: {integrity: sha512-YSTMBJ1YIxsoPkUMX/P4DDks/xV5YYCswWMamU8ZIfK9ly6ppjRnVOyBhMDXBmzjODm4UQKcxsJPvaeFAijp5w==}
-    peerDependencies:
-      '@upstash/redis': ^1.34.3
 
   '@upstash/redis@1.37.0':
     resolution: {integrity: sha512-LqOJ3+XWPLSZ2rGSed5DYG3ixybxb8EhZu3yQqF7MdZX1wLBG/FRcI6xcUZXHy/SS7mmXWyadrud0HJHkOc+uw==}
@@ -5997,18 +5988,10 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.11.1':
     optional: true
 
-  '@upstash/core-analytics@0.0.10':
-    dependencies:
-      '@upstash/redis': 1.37.0
-
-  '@upstash/ratelimit@2.0.8(@upstash/redis@1.37.0)':
-    dependencies:
-      '@upstash/core-analytics': 0.0.10
-      '@upstash/redis': 1.37.0
-
   '@upstash/redis@1.37.0':
     dependencies:
       uncrypto: 0.1.3
+    optional: true
 
   accepts@2.0.0:
     dependencies:
@@ -8746,7 +8729,8 @@ snapshots:
       has-symbols: 1.1.0
       which-boxed-primitive: 1.1.1
 
-  uncrypto@0.1.3: {}
+  uncrypto@0.1.3:
+    optional: true
 
   undefsafe@2.0.5: {}
 

@@ -10,7 +10,10 @@ import Heading from "@/frontend/components/Heading";
 import RollList, { type Roll } from "@/frontend/components/lists/RollList";
 import { CreateRollProvider } from "@/frontend/providers/CreateRollProvider";
 import { EditRollProvider } from "@/frontend/providers/EditRollProvider";
-import { fetchRollsByUserId } from "@/frontend/services/roll.service";
+import {
+	fetchRollsByUserId,
+	type SortOption,
+} from "@/frontend/services/roll.service";
 import { useAuthStore } from "@/frontend/stores/useAuthStore";
 
 interface ProfilePageClientProps {
@@ -25,7 +28,7 @@ export default function ProfilePageClient({
 }: ProfilePageClientProps) {
 	const { user } = useAuthStore();
 	const queryClient = useQueryClient();
-	const [filter, setFilter] = useState("latest");
+	const [filter, setFilter] = useState<SortOption>("latest");
 	const isOwner = user?.name === profileData.user?.username;
 
 	const { data: rolls } = useQuery({
