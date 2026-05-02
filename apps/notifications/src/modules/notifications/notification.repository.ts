@@ -1,6 +1,6 @@
+import { notifications } from "@rensa/db/schemas/notifications";
 import { count, desc, eq } from "drizzle-orm";
 import { db } from "../../database";
-import { notifications } from "../../database/schema";
 import type {
 	CreateNotificationInput,
 	NotificationRecord,

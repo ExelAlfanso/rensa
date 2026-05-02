@@ -14,9 +14,7 @@ import {
 	contactStatusEnum,
 	userRoleEnum,
 } from "./enums";
-
-export type * from "./notifications";
-
+import { notifications, notificationTypeEnum } from "./notifications";
 import { photoMetadata, photos } from "./photos";
 import { rollPhotos, rolls } from "./rolls";
 import { users } from "./users";
@@ -41,6 +39,8 @@ export {
 	comments,
 	contactStatusEnum,
 	contacts,
+	notifications,
+	notificationTypeEnum,
 	photoMetadata,
 	photos,
 	rollPhotos,
@@ -61,6 +61,7 @@ export const schema = {
 		bugReports,
 		comments,
 		contacts,
+		notifications,
 		photos,
 		rolls,
 	},
@@ -69,5 +70,6 @@ export const schema = {
 		bugStatusEnum,
 		userRoleEnum,
 		contactStatusEnum,
+		notificationTypeEnum,
 	},
 };

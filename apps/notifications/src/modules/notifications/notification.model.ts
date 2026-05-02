@@ -2,7 +2,7 @@ import type {
 	NewNotification,
 	Notification,
 	NotificationType,
-} from "../../database/schema";
+} from "@rensa/db/schemas/notifications";
 import type { PublicUser } from "../users/user.model";
 
 export type CreateNotificationInput = Pick<

@@ -1,9 +1,18 @@
 import type {
 	AuthenticatedWebSocket,
+	WebSocketJwtPayload,
 	WebSocketNotificationPayload,
 } from "./websocket.model";
 
 export const onlineUsers = new Map<string, AuthenticatedWebSocket>();
+
+function hasUserId(
+	payload: false | WebSocketJwtPayload
+): payload is WebSocketJwtPayload & {
+	id: string;
+} {
+	return typeof payload === "object" && typeof payload.id === "string";
+}
 
 class WebSocketAuthError extends Error {
 	success = false;
@@ -19,14 +28,15 @@ export const WebSocketService = {
 		const token = ws.data.query.token;
 		const payload = await ws.data.jwt.verify(token);
 
-		if (!payload?.id) {
+		if (!hasUserId(payload)) {
 			throw new WebSocketAuthError("WebSocket authentication failed");
 		}
 
-		ws.data.userId = payload.id;
-		WebSocketService.registerUser(payload.id, ws);
+		const userId = payload.id;
+		ws.data.userId = userId;
+		WebSocketService.registerUser(userId, ws);
 
-		console.log(`User ${payload.id} connected`);
+		console.log(`User ${userId} connected`);
 	},
 
 	close(ws: AuthenticatedWebSocket) {

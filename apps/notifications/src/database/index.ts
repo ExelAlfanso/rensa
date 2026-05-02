@@ -1,7 +1,10 @@
+import {
+	notifications,
+	notificationTypeEnum,
+} from "@rensa/db/schemas/notifications";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import { env } from "../config/env";
-import { notifications, notificationTypeEnum } from "./schema";
 
 const schema = { notificationTypeEnum, notifications };
 
