@@ -150,6 +150,9 @@ importers:
       daisyui:
         specifier: ^5.0.51
         version: 5.5.19
+      ioredis:
+        specifier: ^5.10.1
+        version: 5.10.1
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.3
