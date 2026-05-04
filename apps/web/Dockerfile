@@ -12,7 +12,6 @@ ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 # ===== Dependencies =====
 FROM base AS deps
 COPY package*.json ./
-RUN npm i --package-lock-only
 RUN npm ci
 
 # ===== Build =====
@@ -54,6 +53,7 @@ ARG NEXT_PUBLIC_APP_URL
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 
 COPY package*.json ./
+RUN npm i --package-lock-only
 RUN npm ci --omit=dev
 
 COPY --from=build /app/.next ./.next
