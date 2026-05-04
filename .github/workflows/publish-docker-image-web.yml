@@ -1,5 +1,12 @@
 name: publish-docker-image-web
 
+on:
+  workflow_call:
+    inputs:
+      tag:
+        required: true
+        type: string
+
 jobs:
   docker:
     runs-on: ubuntu-latest
@@ -23,6 +30,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           platforms: linux/amd64
-          file: ../../apps/web/Dockerfile
+          context: .
+          file: apps/web/Dockerfile
           push: true
-          tags: labmgm/rensa-web:$DOCKER_IMAGE_TAG
+          tags: labmgm/rensa-web:${{ inputs.tag }}

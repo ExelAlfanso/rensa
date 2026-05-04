@@ -5,18 +5,27 @@ on:
     branches: [ "*" ]
   workflow_dispatch:
 
-env:
-  DOCKER_IMAGE_TAG: staging
-
 jobs:
-  docker:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Build and push ai image
-        uses: ./publish-docker-image-ai.yml
+  build-ai:
+    uses: ./.github/workflows/publish-docker-image-ai.yml
+    with:
+      tag: staging
+    secrets: inherit
 
-      - name: Build and push web image
-        uses: ./publish-docker-image-web.yml
+  build-web:
+    uses: ./.github/workflows/publish-docker-image-web.yml
+    with:
+      tag: staging
+    secrets: inherit
 
-      - name: Build and push exif image
-        uses: ./publish-docker-image-exif.yml
+  build-exif:
+    uses: ./.github/workflows/publish-docker-image-exif.yml
+    with:
+      tag: staging
+    secrets: inherit
+
+  build-notification:
+    uses: ./.github/workflows/publish-docker-image-notification.yml
+    with:
+      tag: staging
+    secrets: inherit
