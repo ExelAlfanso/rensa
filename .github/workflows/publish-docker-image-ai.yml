@@ -8,5 +8,6 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           platforms: linux/amd64
+          file: ../../apps/ai/Dockerfile
           push: true
           tags: labmgm/rensa-ai:$DOCKER_IMAGE_TAG

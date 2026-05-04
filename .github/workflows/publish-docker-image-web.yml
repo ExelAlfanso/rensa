@@ -8,5 +8,6 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           platforms: linux/amd64
+          file: ../../apps/web/Dockerfile
           push: true
           tags: labmgm/rensa-web:$DOCKER_IMAGE_TAG
