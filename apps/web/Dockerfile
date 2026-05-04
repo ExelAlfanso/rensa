@@ -12,6 +12,7 @@ ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 # ===== Dependencies =====
 FROM base AS deps
 COPY package*.json ./
+RUN npm install --package-lock-only
 RUN npm ci
 
 # ===== Build =====
