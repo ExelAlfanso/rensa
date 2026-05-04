@@ -1,0 +1,12 @@
+name: publish-docker-image-ai
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          platforms: linux/amd64
+          push: true
+          tags: labmgm/rensa-ai:$DOCKER_IMAGE_TAG
