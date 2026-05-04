@@ -30,7 +30,6 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           platforms: linux/amd64
-          context: .
-          file: apps/ai/Dockerfile
+          context: apps/ai/
           push: true
           tags: labmgm/rensa-ai:${{ inputs.tag }}
