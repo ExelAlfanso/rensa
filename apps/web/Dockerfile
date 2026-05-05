@@ -54,6 +54,7 @@ ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 
 COPY apps/web/package*.json .
 COPY packages .
+RUN npm install --package-lock-only
 RUN npm ci --omit=dev
 
 COPY --from=build /app/.next ./.next
