@@ -12,6 +12,7 @@ ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 FROM base AS deps
 COPY apps/web/package*.json .
 COPY packages .
+RUN npm install --package-lock-only
 RUN npm ci
 
 # ===== Build =====
