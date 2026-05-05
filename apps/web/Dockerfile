@@ -2,8 +2,6 @@
 FROM node:20-alpine AS base
 WORKDIR /app
 
-RUN corepack enable && corepack prepare pnpm@10.33.2 --activate
-
 ARG NEXT_PUBLIC_ELYSIA_WS_URL
 ENV NEXT_PUBLIC_ELYSIA_WS_URL=$NEXT_PUBLIC_ELYSIA_WS_URL
 
@@ -12,10 +10,9 @@ ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 
 # ===== Dependencies =====
 FROM base AS deps
-COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
-COPY packages/ ./packages/
-COPY apps/web/package.json ./apps/web/package.json
-RUN pnpm install --filter @rensa/web... --frozen-lockfile --ignore-scripts
+COPY apps/web/package*.json .
+COPY packages .
+RUN npm ci
 
 # ===== Build =====
 FROM deps AS build
@@ -26,8 +23,9 @@ ENV NEXT_PUBLIC_ELYSIA_WS_URL=$NEXT_PUBLIC_ELYSIA_WS_URL
 ARG NEXT_PUBLIC_APP_URL
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 
-COPY apps/web/ ./apps/web/
-RUN pnpm --filter @rensa/web build
+
+COPY apps/web .
+RUN npm run build
 
 # ===== Development =====
 FROM deps AS dev
@@ -38,9 +36,9 @@ ENV NEXT_PUBLIC_ELYSIA_WS_URL=$NEXT_PUBLIC_ELYSIA_WS_URL
 ARG NEXT_PUBLIC_APP_URL
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 
-COPY apps/web/ ./apps/web/
+COPY apps/web .
 EXPOSE 3000
-CMD ["pnpm", "--filter", "@rensa/web", "dev"]
+CMD ["npm", "run", "dev"]
 
 # ===== Production =====
 FROM node:20-alpine AS prod
@@ -53,16 +51,12 @@ ENV NEXT_PUBLIC_ELYSIA_WS_URL=$NEXT_PUBLIC_ELYSIA_WS_URL
 ARG NEXT_PUBLIC_APP_URL
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 
-RUN corepack enable && corepack prepare pnpm@10.33.2 --activate
+COPY apps/web/package*.json .
+COPY packages .
+RUN npm ci --omit=dev
 
-COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
-COPY packages/ ./packages/
-COPY apps/web/package.json ./apps/web/package.json
-RUN pnpm install --filter @rensa/web... --frozen-lockfile --prod --ignore-scripts
+COPY --from=build /app/.next ./.next
+COPY --from=build /app/public ./public
 
-COPY --from=build /app/apps/web/.next ./apps/web/.next
-COPY --from=build /app/apps/web/public ./apps/web/public
-
-WORKDIR /app/apps/web
 EXPOSE 3000
-CMD ["pnpm", "start"]
+CMD ["npm", "start"]

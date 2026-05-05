@@ -28,6 +28,9 @@ jobs:
 
       - name: Build and push
         uses: docker/build-push-action@v6
+        build-args: |
+            NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
+            NEXT_PUBLIC_ELYSIA_WS_URL: ${{ vars.NEXT_PUBLIC_ELYSIA_WS_URL }}
         with:
           platforms: linux/amd64
           context: .
