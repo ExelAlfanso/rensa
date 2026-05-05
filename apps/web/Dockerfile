@@ -8,12 +8,17 @@ ENV NEXT_PUBLIC_ELYSIA_WS_URL=$NEXT_PUBLIC_ELYSIA_WS_URL
 ARG NEXT_PUBLIC_APP_URL
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 
+RUN corepack enable && corepack prepare pnpm@10.33.2 --activate
+
 # ===== Dependencies =====
 FROM base AS deps
-COPY apps/web/package*.json .
-COPY packages .
-RUN npm install --package-lock-only
-RUN npm ci
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
+COPY apps/web/package.json .
+COPY packages/db/package.json ./packages/db/
+COPY packages/config/package.json ./packages/config/
+RUN pnpm install --frozen-lockfile
+
+COPY packages ./packages
 
 # ===== Build =====
 FROM deps AS build
@@ -24,9 +29,8 @@ ENV NEXT_PUBLIC_ELYSIA_WS_URL=$NEXT_PUBLIC_ELYSIA_WS_URL
 ARG NEXT_PUBLIC_APP_URL
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 
-
 COPY apps/web .
-RUN npm run build
+RUN pnpm --filter @rensa/web build
 
 # ===== Development =====
 FROM deps AS dev
@@ -39,7 +43,7 @@ ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 
 COPY apps/web .
 EXPOSE 3000
-CMD ["npm", "run", "dev"]
+CMD ["pnpm", "--filter", "@rensa/web", "dev"]
 
 # ===== Production =====
 FROM node:20-alpine AS prod
@@ -52,13 +56,17 @@ ENV NEXT_PUBLIC_ELYSIA_WS_URL=$NEXT_PUBLIC_ELYSIA_WS_URL
 ARG NEXT_PUBLIC_APP_URL
 ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 
-COPY apps/web/package*.json .
-COPY packages .
-RUN npm install --package-lock-only
-RUN npm ci --omit=dev
+RUN corepack enable && corepack prepare pnpm@10.33.2 --activate
 
-COPY --from=build /app/.next ./.next
-COPY --from=build /app/public ./public
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
+COPY apps/web/package.json ./apps/web/
+COPY packages/db/package.json ./packages/db/
+COPY packages/config/package.json ./packages/config/
+RUN pnpm install --frozen-lockfile --prod
+
+COPY packages ./packages
+COPY --from=build /app/apps/web/.next ./apps/web/.next
+COPY --from=build /app/apps/web/public ./apps/web/public
 
 EXPOSE 3000
-CMD ["npm", "start"]
+CMD ["pnpm", "--filter", "@rensa/web", "start"]
