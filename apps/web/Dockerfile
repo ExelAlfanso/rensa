@@ -15,7 +15,7 @@ FROM base AS deps
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY packages/ ./packages/
 COPY apps/web/package.json ./apps/web/package.json
-RUN pnpm install --filter @rensa/web... --frozen-lockfile
+RUN pnpm install --filter @rensa/web... --frozen-lockfile --ignore-scripts
 
 # ===== Build =====
 FROM deps AS build
@@ -58,7 +58,7 @@ RUN corepack enable && corepack prepare pnpm@10.33.2 --activate
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY packages/ ./packages/
 COPY apps/web/package.json ./apps/web/package.json
-RUN pnpm install --filter @rensa/web... --frozen-lockfile --prod
+RUN pnpm install --filter @rensa/web... --frozen-lockfile --prod --ignore-scripts
 
 COPY --from=build /app/apps/web/.next ./apps/web/.next
 COPY --from=build /app/apps/web/public ./apps/web/public
