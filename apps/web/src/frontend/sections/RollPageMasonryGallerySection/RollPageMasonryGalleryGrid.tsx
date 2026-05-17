@@ -6,7 +6,7 @@ import { cn } from "@/utils/cn";
 
 interface RollPageMasonryGalleryGridProps {
 	isOwner: boolean;
-	onPhotoRemoved?: (photo_id: string) => void;
+	onPhotoRemoved?: (photoId: string) => void;
 	photos: Photo[];
 	rollId: string;
 }
@@ -51,12 +51,12 @@ const RollPageMasonryGalleryGrid: React.FC<RollPageMasonryGalleryGridProps> = ({
 				columnClassName="my-masonry-grid_column"
 			>
 				{photos.map((photo) => {
-					const photo_id = photo.photoId.toString();
+					const photoId = photo.photoId.toString();
 					return (
 						<RollPagePhotoCard
-							id={photo_id}
+							id={photoId}
 							isOwner={isOwner}
-							key={photo_id}
+							key={photoId}
 							onPhotoRemoved={onPhotoRemoved}
 							photo={photo}
 							rollId={rollId}

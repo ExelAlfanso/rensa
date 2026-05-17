@@ -10,7 +10,7 @@ export const notificationsOpenApiFragment: OpenApiFragment = {
 				parameters: [
 					{
 						in: "query",
-						name: "recipient_id",
+						name: "recipientId",
 						required: true,
 						schema: { type: "string", format: "uuid" },
 					},
@@ -28,7 +28,7 @@ export const notificationsOpenApiFragment: OpenApiFragment = {
 						"application/json": {
 							schema: { $ref: "#/components/schemas/CreateNotificationDto" },
 							example: {
-								recipient_id: "0f2d8f3e-1dd7-4a52-9dd7-8cbffa4fd89f",
+								recipientId: "0f2d8f3e-1dd7-4a52-9dd7-8cbffa4fd89f",
 								type: "comment",
 								message: "Someone commented on your photo.",
 							},
@@ -44,13 +44,13 @@ export const notificationsOpenApiFragment: OpenApiFragment = {
 			CreateNotificationDto: {
 				type: "object",
 				properties: {
-					recipient_id: { type: "string", format: "uuid" },
-					actor_id: { type: "string", format: "uuid" },
-					photo_id: { type: "string", format: "uuid" },
+					recipientId: { type: "string", format: "uuid" },
+					actorId: { type: "string", format: "uuid" },
+					photoId: { type: "string", format: "uuid" },
 					type: { type: "string" },
 					message: { type: "string" },
 				},
-				required: ["recipient_id"],
+				required: ["recipientId"],
 			},
 		},
 	},

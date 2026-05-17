@@ -10,11 +10,11 @@ export async function GET(
 ) {
 	try {
 		const params = rollIdParamDto.parse(await context.params);
-		const ownerId = await rollService.getOwnerId(params.roll_id);
+		const ownerId = await rollService.getOwnerId(params.rollId);
 		return NextResponse.json({
 			success: true,
 			message: "Successfully fetched profile data from roll id",
-			data: { user_id: ownerId },
+			data: { userId: ownerId },
 		});
 	} catch (error) {
 		if (error instanceof ZodError) {

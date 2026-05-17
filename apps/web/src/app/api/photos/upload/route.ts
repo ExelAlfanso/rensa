@@ -9,6 +9,7 @@ import {
 	PHOTO_UPLOAD_COMPRESSION_START_QUALITY,
 	PHOTO_UPLOAD_MAX_DIMENSION_PX,
 } from "@/backend/services/photos/configs/photo-upload.config";
+import { userService } from "@/backend/services/users/service";
 import { authOptions } from "@/lib/auth";
 import { fastApi } from "@/lib/axios-server";
 import cloudinary, { validateCloudinaryUrl } from "@/lib/cloudinary";
@@ -84,7 +85,19 @@ export async function POST(req: Request) {
 		const formData = await req.formData();
 
 		const file = formData.get("file") as File;
-		const userId = session.user.id;
+		const appUser = session.user.email
+			? await userService.getByEmail(session.user.email)
+			: null;
+		const userId = appUser?.userId ?? session.user.id;
+		if (!appUser) {
+			return NextResponse.json(
+				{
+					success: false,
+					error: "Authenticated user was not found. Please log out and log in again.",
+				},
+				{ status: 401 }
+			);
+		}
 
 		// ðŸ”’ SECURITY: Sanitize and validate all photo metadata
 		const rawTitle = formData.get("title") as string;
@@ -266,9 +279,16 @@ export async function POST(req: Request) {
 			transformation: [{ width: 2000, crop: "limit" }],
 		});
 
-		const { secure_url, width, height, format, bytes, created_at } = uploadRes;
+		const {
+			secure_url: secureUrl,
+			width,
+			height,
+			format,
+			bytes,
+			created_at: createdAt,
+		} = uploadRes;
 
-		if (!validateCloudinaryUrl(secure_url)) {
+		if (!validateCloudinaryUrl(secureUrl)) {
 			try {
 				const publicId = uploadRes.public_id;
 				await cloudinary.uploader.destroy(publicId);
@@ -299,9 +319,9 @@ export async function POST(req: Request) {
 				size: bytes,
 				style,
 				title,
-				uploaded_at: new Date(created_at),
-				url: secure_url,
-				user_id: userId,
+				uploadedAt: new Date(createdAt),
+				url: secureUrl,
+				userId: userId,
 				width,
 			});
 		} catch (persistError) {
@@ -318,8 +338,8 @@ export async function POST(req: Request) {
 		return NextResponse.json({
 			success: true,
 			photo: {
-				photo_id: photo.photo_id,
-				user_id: photo.user_id,
+				photoId: photo.photoId,
+				userId: photo.userId,
 				url: photo.url,
 				title: photo.title,
 				description: photo.description,
@@ -327,8 +347,8 @@ export async function POST(req: Request) {
 				style: photo.style,
 				color: photo.color,
 				camera: photo.camera,
-				created_at: photo.created_at?.toISOString(),
-				updated_at: photo.updated_at?.toISOString(),
+				createdAt: photo.createdAt?.toISOString(),
+				updatedAt: photo.updatedAt?.toISOString(),
 				tags,
 				metadata: {
 					width,
@@ -336,7 +356,7 @@ export async function POST(req: Request) {
 					format,
 					size: bytes,
 					exif,
-					uploaded_at: created_at,
+					uploadedAt: createdAt,
 				},
 			},
 		});

@@ -21,22 +21,22 @@ export async function POST(
 		const params = photoIdParamDto.parse(await context.params);
 		const body = bookmarkActionDto.parse(await request.json());
 		const session = await getServerSession(authOptions);
-		const actor_id = session?.user?.id;
-		if (!actor_id) {
+		const actorId = session?.user?.id;
+		if (!actorId) {
 			throw new UnauthorizedError();
 		}
 
 		const result = await bookmarkService.updateBookmark({
-			photo_id: params.id,
-			user_id: body.user_id,
+			photoId: params.id,
+			userId: body.userId,
 			action: body.action,
-			actor_id: actor_id,
+			actorId: actorId,
 		});
 
 		return NextResponse.json({
 			success: true,
 			bookmarks: result.bookmarks,
-			is_bookmarked: result.is_bookmarked,
+			isBookmarked: result.isBookmarked,
 			message: "Bookmark updated",
 		});
 	} catch (error) {

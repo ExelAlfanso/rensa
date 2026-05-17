@@ -24,14 +24,14 @@ const CommentInputFieldContainer: React.FC<CommentInputFieldContainerProps> = ({
 
 		const tempId = Math.random().toString(36).slice(2, 9);
 		const newComment: CommentType = {
-			comment_id: tempId,
+			commentId: tempId,
 			text: comment,
-			user_id: {
-				id: user?.id || "unknown",
+			user: {
+				userId: user?.id || "unknown",
 				username: user?.name || "Anonymous",
-				avatar_url: user?.image || "/profile.jpg",
+				avatarUrl: user?.image || "/profile.jpg",
 			},
-			created_at: new Date().toISOString(),
+			createdAt: new Date().toISOString(),
 		};
 
 		onAddComment(newComment);

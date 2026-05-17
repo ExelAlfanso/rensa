@@ -73,7 +73,7 @@ export const authOptions: NextAuthOptions = {
 				}
 
 				return {
-					id: user.user_id,
+					id: user.userId,
 					name: user.username,
 					email: user.email,
 					role: user.role,
@@ -88,7 +88,7 @@ export const authOptions: NextAuthOptions = {
 		updateAge: 24 * 60 * 60, // rotate token only once every 24 hours
 	},
 	callbacks: {
-		jwt({ token, account, user }) {
+		async jwt({ token, account, user }) {
 			if (account) {
 				token.accessToken = account.access_token;
 				token.provider = account.provider;
@@ -101,6 +101,14 @@ export const authOptions: NextAuthOptions = {
 				token.name = user.name;
 				token.email = user.email;
 				token.role = user.role;
+			}
+			if (token.email) {
+				const appUser = await userService.getByEmail(token.email);
+				if (appUser) {
+					token.id = appUser.userId;
+					token.name = appUser.username;
+					token.role = appUser.role;
+				}
 			}
 			return token;
 		},

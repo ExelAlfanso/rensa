@@ -23,38 +23,38 @@ export class BookmarkService {
 	}
 
 	async updateBookmark(params: {
-		photo_id: string;
-		user_id: string;
+		photoId: string;
+		userId: string;
 		action: "increment" | "decrement";
-		actor_id?: string;
+		actorId?: string;
 	}): Promise<{
 		bookmarks: string[];
-		is_bookmarked: boolean;
+		isBookmarked: boolean;
 	}> {
-		if (!params.actor_id) {
+		if (!params.actorId) {
 			throw new UnauthorizedError();
 		}
-		if (params.actor_id !== params.user_id) {
+		if (params.actorId !== params.userId) {
 			throw new ForbiddenError("Cannot update bookmarks for another user");
 		}
 
-		const photo_exists = await this.photoRepository.exists(params.photo_id);
-		if (!photo_exists) {
+		const photoExists = await this.photoRepository.exists(params.photoId);
+		if (!photoExists) {
 			throw new NotFoundError("Photo not found");
 		}
 
-		const updated_user = await this.userRepository.updateBookmarks(
-			params.user_id,
-			params.photo_id,
+		const updatedUser = await this.userRepository.updateBookmarks(
+			params.userId,
+			params.photoId,
 			params.action
 		);
-		if (!updated_user) {
+		if (!updatedUser) {
 			throw new NotFoundError("User not found");
 		}
 
 		return {
-			bookmarks: updated_user.bookmarks,
-			is_bookmarked: params.action === "increment",
+			bookmarks: updatedUser.bookmarks,
+			isBookmarked: params.action === "increment",
 		};
 	}
 }

@@ -17,25 +17,25 @@ export const fetchRollsByUserId = async (userId: string, sort?: SortOption) => {
 };
 
 export const addPhotoToRoll = async (
-	actor_id: string,
+	actorId: string,
 	rollId: string,
-	photo_id: string
+	photoId: string
 ) => {
-	await sendPhotoSavedNotification(actor_id, photo_id);
-	return api.post(`/rolls/${rollId}/photos/${photo_id}`, {
+	await sendPhotoSavedNotification(actorId, photoId);
+	return api.post(`/rolls/${rollId}/photos/${photoId}`, {
 		rollIds: [rollId],
-		photo_id,
+		photoId,
 	});
 };
 
-export const removePhotoFromRoll = async (rollId: string, photo_id: string) => {
-	const result = await api.delete(`/rolls/${rollId}/photos/${photo_id}`);
+export const removePhotoFromRoll = async (rollId: string, photoId: string) => {
+	const result = await api.delete(`/rolls/${rollId}/photos/${photoId}`);
 	return result;
 };
 
-export const fetchIsSavedToRolls = async (photo_id: string) => {
+export const fetchIsSavedToRolls = async (photoId: string) => {
 	const res = await api.get("/rolls/is-saved", {
-		params: { photo_id },
+		params: { photoId },
 	});
 	return res.data.data.rollIds;
 };

@@ -57,7 +57,7 @@ export default async function RollPageWrapper({
 		redirect("/404");
 	}
 
-	if (!rollData?.user_id) {
+	if (!rollData?.userId) {
 		redirect("/404");
 	}
 
@@ -65,7 +65,7 @@ export default async function RollPageWrapper({
 		<RollPageClient
 			id={id}
 			name={rollData.name || "Unknown Roll"}
-			ownerId={rollData.user_id}
+			ownerId={rollData.userId}
 		/>
 	);
 }

@@ -40,12 +40,12 @@ export async function DELETE(
 	try {
 		const params = photoIdParamDto.parse(await context.params);
 		const session = await getServerSession(authOptions);
-		const actor_id = session?.user?.id;
-		if (!actor_id) {
+		const actorId = session?.user?.id;
+		if (!actorId) {
 			throw new UnauthorizedError();
 		}
 
-		await photoService.deleteById(params.id, actor_id);
+		await photoService.deleteById(params.id, actorId);
 
 		return NextResponse.json({
 			success: true,

@@ -57,7 +57,7 @@ export const useRollsStore = create<RollsState>((set, get) => ({
 			});
 			const normalizedRoll = normalizeRoll(res.data.data as ApiRoll);
 			if (!normalizedRoll) {
-				throw new Error("Created roll is missing roll_id");
+				throw new Error("Created roll is missing rollId");
 			}
 			set((state) => ({
 				rolls: [...state.rolls, normalizedRoll],

@@ -17,7 +17,7 @@ export async function GET(req: Request) {
 		});
 
 		const result = await photoService.listBookmarkedByUser(
-			query.user_id,
+			query.userId,
 			query.page,
 			query.limit
 		);

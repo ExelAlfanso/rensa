@@ -62,7 +62,7 @@ const RollPageMasonryGallerySection: React.FC<
 			</div>
 		);
 	}
-	const handlePhotoRemoved = (photo_id: string) => {
+	const handlePhotoRemoved = (photoId: string) => {
 		queryClient.setQueryData(
 			["photos", rollId],
 			(oldData: InfiniteData<FetchPhotosResponse> | undefined) => {
@@ -75,7 +75,7 @@ const RollPageMasonryGallerySection: React.FC<
 					pages: oldData.pages.map((page: FetchPhotosResponse) => ({
 						...page,
 						data: page.data.filter(
-							(photo) => photo.photoId.toString() !== photo_id
+							(photo) => photo.photoId.toString() !== photoId
 						),
 					})),
 				};

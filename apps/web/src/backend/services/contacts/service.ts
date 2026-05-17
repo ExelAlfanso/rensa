@@ -28,11 +28,11 @@ export class ContactService {
 	async submit(
 		payload: CreateContactDto,
 		context: {
-			ip_address: string;
-			user_agent: string;
+			ipAddress: string;
+			userAgent: string;
 		}
 	): Promise<ContactSubmitResult> {
-		const { success } = await contactFormLimiter.limit(context.ip_address);
+		const { success } = await contactFormLimiter.limit(context.ipAddress);
 		if (!success) {
 			throw new TooManyRequestsError(
 				"Too many requests. Please try again later."
@@ -44,15 +44,15 @@ export class ContactService {
 			email: sanitizeInput(payload.email).toLowerCase(),
 			subject: sanitizeInput(payload.subject),
 			message: sanitizeInput(payload.message),
-			ip_address: context.ip_address,
-			user_agent: context.user_agent,
+			ipAddress: context.ipAddress,
+			userAgent: context.userAgent,
 		});
 
 		await this.sendContactEmails(contact).catch(() => {
 			return;
 		});
 
-		return { id: contact._id };
+		return { id: contact.contactId };
 	}
 
 	async list(

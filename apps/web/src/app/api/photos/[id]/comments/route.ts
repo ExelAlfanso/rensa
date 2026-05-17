@@ -22,11 +22,11 @@ export async function POST(
 		const params = commentPhotoParamsDto.parse(await context.params);
 		const body = createCommentDto.parse(await request.json());
 		const session = await getServerSession(authOptions);
-		const actor_id = session?.user?.id;
+		const actorId = session?.user?.id;
 		const newComment = await commentService.createForPhoto(
 			params.id,
 			body,
-			actor_id
+			actorId
 		);
 
 		return NextResponse.json(

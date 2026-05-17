@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
 	try {
 		const { searchParams } = new URL(req.url);
 		const query = listNotificationsQueryDto.parse({
-			recipient_id: searchParams.get("recipient_id") ?? undefined,
+			recipientId: searchParams.get("recipientId") ?? undefined,
 			page: searchParams.get("page") ?? undefined,
 			limit: searchParams.get("limit") ?? undefined,
 		});

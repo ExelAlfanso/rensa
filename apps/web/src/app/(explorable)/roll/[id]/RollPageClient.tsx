@@ -5,6 +5,7 @@ import Heading from "@/frontend/components/Heading";
 import { EditRollProvider } from "@/frontend/providers/EditRollProvider";
 import RollPageMasonryGallerySection from "@/frontend/sections/RollPageMasonryGallerySection/RollPageMasonryGallerySection";
 import { useAuthStore } from "@/frontend/stores/useAuthStore";
+import type { SelectedRoll } from "@/frontend/types/roll";
 
 interface RollPageClientProps {
 	id: string;

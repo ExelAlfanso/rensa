@@ -12,8 +12,8 @@ interface MasonryGalleryGridProps {
 const MasonryGalleryGrid: React.FC<MasonryGalleryGridProps> = ({ photos }) => {
 	const [activeDropdownId, setActiveDropdownId] = useState<string | null>(null);
 
-	const handleToggleDropdown = (photo_id: string | null) => {
-		setActiveDropdownId((prev) => (prev === photo_id ? null : photo_id));
+	const handleToggleDropdown = (photoId: string | null) => {
+		setActiveDropdownId((prev) => (prev === photoId ? null : photoId));
 	};
 
 	const getDynamicColumns = (photoCount: number) => {
@@ -49,14 +49,14 @@ const MasonryGalleryGrid: React.FC<MasonryGalleryGridProps> = ({ photos }) => {
 				columnClassName="my-masonry-grid_column"
 			>
 				{photos.map((photo: Photo) => {
-					const photo_id = photo.photoId.toString();
+					const photoId = photo.photoId.toString();
 					return (
 						<PhotoCard
 							closeAllDropdowns={() => setActiveDropdownId(null)}
-							id={photo_id}
-							isDropdownOpen={activeDropdownId === photo_id}
-							key={photo_id}
-							onToggleDropdown={() => handleToggleDropdown(photo_id)}
+							id={photoId}
+							isDropdownOpen={activeDropdownId === photoId}
+							key={photoId}
+							onToggleDropdown={() => handleToggleDropdown(photoId)}
 							photo={photo}
 						/>
 					);

@@ -17,8 +17,8 @@ export const bugReports = pgTable(
 		status: bugStatusEnum("status").default("new"),
 		ipAddress: text("ip_address"),
 		userAgent: text("user_agent"),
-		created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
-		updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+		createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+		updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 	},
 	(table) => [index("idx_bug_reports_email").on(table.email)]
 );
@@ -45,7 +45,7 @@ export interface CreateBugReportDto {
 
 export interface CreatedBugReportDto {
 	bugReportId: string;
-	created_at?: Date | null;
+	createdAt?: Date | null;
 	email: string;
 	title: string;
 }

@@ -99,7 +99,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ id }) => {
 						<div className="relative" key={comment.commentId}>
 							<Comment
 								avatarUrl={comment.user.avatarUrl}
-								created_at={comment.createdAt}
+								createdAt={comment.createdAt}
 								disableBorder={idx === comments.length - 1}
 								userId={comment.user.userId}
 								username={comment.user.username}

@@ -57,11 +57,11 @@ export async function POST(req: Request) {
 		});
 		await rollsApplication.create(
 			{
-				user_id: user.user_id,
+				userId: user.userId,
 				name: "All Photos",
 				description: "This is your default roll.",
 			},
-			user.user_id
+			user.userId
 		);
 
 		try {

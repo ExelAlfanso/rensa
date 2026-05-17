@@ -1,9 +1,9 @@
 import { and, asc, desc, eq, inArray } from "drizzle-orm";
 import type {
-	RollCreateDto,
-	RollRepositoryInterface,
-	RollResponseDto,
-	RollUpdateDto,
+  RollCreateDto,
+  RollRepositoryInterface,
+  RollResponseDto,
+  RollUpdateDto,
 } from "../schemas/rolls";
 import { rollPhotos, rolls } from "../schemas/rolls";
 import db from "../src/db";
@@ -12,237 +12,237 @@ type RollRow = typeof rolls.$inferSelect;
 const DEFAULT_ROLL_IMAGE = "/images/image6.JPG";
 
 const toIso = (value: Date | null): string | undefined =>
-	value ? value.toISOString() : undefined;
+  value ? value.toISOString() : undefined;
 
 export class RollRepository implements RollRepositoryInterface {
-	private async getPhotoIdsByRollIds(
-		roll_ids: string[]
-	): Promise<Map<string, string[]>> {
-		const photo_idsByRollId = new Map<string, string[]>();
-		for (const roll_id of roll_ids) {
-			photo_idsByRollId.set(roll_id, []);
-		}
-		if (roll_ids.length === 0) {
-			return photo_idsByRollId;
-		}
+  private async getPhotoIdsByRollIds(
+    rollIds: string[],
+  ): Promise<Map<string, string[]>> {
+    const photoIdsByRollId = new Map<string, string[]>();
+    for (const rollId of rollIds) {
+      photoIdsByRollId.set(rollId, []);
+    }
+    if (rollIds.length === 0) {
+      return photoIdsByRollId;
+    }
 
-		const rows = await db
-			.select({
-				photo_id: rollPhotos.photo_id,
-				roll_id: rollPhotos.roll_id,
-			})
-			.from(rollPhotos)
-			.where(inArray(rollPhotos.roll_id, roll_ids));
+    const rows = await db
+      .select({
+        photoId: rollPhotos.photoId,
+        rollId: rollPhotos.rollId,
+      })
+      .from(rollPhotos)
+      .where(inArray(rollPhotos.rollId, rollIds));
 
-		for (const row of rows) {
-			if (!(row.roll_id && row.photo_id)) {
-				continue;
-			}
-			const existing = photo_idsByRollId.get(row.roll_id) ?? [];
-			existing.push(row.photo_id);
-			photo_idsByRollId.set(row.roll_id, existing);
-		}
+    for (const row of rows) {
+      if (!(row.rollId && row.photoId)) {
+        continue;
+      }
+      const existing = photoIdsByRollId.get(row.rollId) ?? [];
+      existing.push(row.photoId);
+      photoIdsByRollId.set(row.rollId, existing);
+    }
 
-		return photo_idsByRollId;
-	}
+    return photoIdsByRollId;
+  }
 
-	private mapToRollResponseDto(
-		roll: RollRow,
-		photo_ids: string[]
-	): RollResponseDto {
-		return {
-			roll_id: roll.roll_id,
-			user_id: roll.user_id ?? "",
-			name: roll.name,
-			description: roll.description ?? "",
-			image_url: roll.image_url ?? DEFAULT_ROLL_IMAGE,
-			photos: photo_ids,
-			created_at: toIso(roll.created_at),
-			updated_at: toIso(roll.updated_at),
-		};
-	}
+  private mapToRollResponseDto(
+    roll: RollRow,
+    photoIds: string[],
+  ): RollResponseDto {
+    return {
+      rollId: roll.rollId,
+      userId: roll.userId ?? "",
+      name: roll.name,
+      description: roll.description ?? "",
+      imageUrl: roll.imageUrl ?? DEFAULT_ROLL_IMAGE,
+      photos: photoIds,
+      createdAt: toIso(roll.createdAt),
+      updatedAt: toIso(roll.updatedAt),
+    };
+  }
 
-	async create(payload: RollCreateDto): Promise<RollResponseDto> {
-		const [created] = await db
-			.insert(rolls)
-			.values({
-				description: payload.description ?? "",
-				image_url: payload.image_url ?? DEFAULT_ROLL_IMAGE,
-				name: payload.name,
-				user_id: payload.user_id,
-			})
-			.returning();
-		if (!created) {
-			throw new Error("Failed to create roll");
-		}
+  async create(payload: RollCreateDto): Promise<RollResponseDto> {
+    const [created] = await db
+      .insert(rolls)
+      .values({
+        description: payload.description ?? "",
+        imageUrl: payload.imageUrl ?? DEFAULT_ROLL_IMAGE,
+        name: payload.name,
+        userId: payload.userId,
+      })
+      .returning();
+    if (!created) {
+      throw new Error("Failed to create roll");
+    }
 
-		return this.mapToRollResponseDto(created, []);
-	}
+    return this.mapToRollResponseDto(created, []);
+  }
 
-	async getById(roll_id: string): Promise<RollResponseDto | null> {
-		const [row] = await db
-			.select()
-			.from(rolls)
-			.where(eq(rolls.roll_id, roll_id))
-			.limit(1);
-		if (!row) {
-			return null;
-		}
+  async getById(rollId: string): Promise<RollResponseDto | null> {
+    const [row] = await db
+      .select()
+      .from(rolls)
+      .where(eq(rolls.rollId, rollId))
+      .limit(1);
+    if (!row) {
+      return null;
+    }
 
-		const photo_idsByRollId = await this.getPhotoIdsByRollIds([roll_id]);
-		return this.mapToRollResponseDto(row, photo_idsByRollId.get(roll_id) ?? []);
-	}
+    const photoIdsByRollId = await this.getPhotoIdsByRollIds([rollId]);
+    return this.mapToRollResponseDto(row, photoIdsByRollId.get(rollId) ?? []);
+  }
 
-	async getDefaultByUserId(user_id: string): Promise<RollResponseDto | null> {
-		const [row] = await db
-			.select()
-			.from(rolls)
-			.where(and(eq(rolls.user_id, user_id), eq(rolls.name, "All Photos")))
-			.limit(1);
-		if (!row) {
-			return null;
-		}
+  async getDefaultByUserId(userId: string): Promise<RollResponseDto | null> {
+    const [row] = await db
+      .select()
+      .from(rolls)
+      .where(and(eq(rolls.userId, userId), eq(rolls.name, "All Photos")))
+      .limit(1);
+    if (!row) {
+      return null;
+    }
 
-		const photo_idsByRollId = await this.getPhotoIdsByRollIds([row.roll_id]);
-		return this.mapToRollResponseDto(
-			row,
-			photo_idsByRollId.get(row.roll_id) ?? []
-		);
-	}
+    const photoIdsByRollId = await this.getPhotoIdsByRollIds([row.rollId]);
+    return this.mapToRollResponseDto(
+      row,
+      photoIdsByRollId.get(row.rollId) ?? [],
+    );
+  }
 
-	async listContainingPhoto(
-		user_id: string,
-		photo_id: string
-	): Promise<Array<{ name: string; roll_id: string }>> {
-		const userRolls = await db
-			.select({
-				name: rolls.name,
-				roll_id: rolls.roll_id,
-			})
-			.from(rolls)
-			.where(eq(rolls.user_id, user_id));
-		if (userRolls.length === 0) {
-			return [];
-		}
+  async listContainingPhoto(
+    userId: string,
+    photoId: string,
+  ): Promise<Array<{ name: string; rollId: string }>> {
+    const userRolls = await db
+      .select({
+        name: rolls.name,
+        rollId: rolls.rollId,
+      })
+      .from(rolls)
+      .where(eq(rolls.userId, userId));
+    if (userRolls.length === 0) {
+      return [];
+    }
 
-		const roll_ids = userRolls.map((roll) => roll.roll_id);
-		const links = await db
-			.select({
-				roll_id: rollPhotos.roll_id,
-			})
-			.from(rollPhotos)
-			.where(
-				and(
-					eq(rollPhotos.photo_id, photo_id),
-					inArray(rollPhotos.roll_id, roll_ids)
-				)
-			);
+    const rollIds = userRolls.map((roll) => roll.rollId);
+    const links = await db
+      .select({
+        rollId: rollPhotos.rollId,
+      })
+      .from(rollPhotos)
+      .where(
+        and(
+          eq(rollPhotos.photoId, photoId),
+          inArray(rollPhotos.rollId, rollIds),
+        ),
+      );
 
-		const linkedRollIds = new Set(
-			links
-				.map((link) => link.roll_id)
-				.filter((value): value is string => Boolean(value))
-		);
-		return userRolls
-			.filter((roll) => linkedRollIds.has(roll.roll_id))
-			.map((roll) => ({
-				roll_id: roll.roll_id,
-				name: roll.name,
-			}));
-	}
+    const linkedRollIds = new Set(
+      links
+        .map((link) => link.rollId)
+        .filter((value): value is string => Boolean(value)),
+    );
+    return userRolls
+      .filter((roll) => linkedRollIds.has(roll.rollId))
+      .map((roll) => ({
+        rollId: roll.rollId,
+        name: roll.name,
+      }));
+  }
 
-	async listByUserId(
-		user_id: string,
-		sort: "latest" | "oldest"
-	): Promise<RollResponseDto[]> {
-		const rollRows = await db
-			.select()
-			.from(rolls)
-			.where(eq(rolls.user_id, user_id))
-			.orderBy(
-				sort === "oldest" ? asc(rolls.created_at) : desc(rolls.created_at)
-			);
+  async listByUserId(
+    userId: string,
+    sort: "latest" | "oldest",
+  ): Promise<RollResponseDto[]> {
+    const rollRows = await db
+      .select()
+      .from(rolls)
+      .where(eq(rolls.userId, userId))
+      .orderBy(
+        sort === "oldest" ? asc(rolls.createdAt) : desc(rolls.createdAt),
+      );
 
-		const roll_ids = rollRows.map((roll) => roll.roll_id);
-		const photo_idsByRollId = await this.getPhotoIdsByRollIds(roll_ids);
-		return rollRows.map((roll) =>
-			this.mapToRollResponseDto(roll, photo_idsByRollId.get(roll.roll_id) ?? [])
-		);
-	}
+    const rollIds = rollRows.map((roll) => roll.rollId);
+    const photoIdsByRollId = await this.getPhotoIdsByRollIds(rollIds);
+    return rollRows.map((roll) =>
+      this.mapToRollResponseDto(roll, photoIdsByRollId.get(roll.rollId) ?? []),
+    );
+  }
 
-	async addPhotoToRoll(roll_id: string, photo_id: string): Promise<number> {
-		const [roll] = await db
-			.select({ id: rolls.roll_id })
-			.from(rolls)
-			.where(eq(rolls.roll_id, roll_id))
-			.limit(1);
-		if (!roll) {
-			return 0;
-		}
+  async addPhotoToRoll(rollId: string, photoId: string): Promise<number> {
+    const [roll] = await db
+      .select({ id: rolls.rollId })
+      .from(rolls)
+      .where(eq(rolls.rollId, rollId))
+      .limit(1);
+    if (!roll) {
+      return 0;
+    }
 
-		await db
-			.insert(rollPhotos)
-			.values({
-				photo_id,
-				roll_id,
-			})
-			.onConflictDoNothing({
-				target: [rollPhotos.roll_id, rollPhotos.photo_id],
-			});
+    await db
+      .insert(rollPhotos)
+      .values({
+        photoId,
+        rollId,
+      })
+      .onConflictDoNothing({
+        target: [rollPhotos.rollId, rollPhotos.photoId],
+      });
 
-		return 1;
-	}
+    return 1;
+  }
 
-	async removePhotoFromRoll(roll_id: string, photo_id: string): Promise<void> {
-		await db
-			.delete(rollPhotos)
-			.where(
-				and(eq(rollPhotos.roll_id, roll_id), eq(rollPhotos.photo_id, photo_id))
-			);
-	}
+  async removePhotoFromRoll(rollId: string, photoId: string): Promise<void> {
+    await db
+      .delete(rollPhotos)
+      .where(
+        and(eq(rollPhotos.rollId, rollId), eq(rollPhotos.photoId, photoId)),
+      );
+  }
 
-	async update(
-		roll_id: string,
-		payload: RollUpdateDto
-	): Promise<RollResponseDto | null> {
-		const updateData: {
-			description?: string;
-			image_url?: string;
-			name?: string;
-		} = {};
-		if (payload.description !== undefined) {
-			updateData.description = payload.description;
-		}
-		if (payload.image_url !== undefined) {
-			updateData.image_url = payload.image_url;
-		}
-		if (payload.name !== undefined) {
-			updateData.name = payload.name;
-		}
+  async update(
+    rollId: string,
+    payload: RollUpdateDto,
+  ): Promise<RollResponseDto | null> {
+    const updateData: {
+      description?: string;
+      imageUrl?: string;
+      name?: string;
+    } = {};
+    if (payload.description !== undefined) {
+      updateData.description = payload.description;
+    }
+    if (payload.imageUrl !== undefined) {
+      updateData.imageUrl = payload.imageUrl;
+    }
+    if (payload.name !== undefined) {
+      updateData.name = payload.name;
+    }
 
-		const [updated] = await db
-			.update(rolls)
-			.set(updateData)
-			.where(eq(rolls.roll_id, roll_id))
-			.returning();
-		if (!updated) {
-			return null;
-		}
+    const [updated] = await db
+      .update(rolls)
+      .set(updateData)
+      .where(eq(rolls.rollId, rollId))
+      .returning();
+    if (!updated) {
+      return null;
+    }
 
-		const photo_idsByRollId = await this.getPhotoIdsByRollIds([roll_id]);
-		return this.mapToRollResponseDto(
-			updated,
-			photo_idsByRollId.get(roll_id) ?? []
-		);
-	}
+    const photoIdsByRollId = await this.getPhotoIdsByRollIds([rollId]);
+    return this.mapToRollResponseDto(
+      updated,
+      photoIdsByRollId.get(rollId) ?? [],
+    );
+  }
 
-	async deleteById(roll_id: string): Promise<RollResponseDto | null> {
-		const existing = await this.getById(roll_id);
-		if (!existing) {
-			return null;
-		}
+  async deleteById(rollId: string): Promise<RollResponseDto | null> {
+    const existing = await this.getById(rollId);
+    if (!existing) {
+      return null;
+    }
 
-		await db.delete(rolls).where(eq(rolls.roll_id, roll_id));
-		return existing;
-	}
+    await db.delete(rolls).where(eq(rolls.rollId, rollId));
+    return existing;
+  }
 }

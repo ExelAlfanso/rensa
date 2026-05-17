@@ -31,7 +31,7 @@ export const rollsOpenApiDocFragment: OpenApiFragment = {
 						"application/json": {
 							schema: { $ref: "#/components/schemas/CreateRollDto" },
 							example: {
-								user_id: "0f2d8f3e-1dd7-4a52-9dd7-8cbffa4fd89f",
+								userId: "0f2d8f3e-1dd7-4a52-9dd7-8cbffa4fd89f",
 								name: "My Travel Roll",
 								description: "Trip photos",
 							},
@@ -55,7 +55,7 @@ export const rollsOpenApiDocFragment: OpenApiFragment = {
 				parameters: [
 					{
 						in: "query",
-						name: "photo_id",
+						name: "photoId",
 						required: true,
 						schema: { type: "string", format: "uuid" },
 					},

@@ -87,7 +87,7 @@ export const rollByIdOpenApiFragment: OpenApiFragment = {
 				responses: { 200: { description: "Roll photos listed" } },
 			},
 		},
-		"/api/rolls/[rollId]/photos/[photo_id]": {
+		"/api/rolls/[rollId]/photos/[photoId]": {
 			post: {
 				tags: ["rolls"],
 				summary: "Add photo to roll",
@@ -100,7 +100,7 @@ export const rollByIdOpenApiFragment: OpenApiFragment = {
 					},
 					{
 						in: "path",
-						name: "photo_id",
+						name: "photoId",
 						required: true,
 						schema: { type: "string", format: "uuid" },
 					},
@@ -119,7 +119,7 @@ export const rollByIdOpenApiFragment: OpenApiFragment = {
 					},
 					{
 						in: "path",
-						name: "photo_id",
+						name: "photoId",
 						required: true,
 						schema: { type: "string", format: "uuid" },
 					},

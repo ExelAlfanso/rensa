@@ -3,7 +3,7 @@ import type { Photo } from "@/frontend/types/photo";
 
 interface PicsumPhoto {
 	author: string;
-	download_url: string;
+	downloadUrl: string;
 	height: number;
 	id: string;
 	url: string;
@@ -12,18 +12,18 @@ interface PicsumPhoto {
 
 const toPhoto = (photo: PicsumPhoto): Photo => ({
 	bookmarks: 0,
-	created_at: undefined,
+	createdAt: undefined,
 	description: `Photo by ${photo.author}`,
 	metadata: {
 		height: photo.height,
 		width: photo.width,
 		format: "jpg",
 	},
-	photo_id: photo.id,
+	photoId: photo.id,
 	title: `Picsum #${photo.id}`,
-	url: photo.download_url,
+	url: photo.downloadUrl,
 	user: {
-		user_id: photo.author.toLowerCase().replaceAll(" ", "-"),
+		userId: photo.author.toLowerCase().replaceAll(" ", "-"),
 		username: photo.author,
 	},
 });

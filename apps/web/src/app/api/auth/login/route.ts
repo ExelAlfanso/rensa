@@ -72,9 +72,9 @@ export async function POST(req: Request) {
 		const defaultRoll = await rollsApplication.create(
 			{
 				name: "All Photos",
-				user_id: user.user_id,
+				userId: user.userId,
 			},
-			user.user_id
+			user.userId
 		);
 		if (!defaultRoll) {
 			return NextResponse.json(
@@ -96,7 +96,7 @@ export async function POST(req: Request) {
 			success: true,
 			message: "Login successful",
 			user: {
-				id: user.user_id,
+				id: user.userId,
 				name: user.username,
 				email: user.email,
 			},

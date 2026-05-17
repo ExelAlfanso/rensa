@@ -22,8 +22,8 @@ export async function POST(req: Request) {
 			forwardedIp?.split(",")[0]?.trim() || fallbackIp || "unknown";
 		const userAgent = req.headers.get("user-agent") || "";
 		const result = await contactService.submit(body, {
-			ip_address: ipAddress,
-			user_agent: userAgent,
+			ipAddress: ipAddress,
+			userAgent: userAgent,
 		});
 
 		return NextResponse.json(

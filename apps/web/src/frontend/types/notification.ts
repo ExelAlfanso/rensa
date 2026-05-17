@@ -1,5 +1,5 @@
 export interface NotificationActor {
-	avatar?: string;
+	avatarUrl?: string;
 	id: string;
 	username: string;
 }

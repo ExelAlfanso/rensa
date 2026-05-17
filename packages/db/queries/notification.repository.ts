@@ -89,29 +89,29 @@ export class NotificationRepository implements NotificationRepositoryInterface {
 
 type CreateNotificationInput = Pick<
 	NewNotification,
-	"actor_id" | "photo_id" | "recipient_id" | "type"
+	"actorId" | "photoId" | "recipientId" | "type"
 >;
 
 export class NotificationDbRepository {
 	async findByRecipient(params: {
 		limit: number;
 		offset: number;
-		recipient_id: string;
+		recipientId: string;
 	}): Promise<Notification[]> {
 		return await db
 			.select()
 			.from(notifications)
-			.where(eq(notifications.recipient_id, params.recipient_id))
-			.orderBy(desc(notifications.created_at))
+			.where(eq(notifications.recipientId, params.recipientId))
+			.orderBy(desc(notifications.createdAt))
 			.limit(params.limit)
 			.offset(params.offset);
 	}
 
-	async countByRecipient(recipient_id: string): Promise<number> {
+	async countByRecipient(recipientId: string): Promise<number> {
 		const [result] = await db
 			.select({ total: count() })
 			.from(notifications)
-			.where(eq(notifications.recipient_id, recipient_id));
+			.where(eq(notifications.recipientId, recipientId));
 
 		return result?.total ?? 0;
 	}
@@ -129,11 +129,11 @@ export class NotificationDbRepository {
 		return notification;
 	}
 
-	async deleteByRecipient(recipient_id: string): Promise<number> {
+	async deleteByRecipient(recipientId: string): Promise<number> {
 		const deleted = await db
 			.delete(notifications)
-			.where(eq(notifications.recipient_id, recipient_id))
-			.returning({ id: notifications.id });
+			.where(eq(notifications.recipientId, recipientId))
+			.returning({ id: notifications.notificationId });
 
 		return deleted.length;
 	}
@@ -141,8 +141,8 @@ export class NotificationDbRepository {
 	async markAsRead(id: string): Promise<Notification | null> {
 		const [notification] = await db
 			.update(notifications)
-			.set({ read: true, updated_at: new Date() })
-			.where(eq(notifications.id, id))
+			.set({ read: true, updatedAt: new Date() })
+			.where(eq(notifications.notificationId, id))
 			.returning();
 
 		return notification ?? null;

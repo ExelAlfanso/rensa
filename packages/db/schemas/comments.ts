@@ -3,59 +3,57 @@ import { photos } from "./photos";
 import { users } from "./users";
 
 export const comments = pgTable(
-	"comments",
-	{
-		comment_id: uuid("comment_id").primaryKey().defaultRandom(),
-		photo_id: uuid("photo_id").references(() => photos.photo_id, {
-			onDelete: "cascade",
-		}),
-		user_id: uuid("user_id").references(() => users.user_id, {
-			onDelete: "cascade",
-		}),
-		text: text("text").notNull(),
-		created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
-		updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow(),
-	},
-	(table) => [
-		index("idx_comments_photo").on(table.photo_id),
-		index("idx_comments_user").on(table.user_id),
-	]
+  "comments",
+  {
+    commentId: uuid("comment_id").primaryKey().defaultRandom(),
+    photoId: uuid("photo_id").references(() => photos.photoId, {
+      onDelete: "cascade",
+    }),
+    userId: uuid("user_id").references(() => users.userId, {
+      onDelete: "cascade",
+    }),
+    text: text("text").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+  },
+  (table) => [
+    index("idx_comments_photo").on(table.photoId),
+    index("idx_comments_user").on(table.userId),
+  ],
 );
 
 export interface CommentResponseDto {
-	comment_id: string;
-	created_at?: string;
-	photo_id: string;
-	text: string;
-	updated_at?: string;
-	user_id:
-		| string
-		| {
-				avatar_url?: string;
-				id: string;
-				username: string;
-		  };
+  commentId: string;
+  createdAt?: string;
+  photoId: string;
+  text: string;
+  updatedAt?: string;
+  user: {
+    userId: string;
+    username: string;
+    avatarUrl?: string;
+  };
 }
 
 export interface CreateCommentDto {
-	text: string;
-	user_id?: string;
+  text: string;
+  userId?: string;
 }
 
 export interface ListCommentsResult {
-	comments: CommentResponseDto[];
-	total: number;
+  comments: CommentResponseDto[];
+  total: number;
 }
 
 export interface CommentRepositoryInterface {
-	create(params: {
-		photo_id: string;
-		text: string;
-		user_id: string;
-	}): Promise<CommentResponseDto>;
-	listByPhotoId(params: {
-		limit: number;
-		offset: number;
-		photo_id: string;
-	}): Promise<ListCommentsResult>;
+  create(params: {
+    photoId: string;
+    text: string;
+    userId: string;
+  }): Promise<CommentResponseDto>;
+  listByPhotoId(params: {
+    limit: number;
+    offset: number;
+    photoId: string;
+  }): Promise<ListCommentsResult>;
 }

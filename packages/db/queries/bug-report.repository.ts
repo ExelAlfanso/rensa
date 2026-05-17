@@ -27,7 +27,7 @@ export class BugReportRepository {
 			})
 			.returning({
 				bugReportId: bugReports.bugReportId,
-				created_at: bugReports.created_at,
+				createdAt: bugReports.createdAt,
 				email: bugReports.email,
 				title: bugReports.title,
 			});
@@ -59,13 +59,13 @@ export class BugReportRepository {
 		}
 
 		const orderByClause =
-			sortField === "updated_at"
+			sortField === "updatedAt"
 				? descending
-					? desc(bugReports.updated_at)
-					: bugReports.updated_at
+					? desc(bugReports.updatedAt)
+					: bugReports.updatedAt
 				: descending
-					? desc(bugReports.created_at)
-					: bugReports.created_at;
+					? desc(bugReports.createdAt)
+					: bugReports.createdAt;
 
 		const data = await db
 			.select()

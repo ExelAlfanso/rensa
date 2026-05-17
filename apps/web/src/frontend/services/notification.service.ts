@@ -7,31 +7,31 @@ export type PhotoNotificationType =
 	| "photo-saved";
 
 export const fetchNotifications = async (
-	recipient_id: string,
+	recipientId: string,
 	page = 1,
 	limit = 10
 ) => {
 	const res = await api.get("/notifications", {
-		params: { recipient_id, page, limit },
+		params: { recipientId, page, limit },
 	});
 	return res.data?.data ?? [];
 };
 
 const sendPhotoNotification = async (
-	actor_id: string,
-	photo_id: string,
+	actorId: string,
+	photoId: string,
 	type: PhotoNotificationType
 ) => {
-	const recipient_id = await fetchPhotoOwnerByPhotoId(photo_id);
+	const recipientId = await fetchPhotoOwnerByPhotoId(photoId);
 
-	if (!recipient_id || recipient_id === actor_id) {
+	if (!recipientId || recipientId === actorId) {
 		return null;
 	}
 
 	const res = await api.post("/notifications", {
-		actor_id,
-		recipient_id,
-		photo_id,
+		actorId,
+		recipientId,
+		photoId,
 		type,
 	});
 
@@ -39,17 +39,17 @@ const sendPhotoNotification = async (
 };
 
 export const sendPhotoSavedNotification = (
-	actor_id: string,
-	photo_id: string
-) => sendPhotoNotification(actor_id, photo_id, "photo-saved");
+	actorId: string,
+	photoId: string
+) => sendPhotoNotification(actorId, photoId, "photo-saved");
 
 export const sendBookmarkedNotification = (
-	actor_id: string,
-	photo_id: string
-) => sendPhotoNotification(actor_id, photo_id, "photo-bookmarked");
+	actorId: string,
+	photoId: string
+) => sendPhotoNotification(actorId, photoId, "photo-bookmarked");
 
-export const sendCommentedNotification = (actor_id: string, photo_id: string) =>
-	sendPhotoNotification(actor_id, photo_id, "photo-commented");
+export const sendCommentedNotification = (actorId: string, photoId: string) =>
+	sendPhotoNotification(actorId, photoId, "photo-commented");
 
 export const clearUserNotifications = async (userId: string) => {
 	const res = await api.delete(`/notifications/${userId}`);

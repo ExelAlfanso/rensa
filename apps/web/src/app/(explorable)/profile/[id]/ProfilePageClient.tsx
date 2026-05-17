@@ -15,11 +15,11 @@ import {
 	type SortOption,
 } from "@/frontend/services/roll.service";
 import { useAuthStore } from "@/frontend/stores/useAuthStore";
-import type { Roll } from "@/frontend/types/roll";
+import type { Roll, SelectedRoll } from "@/frontend/types/roll";
 
 interface ProfilePageClientProps {
 	profileData: {
-		user: { id: string; username: string; avatar?: string };
+		user: { avatarUrl?: string; id: string; username: string };
 		rolls: Roll[];
 	};
 }
@@ -46,7 +46,7 @@ export default function ProfilePageClient({
 					return [];
 				}
 				return oldRolls.map((r) =>
-					r.roll_id === roll.rollId ? { ...r, name: roll.name } : r
+					r.rollId === roll.rollId ? { ...r, name: roll.name } : r
 				);
 			}
 		);
@@ -58,7 +58,7 @@ export default function ProfilePageClient({
 				if (!oldRolls) {
 					return [];
 				}
-				return oldRolls.filter((r) => r.roll_id !== rollId);
+				return oldRolls.filter((r) => r.rollId !== rollId);
 			}
 		);
 	};
@@ -72,11 +72,11 @@ export default function ProfilePageClient({
 				}
 				return [
 					{
-						roll_id: roll.roll_id,
+						rollId: roll.rollId,
 						userId: user?.id || "",
 						name: roll.name,
 						previewPhotos: [],
-						created_at: new Date().toISOString(),
+						createdAt: new Date().toISOString(),
 					},
 					...oldRolls,
 				];
@@ -95,7 +95,7 @@ export default function ProfilePageClient({
 							alt={profileData.user?.username || "User Avatar"}
 							className="h-full w-full object-cover"
 							fill
-							src={profileData.user?.avatar || "/profile.jpg"}
+							src={profileData.user?.avatarUrl || "/profile.jpg"}
 						/>
 					</div>
 					<Heading className="mt-4 text-black" size="l">

@@ -56,7 +56,7 @@ export const profileByIdOpenApiFragment: OpenApiFragment = {
 					id: { type: "string", format: "uuid" },
 					username: { type: "string" },
 					email: { type: "string", format: "email" },
-					avatar: { type: "string", format: "binary" },
+					avatarUrl: { type: "string", format: "binary" },
 				},
 			},
 		},

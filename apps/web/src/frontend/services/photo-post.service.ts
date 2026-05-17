@@ -7,16 +7,16 @@ import {
 
 export const bookmarkPhoto = async (
 	userId: string | undefined,
-	photo_id: string,
+	photoId: string,
 	action: "decrement" | "increment"
 ) => {
-	const res = await api.post(`/photos/bookmark/${photo_id}`, {
+	const res = await api.post(`/photos/bookmark/${photoId}`, {
 		action,
 		userId,
 	});
 
 	if (action === "increment") {
-		await sendBookmarkedNotification(userId || "", photo_id);
+		await sendBookmarkedNotification(userId || "", photoId);
 	}
 
 	return res.data.bookmarks;
@@ -34,6 +34,6 @@ export const commentPhoto = async (
 	await sendCommentedNotification(userId || "", id);
 };
 
-export const removeUserPhoto = async (photo_id: string) => {
-	await api.delete(`/photos/${photo_id}`);
+export const removeUserPhoto = async (photoId: string) => {
+	await api.delete(`/photos/${photoId}`);
 };

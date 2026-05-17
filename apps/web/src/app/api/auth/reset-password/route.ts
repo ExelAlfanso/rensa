@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
 		const updated = await userRepository.resetPassword({
 			email: payload.email,
 			password: hashedPassword,
-			user_id: payload.id,
+			userId: payload.id,
 		});
 
 		if (!updated) {

@@ -107,15 +107,15 @@ export const fetchExplorePhotos = async (
 	};
 };
 
-export const fetchPhotoOwnerByPhotoId = async (photo_id: string) => {
+export const fetchPhotoOwnerByPhotoId = async (photoId: string) => {
 	const res = await api.get<{ data: { ownerId: string } }>(
-		`/photos/${photo_id}/owner`
+		`/photos/${photoId}/owner`
 	);
 	return res.data.data.ownerId;
 };
 
-export const fetchPhotoById = async (photo_id: string) => {
-	const res = await api.get(`/photos/${photo_id}`);
+export const fetchPhotoById = async (photoId: string) => {
+	const res = await api.get(`/photos/${photoId}`);
 	return res.data.data;
 };
 
