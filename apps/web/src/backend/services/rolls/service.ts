@@ -1,3 +1,5 @@
+import { PhotoRepository } from "@rensa/db/queries/photo.repository";
+import { RollRepository } from "@rensa/db/queries/roll.repository";
 import type {
 	ListRollPhotosQueryDto,
 	PhotoRepositoryInterface,
@@ -194,3 +196,8 @@ export class RollService {
 		};
 	}
 }
+
+const rollRepository = new RollRepository();
+const photoRepository = new PhotoRepository();
+
+export const rollService = new RollService(rollRepository, photoRepository);

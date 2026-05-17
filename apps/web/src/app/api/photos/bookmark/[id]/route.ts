@@ -7,7 +7,7 @@ import {
 } from "@/backend/common/backend.error";
 import { bookmarkActionDto } from "@/backend/dtos/bookmark.dto";
 import { photoIdParamDto } from "@/backend/dtos/photo.dto";
-import { bookmarkController } from "@/backend/services/bookmarks/controller";
+import { bookmarkService } from "@/backend/services/bookmarks/service";
 import { authOptions } from "@/lib/auth";
 
 /*
@@ -26,17 +26,17 @@ export async function POST(
 			throw new UnauthorizedError();
 		}
 
-		const result = await bookmarkController.updateBookmark({
-			photoId: params.id,
-			userId: body.userId,
+		const result = await bookmarkService.updateBookmark({
+			photo_id: params.id,
+			user_id: body.user_id,
 			action: body.action,
-			actorId,
+			actor_id: actorId,
 		});
 
 		return NextResponse.json({
 			success: true,
 			bookmarks: result.bookmarks,
-			isBookmarked: result.isBookmarked,
+			is_bookmarked: result.is_bookmarked,
 			message: "Bookmark updated",
 		});
 	} catch (error) {

@@ -1,7 +1,7 @@
 import { UserRepository } from "@rensa/db/queries/user.repository";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { type NextRequest, NextResponse } from "next/server";
-import { userController } from "@/backend/services/users/controller";
+import { userService } from "@/backend/services/users/service";
 
 const userRepository = new UserRepository();
 
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
 		}
 
 		const { email } = payload;
-		const user = await userController.getByEmail(email);
+		const user = await userService.getByEmail(email);
 
 		if (!user) {
 			return NextResponse.json(

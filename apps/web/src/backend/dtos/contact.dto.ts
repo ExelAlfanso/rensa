@@ -10,12 +10,12 @@ export const contactResponseDto = z
 		email: z.email(),
 		subject: z.string().min(1),
 		message: z.string().min(1),
-		ipAddress: z.string().min(1),
-		userAgent: z.string().optional(),
+		ip_address: z.string().min(1),
+		user_agent: z.string().optional(),
 		status: contactStatusDto,
-		respondedAt: z.union([z.string(), z.date()]).optional(),
-		createdAt: z.union([z.string(), z.date()]).optional(),
-		updatedAt: z.union([z.string(), z.date()]).optional(),
+		responded_at: z.union([z.string(), z.date()]).optional(),
+		created_at: z.union([z.string(), z.date()]).optional(),
+		updated_at: z.union([z.string(), z.date()]).optional(),
 	})
 	.passthrough();
 

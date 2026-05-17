@@ -13,16 +13,16 @@ const toIso = (value: Date | null): string | undefined =>
 
 export class CommentRepository implements CommentRepositoryInterface {
 	async create(params: {
-		photoId: string;
-		userId: string;
+		photo_id: string;
+		user_id: string;
 		text: string;
 	}): Promise<CommentResponseDto> {
 		const [row] = await db
 			.insert(comments)
 			.values({
-				photoId: params.photoId,
+				photo_id: params.photo_id,
 				text: params.text,
-				userId: params.userId,
+				user_id: params.user_id,
 			})
 			.returning();
 		if (!row) {
@@ -30,60 +30,60 @@ export class CommentRepository implements CommentRepositoryInterface {
 		}
 
 		return {
-			comment_id: row.commentId,
-			photoId: row.photoId ?? "",
-			userId: row.userId ?? "",
+			comment_id: row.comment_id,
+			photo_id: row.photo_id ?? "",
+			user_id: row.user_id ?? "",
 			text: row.text,
-			createdAt: toIso(row.createdAt),
-			updatedAt: toIso(row.updatedAt),
+			created_at: toIso(row.created_at),
+			updated_at: toIso(row.updated_at),
 		};
 	}
 
 	async listByPhotoId(params: {
-		photoId: string;
+		photo_id: string;
 		offset: number;
 		limit: number;
 	}): Promise<ListCommentsResult> {
 		const rows = await db
 			.select({
 				avatar: users.avatar,
-				commentId: comments.commentId,
-				createdAt: comments.createdAt,
-				photoId: comments.photoId,
+				comment_id: comments.comment_id,
+				created_at: comments.created_at,
+				photo_id: comments.photo_id,
 				text: comments.text,
-				updatedAt: comments.updatedAt,
-				userId: comments.userId,
+				updated_at: comments.updated_at,
+				user_id: comments.user_id,
 				username: users.username,
 			})
 			.from(comments)
-			.leftJoin(users, eq(comments.userId, users.userId))
-			.where(eq(comments.photoId, params.photoId))
-			.orderBy(asc(comments.createdAt))
+			.leftJoin(users, eq(comments.user_id, users.user_id))
+			.where(eq(comments.photo_id, params.photo_id))
+			.orderBy(asc(comments.created_at))
 			.limit(params.limit)
 			.offset(params.offset);
 
 		const [countRow] = await db
 			.select({ total: count() })
 			.from(comments)
-			.where(eq(comments.photoId, params.photoId));
+			.where(eq(comments.photo_id, params.photo_id));
 
 		const mapped = rows.map((row) => {
 			const user =
-				row.userId && row.username
+				row.user_id && row.username
 					? {
-							id: row.userId,
+							id: row.user_id,
 							username: row.username,
-							avatarUrl: row.avatar ?? undefined,
+							avatar_url: row.avatar ?? undefined,
 						}
-					: (row.userId ?? "");
+					: (row.user_id ?? "");
 
 			return {
-				comment_id: row.commentId,
-				photoId: row.photoId ?? "",
-				userId: user,
+				comment_id: row.comment_id,
+				photo_id: row.photo_id ?? "",
+				user_id: user,
 				text: row.text,
-				createdAt: toIso(row.createdAt),
-				updatedAt: toIso(row.updatedAt),
+				created_at: toIso(row.created_at),
+				updated_at: toIso(row.updated_at),
 			};
 		});
 

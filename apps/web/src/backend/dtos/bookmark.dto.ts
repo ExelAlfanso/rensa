@@ -21,10 +21,19 @@ export const updateBookmarkDto = bookmarkResponseDto.partial().omit({
 	updated_at: true,
 });
 
-export const bookmarkActionDto = z.object({
-	action: z.enum(["increment", "decrement"]),
-	userId: z.uuid(),
-});
+export const bookmarkActionDto = z
+	.object({
+		action: z.enum(["increment", "decrement"]),
+		user_id: z.uuid().optional(),
+		userId: z.uuid().optional(),
+	})
+	.refine((value) => value.user_id ?? value.userId, {
+		message: "user_id is required",
+	})
+	.transform((value) => ({
+		action: value.action,
+		user_id: (value.user_id ?? value.userId) as string,
+	}));
 
 export type BookmarkResponseDto = z.infer<typeof bookmarkResponseDto>;
 export type CreateBookmarkDto = z.infer<typeof createBookmarkDto>;

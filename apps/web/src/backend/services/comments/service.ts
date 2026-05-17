@@ -1,3 +1,4 @@
+import { CommentRepository } from "@rensa/db/queries/comment.repository";
 import type {
 	CommentRepositoryInterface,
 	CreateCommentDto,
@@ -22,16 +23,16 @@ export class CommentService {
 	}
 
 	async createForPhoto(
-		photoId: string,
+		photo_id: string,
 		payload: CreateCommentDto,
-		actorId?: string
+		actor_id?: string
 	): Promise<unknown> {
-		const effectiveActorId = actorId ?? payload.userId;
-		if (!effectiveActorId) {
+		const effective_actor_id = actor_id ?? payload.user_id;
+		if (!effective_actor_id) {
 			throw new UnauthorizedError();
 		}
 
-		if (payload.userId && payload.userId !== effectiveActorId) {
+		if (payload.user_id && payload.user_id !== effective_actor_id) {
 			throw new ForbiddenError(
 				"Cannot create comments on behalf of other users"
 			);
@@ -39,8 +40,8 @@ export class CommentService {
 
 		try {
 			return await this.commentRepository.create({
-				photoId,
-				userId: effectiveActorId,
+				photo_id,
+				user_id: effective_actor_id,
 				text: payload.text,
 			});
 		} catch {
@@ -49,12 +50,12 @@ export class CommentService {
 	}
 
 	async listByPhotoId(
-		photoId: string,
+		photo_id: string,
 		offset: number,
 		limit: number
 	): Promise<ListCommentsResult> {
 		const { comments, total } = await this.commentRepository.listByPhotoId({
-			photoId,
+			photo_id,
 			offset,
 			limit,
 		});
@@ -66,3 +67,5 @@ export class CommentService {
 		};
 	}
 }
+
+export const commentService = new CommentService(new CommentRepository());

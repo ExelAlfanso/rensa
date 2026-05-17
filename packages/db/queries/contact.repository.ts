@@ -17,8 +17,8 @@ export class ContactRepository implements ContactRepositoryInterface {
 		email: string;
 		subject: string;
 		message: string;
-		ipAddress: string;
-		userAgent: string;
+		ip_address: string;
+		user_agent: string;
 	}): Promise<ContactResponseDto> {
 		const [row] = await db
 			.insert(contacts)
@@ -27,8 +27,8 @@ export class ContactRepository implements ContactRepositoryInterface {
 				email: params.email,
 				subject: params.subject,
 				message: params.message,
-				ipAddress: params.ipAddress,
-				userAgent: params.userAgent,
+				ip_address: params.ip_address,
+				user_agent: params.user_agent,
 				status: "new",
 			})
 			.returning();
@@ -37,17 +37,17 @@ export class ContactRepository implements ContactRepositoryInterface {
 		}
 
 		return {
-			_id: row.contactId,
+			_id: row.contact_id,
 			name: row.name,
 			email: row.email,
 			subject: row.subject,
 			message: row.message,
-			ipAddress: row.ipAddress ?? "",
-			userAgent: row.userAgent ?? undefined,
+			ip_address: row.ip_address ?? "",
+			user_agent: row.user_agent ?? undefined,
 			status: row.status ?? "new",
-			respondedAt: toIso(row.respondedAt),
-			createdAt: toIso(row.createdAt),
-			updatedAt: toIso(row.updatedAt),
+			responded_at: toIso(row.responded_at),
+			created_at: toIso(row.created_at),
+			updated_at: toIso(row.updated_at),
 		};
 	}
 
@@ -58,7 +58,7 @@ export class ContactRepository implements ContactRepositoryInterface {
 			.select()
 			.from(contacts)
 			.where(eq(contacts.status, query.status))
-			.orderBy(desc(contacts.createdAt))
+			.orderBy(desc(contacts.created_at))
 			.limit(query.limit)
 			.offset(from);
 		const [countRow] = await db
@@ -67,17 +67,17 @@ export class ContactRepository implements ContactRepositoryInterface {
 			.where(eq(contacts.status, query.status));
 
 		const mapped = rows.map((contact) => ({
-			_id: contact.contactId,
+			_id: contact.contact_id,
 			name: contact.name,
 			email: contact.email,
 			subject: contact.subject,
 			message: contact.message,
-			ipAddress: contact.ipAddress ?? "",
-			userAgent: contact.userAgent ?? undefined,
+			ip_address: contact.ip_address ?? "",
+			user_agent: contact.user_agent ?? undefined,
 			status: contact.status ?? "new",
-			respondedAt: toIso(contact.respondedAt),
-			createdAt: toIso(contact.createdAt),
-			updatedAt: toIso(contact.updatedAt),
+			responded_at: toIso(contact.responded_at),
+			created_at: toIso(contact.created_at),
+			updated_at: toIso(contact.updated_at),
 		}));
 
 		return {

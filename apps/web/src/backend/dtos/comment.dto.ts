@@ -3,26 +3,32 @@ import { z } from "zod";
 const commentUserDto = z.object({
 	id: z.string().min(1),
 	username: z.string().min(1),
-	avatarUrl: z.string().optional(),
+	avatar_url: z.string().optional(),
 });
 
 export const commentResponseDto = z.object({
 	comment_id: z.string().min(1),
-	photoId: z.string().min(1),
-	userId: z.union([z.string().min(1), commentUserDto]),
+	photo_id: z.string().min(1),
+	user_id: z.union([z.string().min(1), commentUserDto]),
 	text: z.string().min(1).max(500),
-	createdAt: z.union([z.string(), z.date()]).optional(),
-	updatedAt: z.union([z.string(), z.date()]).optional(),
+	created_at: z.union([z.string(), z.date()]).optional(),
+	updated_at: z.union([z.string(), z.date()]).optional(),
 });
 
 export const commentPhotoParamsDto = z.object({
 	id: z.string().min(1),
 });
 
-export const createCommentDto = z.object({
-	text: z.string().trim().min(1).max(500),
-	userId: z.string().min(1).optional(),
-});
+export const createCommentDto = z
+	.object({
+		text: z.string().trim().min(1).max(500),
+		user_id: z.string().min(1).optional(),
+		userId: z.string().min(1).optional(),
+	})
+	.transform((value) => ({
+		text: value.text,
+		user_id: value.user_id ?? value.userId,
+	}));
 
 export const listCommentsQueryDto = z.object({
 	offset: z.coerce.number().int().min(0).default(0),

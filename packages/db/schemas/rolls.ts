@@ -12,30 +12,30 @@ import { users } from "./users";
 export const rolls = pgTable(
 	"rolls",
 	{
-		rollId: uuid("roll_id").primaryKey().defaultRandom(),
-		userId: uuid("user_id").references(() => users.userId, {
+		roll_id: uuid("roll_id").primaryKey().defaultRandom(),
+		user_id: uuid("user_id").references(() => users.user_id, {
 			onDelete: "cascade",
 		}),
 		name: text("name").notNull(),
 		description: text("description"),
-		imageUrl: text("image_url"),
-		createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
-		updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+		image_url: text("image_url"),
+		created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
+		updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 	},
-	(table) => [index("idx_rolls_user").on(table.userId)]
+	(table) => [index("idx_rolls_user").on(table.user_id)]
 );
 
 export const rollPhotos = pgTable(
 	"roll_photos",
 	{
-		rollId: uuid("roll_id").references(() => rolls.rollId, {
+		roll_id: uuid("roll_id").references(() => rolls.roll_id, {
 			onDelete: "cascade",
 		}),
-		photoId: uuid("photo_id").references(() => photos.photoId, {
+		photo_id: uuid("photo_id").references(() => photos.photo_id, {
 			onDelete: "cascade",
 		}),
 	},
-	(table) => [primaryKey({ columns: [table.rollId, table.photoId] })]
+	(table) => [primaryKey({ columns: [table.roll_id, table.photo_id] })]
 );
 
 interface Passthrough {
@@ -44,14 +44,14 @@ interface Passthrough {
 
 export interface RollCreateDto {
 	description?: string;
-	imageUrl?: string;
+	image_url?: string;
 	name: string;
 	user_id: string;
 }
 
 export interface RollUpdateDto {
 	description?: string;
-	imageUrl?: string;
+	image_url?: string;
 	name?: string;
 }
 
@@ -61,13 +61,13 @@ export interface ListRollPhotosQueryDto {
 }
 
 export interface RollResponseDto extends Passthrough {
-	createdAt?: string;
+	created_at?: string;
 	description: string;
-	imageUrl: string;
+	image_url: string;
 	name: string;
 	photos: string[];
 	roll_id: string;
-	updatedAt?: string;
+	updated_at?: string;
 	user_id: string;
 }
 

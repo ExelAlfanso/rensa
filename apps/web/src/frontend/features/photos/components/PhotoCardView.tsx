@@ -39,9 +39,7 @@ const PhotoCardView: React.FC<PhotoCardViewProps> = ({
 	onSaveToggle,
 	showVisitPageCta,
 }) => {
-	const user = photo.userId ?? photo.user_id;
-	const username =
-		typeof user === "object" && user !== null ? user.username : undefined;
+	const username = photo.user?.username;
 
 	return (
 		<motion.div

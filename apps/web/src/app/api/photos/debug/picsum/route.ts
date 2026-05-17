@@ -12,7 +12,7 @@ interface PicsumPhoto {
 
 const toPhoto = (photo: PicsumPhoto): Photo => ({
 	bookmarks: 0,
-	createdAt: undefined,
+	created_at: undefined,
 	description: `Photo by ${photo.author}`,
 	metadata: {
 		height: photo.height,
@@ -22,8 +22,8 @@ const toPhoto = (photo: PicsumPhoto): Photo => ({
 	photo_id: photo.id,
 	title: `Picsum #${photo.id}`,
 	url: photo.download_url,
-	userId: {
-		_id: photo.author.toLowerCase().replaceAll(" ", "-"),
+	user: {
+		user_id: photo.author.toLowerCase().replaceAll(" ", "-"),
 		username: photo.author,
 	},
 });

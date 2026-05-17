@@ -4,17 +4,17 @@ import { contactStatusEnum } from "./enums";
 export const contacts = pgTable(
 	"contacts",
 	{
-		contactId: uuid("contact_id").primaryKey().defaultRandom(),
+		contact_id: uuid("contact_id").primaryKey().defaultRandom(),
 		name: text("name").notNull(),
 		email: text("email").notNull(),
 		subject: text("subject").notNull(),
 		message: text("message").notNull(),
-		ipAddress: text("ip_address"),
-		userAgent: text("user_agent"),
+		ip_address: text("ip_address"),
+		user_agent: text("user_agent"),
 		status: contactStatusEnum("status").default("new"),
-		respondedAt: timestamp("responded_at", { withTimezone: true }),
-		createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
-		updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+		responded_at: timestamp("responded_at", { withTimezone: true }),
+		created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
+		updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 	},
 	(table) => [index("idx_contacts_email").on(table.email)]
 );
@@ -27,16 +27,16 @@ export type ContactStatus = "new" | "read" | "responded";
 
 export interface ContactResponseDto extends Passthrough {
 	_id: string;
-	createdAt?: string;
+	created_at?: string;
 	email: string;
-	ipAddress: string;
+	ip_address: string;
 	message: string;
 	name: string;
-	respondedAt?: string;
+	responded_at?: string;
 	status: ContactStatus;
 	subject: string;
-	updatedAt?: string;
-	userAgent?: string;
+	updated_at?: string;
+	user_agent?: string;
 }
 
 export interface CreateContactDto {
@@ -60,11 +60,11 @@ export interface ListContactsResult {
 export interface ContactRepositoryInterface {
 	create(params: {
 		email: string;
-		ipAddress: string;
+		ip_address: string;
 		message: string;
 		name: string;
 		subject: string;
-		userAgent: string;
+		user_agent: string;
 	}): Promise<ContactResponseDto>;
 	list(query: ListContactsQueryDto): Promise<ListContactsResult>;
 }

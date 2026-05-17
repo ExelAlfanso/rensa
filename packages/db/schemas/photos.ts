@@ -12,8 +12,8 @@ import { users } from "./users";
 export const photos = pgTable(
   "photos",
   {
-    photoId: uuid("photo_id").primaryKey().defaultRandom(),
-    userId: uuid("user_id").references(() => users.userId, {
+    photo_id: uuid("photo_id").primaryKey().defaultRandom(),
+    user_id: uuid("user_id").references(() => users.user_id, {
       onDelete: "cascade",
     }),
     url: text("url").notNull(),
@@ -23,22 +23,22 @@ export const photos = pgTable(
     style: text("style"),
     color: text("color"),
     camera: text("camera"),
-    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
-    updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
+    created_at: timestamp("created_at", { withTimezone: true }).defaultNow(),
+    updated_at: timestamp("updated_at", { withTimezone: true }).defaultNow(),
   },
-  (table) => [index("idx_photos_user").on(table.userId)],
+  (table) => [index("idx_photos_user").on(table.user_id)],
 );
 
 export const photoMetadata = pgTable("photo_metadata", {
-  photoMetadataId: uuid("photo_metadata_id")
+  photo_metadata_id: uuid("photo_metadata_id")
     .primaryKey()
-    .references(() => photos.photoId, { onDelete: "cascade" }),
+    .references(() => photos.photo_id, { onDelete: "cascade" }),
   exif: jsonb("exif").$type<Record<string, unknown>>(),
   width: integer("width"),
   height: integer("height"),
   format: text("format"),
   size: integer("size"),
-  uploadedAt: timestamp("uploaded_at", { withTimezone: true }),
+  uploaded_at: timestamp("uploaded_at", { withTimezone: true }),
 });
 
 interface Passthrough {
@@ -64,7 +64,7 @@ export interface PhotoResponseDto extends Passthrough {
     format?: string;
     height?: number;
     size?: number;
-    uploadedAt?: string;
+    uploaded_at?: string;
     width?: number;
   };
   photo_id: string;
@@ -116,9 +116,9 @@ export interface CreateUploadedPhotoDto {
   size?: number;
   style: string;
   title: string;
-  uploadedAt?: Date;
+  uploaded_at?: Date;
   url: string;
-  userId: string;
+  user_id: string;
   width?: number;
 }
 
@@ -126,18 +126,18 @@ export interface UploadedPhotoDto {
   camera: string | null;
   category: string | null;
   color: string | null;
-  createdAt?: Date | null;
+  created_at?: Date | null;
   description: string | null;
   exif?: Record<string, unknown>;
   format?: string;
   height?: number;
-  photoId: string;
+  photo_id: string;
   size?: number;
   style: string | null;
   title: string;
-  updatedAt?: Date | null;
-  uploadedAt?: Date;
+  updated_at?: Date | null;
+  uploaded_at?: Date;
   url: string;
-  userId: string | null;
+  user_id: string | null;
   width?: number;
 }

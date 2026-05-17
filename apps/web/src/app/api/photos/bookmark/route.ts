@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { BackendError } from "@/backend/common/backend.error";
 import { photoBookmarkQueryDto } from "@/backend/dtos/photo.dto";
-import { photoController } from "@/backend/services/photos/controller";
+import { photoService } from "@/backend/services/photos/service";
 
 /*
   GET /api/photos/bookmark?page=1&limit=10&userId=...
@@ -16,8 +16,8 @@ export async function GET(req: Request) {
 			limit: searchParams.get("limit") ?? undefined,
 		});
 
-		const result = await photoController.listBookmarkedByUser(
-			query.userId,
+		const result = await photoService.listBookmarkedByUser(
+			query.user_id,
 			query.page,
 			query.limit
 		);

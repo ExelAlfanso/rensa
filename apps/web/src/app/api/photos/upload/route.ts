@@ -299,9 +299,9 @@ export async function POST(req: Request) {
 				size: bytes,
 				style,
 				title,
-				uploadedAt: new Date(created_at),
+				uploaded_at: new Date(created_at),
 				url: secure_url,
-				userId,
+				user_id: userId,
 				width,
 			});
 		} catch (persistError) {
@@ -318,8 +318,8 @@ export async function POST(req: Request) {
 		return NextResponse.json({
 			success: true,
 			photo: {
-				photo_id: photo.photoId,
-				user_id: photo.userId,
+				photo_id: photo.photo_id,
+				user_id: photo.user_id,
 				url: photo.url,
 				title: photo.title,
 				description: photo.description,
@@ -327,8 +327,8 @@ export async function POST(req: Request) {
 				style: photo.style,
 				color: photo.color,
 				camera: photo.camera,
-				created_at: photo.createdAt?.toISOString(),
-				updated_at: photo.updatedAt?.toISOString(),
+				created_at: photo.created_at?.toISOString(),
+				updated_at: photo.updated_at?.toISOString(),
 				tags,
 				metadata: {
 					width,
@@ -336,7 +336,7 @@ export async function POST(req: Request) {
 					format,
 					size: bytes,
 					exif,
-					uploadedAt: created_at,
+					uploaded_at: created_at,
 				},
 			},
 		});

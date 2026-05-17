@@ -31,7 +31,7 @@ export class PhotoRepository implements PhotoRepositoryInterface {
         style: payload.style,
         title: payload.title,
         url: payload.url,
-        userId: payload.userId,
+        user_id: payload.user_id,
       })
       .returning();
     if (!photo) {
@@ -43,7 +43,7 @@ export class PhotoRepository implements PhotoRepositoryInterface {
       payload.height !== undefined ||
       payload.format !== undefined ||
       payload.size !== undefined ||
-      payload.uploadedAt !== undefined ||
+      payload.uploaded_at !== undefined ||
       payload.exif !== undefined
     ) {
       await db
@@ -52,19 +52,19 @@ export class PhotoRepository implements PhotoRepositoryInterface {
           exif: payload.exif,
           format: payload.format,
           height: payload.height,
-          photoMetadataId: photo.photoId,
+          photo_metadata_id: photo.photo_id,
           size: payload.size,
-          uploadedAt: payload.uploadedAt,
+          uploaded_at: payload.uploaded_at,
           width: payload.width,
         })
         .onConflictDoUpdate({
-          target: photoMetadata.photoMetadataId,
+          target: photoMetadata.photo_metadata_id,
           set: {
             exif: payload.exif,
             format: payload.format,
             height: payload.height,
             size: payload.size,
-            uploadedAt: payload.uploadedAt,
+            uploaded_at: payload.uploaded_at,
             width: payload.width,
           },
         });
@@ -76,7 +76,7 @@ export class PhotoRepository implements PhotoRepositoryInterface {
       format: payload.format,
       height: payload.height,
       size: payload.size,
-      uploadedAt: payload.uploadedAt,
+      uploaded_at: payload.uploaded_at,
       width: payload.width,
     };
   }
@@ -94,33 +94,33 @@ export class PhotoRepository implements PhotoRepositoryInterface {
 
     const rows = await db
       .select({
-        count: count(bookmarks.photoId),
-        photoId: bookmarks.photoId,
+        count: count(bookmarks.photo_id),
+        photo_id: bookmarks.photo_id,
       })
       .from(bookmarks)
-      .where(inArray(bookmarks.photoId, photoIds))
-      .groupBy(bookmarks.photoId);
+      .where(inArray(bookmarks.photo_id, photoIds))
+      .groupBy(bookmarks.photo_id);
 
     for (const row of rows) {
-      if (!row.photoId) {
+      if (!row.photo_id) {
         continue;
       }
-      bookmarkCountByPhotoId.set(row.photoId, Number(row.count));
+      bookmarkCountByPhotoId.set(row.photo_id, Number(row.count));
     }
 
     return bookmarkCountByPhotoId;
   }
 
-  private serilizePhoto(
+  private serializePhoto(
     photo: PhotoRow,
     bookmarksCount: number,
     metadata?: PhotoMetadataRow | null,
   ): PhotoResponseDto {
     return {
-      photo_id: photo.photoId,
+      photo_id: photo.photo_id,
       url: photo.url,
       user: {
-        user_id: photo.userId as string,
+        user_id: photo.user_id as string,
         username: "", // Placeholder, as username is not available in this context
         avatar_url: "", // Placeholder, as avatar URL is not available in this context
       },
@@ -131,8 +131,8 @@ export class PhotoRepository implements PhotoRepositoryInterface {
       color: photo.color ?? "",
       camera: photo.camera ?? "",
       bookmarks: bookmarksCount,
-      created_at: toIso(photo.createdAt),
-      updated_at: toIso(photo.updatedAt),
+      created_at: toIso(photo.created_at),
+      updated_at: toIso(photo.updated_at),
       ...(metadata
         ? {
             metadata: {
@@ -140,7 +140,7 @@ export class PhotoRepository implements PhotoRepositoryInterface {
               format: metadata.format ?? undefined,
               height: metadata.height ?? undefined,
               size: metadata.size ?? undefined,
-              uploadedAt: toIso(metadata.uploadedAt),
+              uploaded_at: toIso(metadata.uploaded_at),
               width: metadata.width ?? undefined,
             },
           }
@@ -151,11 +151,14 @@ export class PhotoRepository implements PhotoRepositoryInterface {
   private async mapPhotosToResponseDtos(
     photoRows: PhotoRow[],
   ): Promise<PhotoResponseDto[]> {
-    const photoIds = photoRows.map((photo) => photo.photoId);
+    const photoIds = photoRows.map((photo) => photo.photo_id);
     const bookmarkCountByPhotoId =
       await this.countBookmarksByPhotoIds(photoIds);
     return photoRows.map((photo) =>
-      this.serilizePhoto(photo, bookmarkCountByPhotoId.get(photo.photoId) ?? 0),
+      this.serializePhoto(
+        photo,
+        bookmarkCountByPhotoId.get(photo.photo_id) ?? 0,
+      ),
     );
   }
 
@@ -167,13 +170,13 @@ export class PhotoRepository implements PhotoRepositoryInterface {
     const photoRows = await db
       .select()
       .from(photos)
-      .where(inArray(photos.photoId, photoIds));
+      .where(inArray(photos.photo_id, photoIds));
 
     const orderByPhotoId = new Map(photoIds.map((id, index) => [id, index]));
     photoRows.sort(
       (a, b) =>
-        (orderByPhotoId.get(a.photoId) ?? Number.MAX_SAFE_INTEGER) -
-        (orderByPhotoId.get(b.photoId) ?? Number.MAX_SAFE_INTEGER),
+        (orderByPhotoId.get(a.photo_id) ?? Number.MAX_SAFE_INTEGER) -
+        (orderByPhotoId.get(b.photo_id) ?? Number.MAX_SAFE_INTEGER),
     );
 
     return photoRows;
@@ -202,24 +205,24 @@ export class PhotoRepository implements PhotoRepositoryInterface {
     if (query.sort === "popular") {
       const popularRows = await db
         .select({
-          photoId: photos.photoId,
+          photo_id: photos.photo_id,
         })
         .from(photos)
-        .leftJoin(bookmarks, eq(bookmarks.photoId, photos.photoId))
+        .leftJoin(bookmarks, eq(bookmarks.photo_id, photos.photo_id))
         .where(whereClause)
-        .groupBy(photos.photoId)
-        .orderBy(desc(count(bookmarks.bookmarkId)), desc(photos.createdAt))
+        .groupBy(photos.photo_id)
+        .orderBy(desc(count(bookmarks.bookmark_id)), desc(photos.created_at))
         .limit(query.limit)
         .offset(from);
 
-      const orderedPhotoIds = popularRows.map((row) => row.photoId);
+      const orderedPhotoIds = popularRows.map((row) => row.photo_id);
       photoRows = await this.getPhotosByIdsInOrder(orderedPhotoIds);
     } else {
       photoRows = await db
         .select()
         .from(photos)
         .where(whereClause)
-        .orderBy(desc(photos.createdAt))
+        .orderBy(desc(photos.created_at))
         .limit(query.limit)
         .offset(from);
     }
@@ -240,7 +243,7 @@ export class PhotoRepository implements PhotoRepositoryInterface {
     const [row] = await db
       .select()
       .from(photos)
-      .where(eq(photos.photoId, id))
+      .where(eq(photos.photo_id, id))
       .limit(1);
     if (!row) {
       return null;
@@ -250,9 +253,9 @@ export class PhotoRepository implements PhotoRepositoryInterface {
     const [metadata] = await db
       .select()
       .from(photoMetadata)
-      .where(eq(photoMetadata.photoMetadataId, id))
+      .where(eq(photoMetadata.photo_metadata_id, id))
       .limit(1);
-    return this.serilizePhoto(
+    return this.serializePhoto(
       row,
       bookmarkCountByPhotoId.get(id) ?? 0,
       metadata,
@@ -261,22 +264,22 @@ export class PhotoRepository implements PhotoRepositoryInterface {
 
   async getOwnerId(id: string): Promise<string | null> {
     const [row] = await db
-      .select({ userId: photos.userId })
+      .select({ userId: photos.user_id })
       .from(photos)
-      .where(eq(photos.photoId, id))
+      .where(eq(photos.photo_id, id))
       .limit(1);
     return row?.userId ?? null;
   }
 
   async deleteById(id: string): Promise<void> {
-    await db.delete(photos).where(eq(photos.photoId, id));
+    await db.delete(photos).where(eq(photos.photo_id, id));
   }
 
   async exists(id: string): Promise<boolean> {
     const [row] = await db
-      .select({ id: photos.photoId })
+      .select({ id: photos.photo_id })
       .from(photos)
-      .where(eq(photos.photoId, id))
+      .where(eq(photos.photo_id, id))
       .limit(1);
     return Boolean(row);
   }
@@ -294,13 +297,13 @@ export class PhotoRepository implements PhotoRepositoryInterface {
     }
 
     const from = (page - 1) * limit;
-    const whereClause = inArray(photos.photoId, ids);
+    const whereClause = inArray(photos.photo_id, ids);
 
     const photoRows = await db
       .select()
       .from(photos)
       .where(whereClause)
-      .orderBy(desc(photos.createdAt))
+      .orderBy(desc(photos.created_at))
       .limit(limit)
       .offset(from);
     const [countRow] = await db
@@ -323,16 +326,16 @@ export class PhotoRepository implements PhotoRepositoryInterface {
     const from = (page - 1) * limit;
 
     const bookmarkRows = await db
-      .select({ photoId: bookmarks.photoId })
+      .select({ photoId: bookmarks.photo_id })
       .from(bookmarks)
-      .where(eq(bookmarks.userId, userId))
-      .orderBy(desc(bookmarks.createdAt))
+      .where(eq(bookmarks.user_id, userId))
+      .orderBy(desc(bookmarks.created_at))
       .limit(limit)
       .offset(from);
     const [countRow] = await db
       .select({ total: count() })
       .from(bookmarks)
-      .where(eq(bookmarks.userId, userId));
+      .where(eq(bookmarks.user_id, userId));
 
     const photoIds = bookmarkRows
       .map((row) => row.photoId)

@@ -34,7 +34,8 @@ const ExploreGalleryContainer: React.FC<ExploreGalleryContainerProps> = ({
 		queryKey: ["explore-photos", filters, sort],
 		queryFn: ({ pageParam }) => {
 			const page = pageParam as number;
-			return fetchExplorePhotos(page, filters, sort);
+			const result = fetchExplorePhotos(page, filters, sort);
+			return result;
 		},
 		getNextPageParam: (lastPage) => lastPage.nextPage,
 		initialPageParam: 1,

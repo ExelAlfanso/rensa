@@ -9,8 +9,8 @@ export const userResponseDto = z.object({
 	bookmarks: z.array(uuidDto).default([]),
 	role: z.enum(["user", "admin"]),
 	verified: z.boolean().default(false),
-	createdAt: z.string().optional(),
-	updatedAt: z.string().optional(),
+	created_at: z.string().optional(),
+	updated_at: z.string().optional(),
 });
 
 export const userUpdateDto = userResponseDto
@@ -20,8 +20,8 @@ export const userUpdateDto = userResponseDto
 		role: true,
 		bookmarks: true,
 		verified: true,
-		createdAt: true,
-		updatedAt: true,
+		created_at: true,
+		updated_at: true,
 	})
 	.partial();
 

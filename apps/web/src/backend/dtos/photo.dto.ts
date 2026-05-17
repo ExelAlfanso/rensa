@@ -61,9 +61,19 @@ export const listPhotosQueryDto = paginationQueryDto.extend({
 		.optional(),
 });
 
-export const photoBookmarkQueryDto = paginationQueryDto.extend({
-	userId: uuidDto,
-});
+export const photoBookmarkQueryDto = paginationQueryDto
+	.extend({
+		user_id: uuidDto.optional(),
+		userId: uuidDto.optional(),
+	})
+	.refine((value) => value.user_id ?? value.userId, {
+		message: "user_id is required",
+	})
+	.transform((value) => ({
+		limit: value.limit,
+		page: value.page,
+		user_id: (value.user_id ?? value.userId) as string,
+	}));
 
 export type PhotoResponseDto = z.infer<typeof photoResponseDto>;
 export type CreatePhotoDto = z.infer<typeof createPhotoDto>;

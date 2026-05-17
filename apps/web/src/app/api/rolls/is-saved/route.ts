@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { ZodError } from "zod";
 import { BackendError } from "@/backend/common/backend.error";
 import { isSavedQueryDto } from "@/backend/dtos/roll.dto";
-import { rollController } from "@/backend/services/rolls/controller";
+import { rollService } from "@/backend/services/rolls/service";
 import { authOptions } from "@/lib/auth";
 
 /*
@@ -18,8 +18,8 @@ export async function GET(req: NextRequest) {
 			photoId: searchParams.get("photoId") ?? undefined,
 		});
 
-		const result = await rollController.listContainingPhoto(
-			query.photoId,
+		const result = await rollService.listContainingPhoto(
+			query.photo_id,
 			actorId
 		);
 		return NextResponse.json(

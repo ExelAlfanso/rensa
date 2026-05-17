@@ -6,7 +6,7 @@ import {
 	UnauthorizedError,
 } from "@/backend/common/backend.error";
 import { photoIdParamDto, rollIdParamDto } from "@/backend/dtos/roll.dto";
-import { rollController } from "@/backend/services/rolls/controller";
+import { rollService } from "@/backend/services/rolls/service";
 import { authOptions } from "@/lib/auth";
 
 /*
@@ -18,17 +18,17 @@ export async function POST(
 ) {
 	try {
 		const rawParams = await context.params;
-		const { rollId } = rollIdParamDto.parse(rawParams);
-		const { photoId } = photoIdParamDto.parse(rawParams);
+		const { roll_id } = rollIdParamDto.parse(rawParams);
+		const { photo_id } = photoIdParamDto.parse(rawParams);
 		const session = await getServerSession(authOptions);
 		const actorId = session?.user?.id;
 		if (!actorId) {
 			throw new UnauthorizedError();
 		}
 
-		const modifiedCount = await rollController.addPhotoToRoll(
-			rollId,
-			photoId,
+		const modifiedCount = await rollService.addPhotoToRoll(
+			roll_id,
+			photo_id,
 			actorId
 		);
 
@@ -51,15 +51,15 @@ export async function DELETE(
 ) {
 	try {
 		const rawParams = await context.params;
-		const { rollId } = rollIdParamDto.parse(rawParams);
-		const { photoId } = photoIdParamDto.parse(rawParams);
+		const { roll_id } = rollIdParamDto.parse(rawParams);
+		const { photo_id } = photoIdParamDto.parse(rawParams);
 		const session = await getServerSession(authOptions);
 		const actorId = session?.user?.id;
 		if (!actorId) {
 			throw new UnauthorizedError();
 		}
 
-		await rollController.removePhotoFromRoll(rollId, photoId, actorId);
+		await rollService.removePhotoFromRoll(roll_id, photo_id, actorId);
 
 		return NextResponse.json({
 			success: true,

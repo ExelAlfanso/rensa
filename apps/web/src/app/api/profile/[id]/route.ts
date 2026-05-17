@@ -158,7 +158,7 @@ export async function POST(req: Request) {
 		const updatedUser = await userRepository.updateProfile({
 			avatar: avatarUrl,
 			email,
-			userId: id,
+			user_id: id,
 			username,
 		});
 
