@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { rollController } from "@/backend/services/rolls/controller";
 import { userController } from "@/backend/services/users/controller";
+import { sendVerificationEmail } from "@/frontend/services/email.service";
 
 const usersApplication = userController;
 const rollsApplication = rollController;
@@ -63,11 +64,11 @@ export async function POST(req: Request) {
       user.user_id,
     );
 
-    // try {
-    // 	await sendVerificationEmail(email);
-    // } catch (err) {
-    // 	console.error("Error sending verification email:", err);
-    // }
+    try {
+      await sendVerificationEmail(email);
+    } catch (err) {
+      console.error("Error sending verification email:", err);
+    }
 
     return NextResponse.json(
       { message: "User registered successfully" },
