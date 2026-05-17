@@ -5,6 +5,7 @@ import Heading from "@/frontend/components/Heading";
 import ImagePreview from "@/frontend/components/ImagePreview";
 import MasonryGalleryPage from "@/frontend/sections/MasonryGallerySection/MasonryGallerySection";
 import { fetchPhotoById } from "@/frontend/services/photo.service";
+import type { Photo } from "@/frontend/types/photo";
 
 export async function generateMetadata({
 	params,
@@ -62,7 +63,7 @@ export default async function PhotoPage({
 	params: Promise<{ id: string }>;
 }) {
 	const { id } = await params;
-	let photo: Awaited<ReturnType<typeof fetchPhotoById>> | null = null;
+	let photo: Photo | null = null;
 	try {
 		photo = await fetchPhotoById(id);
 		console.log("Fetched photo:", photo);
@@ -77,19 +78,19 @@ export default async function PhotoPage({
 			<div className="flex flex-col items-start justify-center gap-16.75 pt-35 lg:flex-row">
 				<div className="flex flex-col items-center justify-center gap-2 md:items-start md:justify-start">
 					<ImagePreview
-						alt={photo?.title ?? "Photo"}
-						height={photo.metadata.height}
-						src={photo?.url ?? ""}
-						width={photo.metadata.width}
+						alt={photo.title ?? "Photo"}
+						height={photo.metadata?.height}
+						src={photo.url ?? ""}
+						width={photo.metadata?.width}
 					/>
 				</div>
 				<PhotoInfoCard
-					description={photo?.description}
+					description={photo.description}
 					id={id}
-					initialBookmarks={photo?.bookmarkedBy?.length || 0}
-					metadata={photo?.metadata}
-					ownerId={photo?.user?.userId}
-					title={photo?.title}
+					initialBookmarks={photo.bookmarks}
+					metadata={photo.metadata}
+					ownerId={photo.user.userId}
+					title={photo.title}
 				/>
 			</div>
 			<Heading className="text-primary" size="s">
