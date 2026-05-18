@@ -58,20 +58,20 @@ export const WebSocketService = {
 	},
 
 	sendNotification(notification: WebSocketNotificationPayload) {
-		const ws = onlineUsers.get(notification.recipient_id);
+		const ws = onlineUsers.get(notification.recipientId);
 		if (!ws) {
 			return;
 		}
 
 		ws.send(
 			JSON.stringify({
-				id: notification.id,
-				recipient_id: notification.recipient_id,
-				actor_id: notification.actor_id,
-				photo_id: notification.photo_id,
+				id: notification.notificationId,
+				recipient_id: notification.recipientId,
+				actor_id: notification.actorId,
+				photo_id: notification.photoId,
 				type: notification.type,
 				read: notification.read,
-				created_at: notification.created_at,
+				created_at: notification.createdAt,
 			})
 		);
 	},

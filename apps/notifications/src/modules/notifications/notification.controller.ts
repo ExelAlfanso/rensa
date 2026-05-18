@@ -33,9 +33,9 @@ export const notificationController = new Elysia({ prefix: "/notifications" })
 			}
 
 			return await NotificationService.notify({
-				actor_id: user.id,
-				recipient_id: body.recipient_id,
-				photo_id: body.photo_id,
+				actorId: user.id,
+				recipientId: body.recipient_id,
+				photoId: body.photo_id,
 				type: body.type,
 			});
 		},
@@ -55,7 +55,7 @@ export const notificationController = new Elysia({ prefix: "/notifications" })
 			}
 
 			return await NotificationService.fetchNotifications({
-				recipient_id: user.id,
+				recipientId: user.id,
 				page: query.page,
 				limit: query.limit,
 			});

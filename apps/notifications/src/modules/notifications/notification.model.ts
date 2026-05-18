@@ -7,13 +7,13 @@ import type {
 
 export type CreateNotificationInput = Pick<
 	NewNotification,
-	"recipient_id" | "actor_id" | "photo_id" | "type"
+	"recipientId" | "actorId" | "photoId" | "type"
 >;
 
 export type NotificationRecord = Notification;
 
-export type NotificationResponse = Omit<Notification, "actor_id"> & {
-	actor_id: UserProfileDto | null;
+export type NotificationResponse = Omit<Notification, "actorId"> & {
+	actorId: UserProfileDto | null;
 };
 
 export const notificationTypes: NotificationType[] = [

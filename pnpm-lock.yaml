@@ -234,6 +234,9 @@ importers:
 
   packages/db:
     dependencies:
+      cloudinary:
+        specifier: ^2.7.0
+        version: 2.10.0
       dotenv:
         specifier: ^17.4.2
         version: 17.4.2

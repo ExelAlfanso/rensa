@@ -35,7 +35,7 @@ class NotificationServiceError extends Error {
 }
 
 function getNotificationKey(notification: NotificationRecord) {
-	return `notifications:${notification.recipient_id}:${notification.actor_id}:${notification.photo_id}:${notification.type}`;
+	return `notifications:${notification.recipientId}:${notification.actorId}:${notification.photoId}:${notification.type}`;
 }
 
 async function checkNotificationKey(notificationKey: string) {
@@ -61,17 +61,17 @@ async function setNotificationKey(notificationKey: string) {
 async function populateNotificationActor(
 	notification: NotificationRecord
 ): Promise<NotificationResponse> {
-	const actor = await userRepository.getProfileById(notification.actor_id);
+	const actor = await userRepository.getProfileById(notification.actorId);
 
 	return {
 		...notification,
-		actor_id: actor,
+		actorId: actor,
 	};
 }
 
 export const NotificationService = {
 	async fetchNotifications(query: {
-		recipient_id: string;
+		recipientId: string;
 		page?: number;
 		limit?: number;
 	}) {
@@ -81,11 +81,11 @@ export const NotificationService = {
 
 		const [notifications, total] = await Promise.all([
 			notificationRepository.findByRecipient({
-				recipient_id: query.recipient_id,
+				recipientId: query.recipientId,
 				limit,
 				offset,
 			}),
-			notificationRepository.countByRecipient(query.recipient_id),
+			notificationRepository.countByRecipient(query.recipientId),
 		]);
 
 		const populatedNotifications = await Promise.all(
@@ -127,18 +127,18 @@ export const NotificationService = {
 	},
 
 	async notify(params: {
-		actor_id: string;
-		recipient_id: string;
-		photo_id: string;
+		actorId: string;
+		recipientId: string;
+		photoId: string;
 		type: string;
 	}) {
-		const { actor_id, recipient_id, photo_id, type } = params;
+		const { actorId, recipientId, photoId, type } = params;
 
-		if (actor_id === recipient_id) {
+		if (actorId === recipientId) {
 			throw new NotificationServiceError("Cannot notify yourself");
 		}
 
-		if (!(actor_id && recipient_id && photo_id)) {
+		if (!(actorId && recipientId && photoId)) {
 			throw new NotificationServiceError("Missing required fields");
 		}
 
@@ -147,9 +147,9 @@ export const NotificationService = {
 		}
 
 		const notification = await notificationRepository.create({
-			actor_id,
-			recipient_id,
-			photo_id,
+			actorId,
+			recipientId,
+			photoId,
 			type,
 		});
 
