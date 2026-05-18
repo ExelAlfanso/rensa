@@ -62,10 +62,13 @@ async function populateNotificationActor(
 	notification: NotificationRecord
 ): Promise<NotificationResponse> {
 	const actor = await userRepository.getProfileById(notification.actorId);
+	if (!actor) {
+		throw new NotificationServiceError("Notification actor not found");
+	}
 
 	return {
 		...notification,
-		actorId: actor,
+		actor,
 	};
 }
 

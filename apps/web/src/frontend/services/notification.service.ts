@@ -8,7 +8,7 @@ export const fetchNotifications = async (
 	const res = await api.get("/notifications", {
 		params: { recipientId, page, limit },
 	});
-	return res.data?.data ?? [];
+	return res.data?.notifications ?? [];
 };
 
 export const clearUserNotifications = async (userId: string) => {

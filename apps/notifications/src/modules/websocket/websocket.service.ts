@@ -65,13 +65,14 @@ export const WebSocketService = {
 
 		ws.send(
 			JSON.stringify({
-				id: notification.notificationId,
-				recipient_id: notification.recipientId,
-				actor_id: notification.actorId,
-				photo_id: notification.photoId,
+				actor: notification.actor,
+				notificationId: notification.notificationId,
+				photoId: notification.photoId,
 				type: notification.type,
 				read: notification.read,
-				created_at: notification.createdAt,
+				recipientId: notification.recipientId,
+				createdAt: notification.createdAt,
+				updatedAt: notification.updatedAt,
 			})
 		);
 	},

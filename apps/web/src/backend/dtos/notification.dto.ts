@@ -2,15 +2,15 @@ import { z } from "zod";
 import { paginationQueryDto } from "./common.dto";
 
 const notificationActorDto = z.object({
-	id: z.string().min(1),
+	userId: z.string().min(1),
 	username: z.string().min(1),
-	avatarUrl: z.string(),
+	avatarUrl: z.string().optional(),
 });
 
 export const notificationResponseDto = z.object({
-	id: z.string().min(1),
+	notificationId: z.string().min(1),
 	recipientId: z.string().min(1),
-	actorId: notificationActorDto,
+	actor: notificationActorDto,
 	photoId: z.string().min(1),
 	type: z.string().min(1),
 	read: z.boolean(),

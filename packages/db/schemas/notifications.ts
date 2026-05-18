@@ -48,13 +48,13 @@ interface Passthrough {
 }
 
 export interface NotificationActorDto extends Passthrough {
-	avatarUrl: string;
-	id: string;
+	avatarUrl?: string;
+	userId: string;
 	username: string;
 }
 
 export interface NotificationResponseDto extends Passthrough {
-	actorId: NotificationActorDto;
+	actor: NotificationActorDto;
 	createdAt?: Date | string;
 	message: string;
 	notificationId: string;

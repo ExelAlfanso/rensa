@@ -44,15 +44,15 @@ export const notificationController = new Elysia({ prefix: "/notifications" })
 
 			return await NotificationService.notify({
 				actorId: user.id,
-				recipientId: body.recipient_id,
-				photoId: body.photo_id,
+				recipientId: body.recipientId,
+				photoId: body.photoId,
 				type: body.type,
 			});
 		},
 		{
 			body: t.Object({
-				recipient_id: t.String(),
-				photo_id: t.String(),
+				recipientId: t.String(),
+				photoId: t.String(),
 				type: t.String(),
 			}),
 		}

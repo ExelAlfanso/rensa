@@ -13,7 +13,7 @@ export type CreateNotificationInput = Pick<
 export type NotificationRecord = Notification;
 
 export type NotificationResponse = Omit<Notification, "actorId"> & {
-	actorId: UserProfileDto | null;
+	actor: UserProfileDto;
 };
 
 export const notificationTypes: NotificationType[] = [

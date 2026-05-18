@@ -54,8 +54,8 @@ export class NotificationRepository implements NotificationRepositoryInterface {
 			const response = await this.api.post<NotificationApiResponse>(
 				"/notifications",
 				{
-					photo_id: payload.photoId,
-					recipient_id: payload.recipientId,
+					photoId: payload.photoId,
+					recipientId: payload.recipientId,
 					type: payload.type,
 				}
 			);

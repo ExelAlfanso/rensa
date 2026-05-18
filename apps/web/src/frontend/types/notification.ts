@@ -1,14 +1,14 @@
 export interface NotificationActor {
 	avatarUrl?: string;
-	id: string;
+	userId: string;
 	username: string;
 }
 
 export interface NotificationData {
-	actorId: NotificationActor;
+	actor: NotificationActor;
 	createdAt?: Date | string;
-	id: string;
 	message?: string;
+	notificationId: string;
 	photoId: string;
 	read: boolean;
 	recipientId: string;

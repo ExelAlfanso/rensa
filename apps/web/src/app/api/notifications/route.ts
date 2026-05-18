@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
 		return NextResponse.json(
 			{
 				success: true,
-				data: notifications,
+				notifications,
 				message: "Notifications fetched successfully",
 			},
 			{ status: 200 }
