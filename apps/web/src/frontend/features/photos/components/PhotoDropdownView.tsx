@@ -17,7 +17,6 @@ const PhotoDropdownView: React.FC<PhotoDropdownViewProps> = ({
 	<div className="flex items-center justify-center">
 		<IconDropdown
 			className="no-scrollbar flex max-h-40 flex-col items-center justify-center overflow-y-auto font-figtree font-semibold"
-			closeOnItemClick={false}
 			iconSize={24}
 			Tag={DotsThreeVerticalIcon}
 			weight="bold"
