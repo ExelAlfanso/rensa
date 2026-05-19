@@ -15,6 +15,8 @@ import {
 import { notificationService } from "@/backend/services/notifications/service";
 import type { PaginatedPhotoListResult } from "@/backend/types/service.types";
 
+export const DEFAULT_ROLL_NAME = "All Photos";
+
 export class RollService {
 	readonly photoRepository: PhotoRepositoryInterface;
 	readonly rollRepository: RollRepositoryInterface;
@@ -106,9 +108,17 @@ export class RollService {
 			throw new UnauthorizedError();
 		}
 
-		const ownerId = await this.getOwnerId(rollId);
-		if (ownerId !== actorId) {
+		const roll = await this.rollRepository.getById(rollId);
+		if (!roll) {
+			throw new NotFoundError("Roll not found");
+		}
+
+		if (roll.userId !== actorId) {
 			throw new ForbiddenError("Forbidden: You don't own this roll");
+		}
+
+		if (roll.name === DEFAULT_ROLL_NAME) {
+			throw new ForbiddenError("The default All Photos roll cannot be deleted");
 		}
 
 		const deletedRoll = await this.rollRepository.deleteById(rollId);

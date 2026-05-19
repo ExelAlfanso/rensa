@@ -16,10 +16,12 @@ export const fetchRollsByUserId = async (userId: string, sort?: SortOption) => {
 };
 
 export const addPhotoToRoll = async (rollId: string, photoId: string) =>
-	api.post(`/rolls/${rollId}/photos/${photoId}`);
+	api.post("/rolls/is-saved", { photoId, rollId });
 
 export const removePhotoFromRoll = async (rollId: string, photoId: string) => {
-	const result = await api.delete(`/rolls/${rollId}/photos/${photoId}`);
+	const result = await api.delete("/rolls/is-saved", {
+		data: { photoId, rollId },
+	});
 	return result;
 };
 

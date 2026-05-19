@@ -12,8 +12,12 @@ export const bookmarkPhoto = async (
 ): Promise<BookmarkStatusResponse> => {
 	const res =
 		action === "add"
-			? await api.put(`/photos/${photoId}/bookmark`)
-			: await api.delete(`/photos/${photoId}/bookmark`);
+			? await api.put("/photos/bookmark", null, {
+					params: { photoId },
+				})
+			: await api.delete("/photos/bookmark", {
+					params: { photoId },
+				});
 
 	return res.data.data;
 };

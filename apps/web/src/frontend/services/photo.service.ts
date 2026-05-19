@@ -91,7 +91,9 @@ export const fetchPhotoById = async (photoId: string) => {
 };
 
 export const fetchPhotoBookmarkStatus = async (photoId: string) => {
-	const res = await api.get(`/photos/${photoId}/bookmark`);
+	const res = await api.get("/photos/bookmark", {
+		params: { photoId },
+	});
 	return res.data.data as {
 		bookmarkCount: number;
 		isBookmarked: boolean;
